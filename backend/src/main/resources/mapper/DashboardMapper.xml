@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.main_tp40.mapper.DashboardMapper">
+    <insert id="insertBatchDustTables">
+        insert into dust_records(site_name, create_time, health_parameter, average_value, health_advice)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.siteName}, #{item.createTime}, #{item.healthParameter}, #{item.averageValue}, #{item.healthAdvice})
+        </foreach>
+
+    </insert>
+
+</mapper>

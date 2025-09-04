@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url:
+    url: jdbc:mysql://54.66.150.154:3306/tp40
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: FIT5120tp40
