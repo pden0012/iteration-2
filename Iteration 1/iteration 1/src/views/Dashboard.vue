@@ -321,7 +321,9 @@ export default {
     // 为特定地点加载数据
     async loadDataForLocation(location) {
       try {
-        const res = await fetch(`http://54.66.150.154:8080/dashboard?suburb=${encodeURIComponent(location)}&format=json`);
+        const apiBase = import.meta.env.VITE_API_BASE || '';
+        const url = `${apiBase}/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
+        const res = await fetch(url);
         const json = await res.json();
         const item = Array.isArray(json?.data) ? (json.data[0] || {}) : (json?.data || {});
         const toLevel = (v) => this.mapBackendLevelToUi(String(v || '').toLowerCase());
