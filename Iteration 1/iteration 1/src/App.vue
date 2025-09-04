@@ -25,7 +25,9 @@
     
     <!-- Main Content Area -->
     <main class="main-content">
-              <HomePage v-if="currentView === 'home'" />
+              <HomePage v-if="currentView === 'home'"
+                @feature-button-clicked="onHomeFeatureButton"
+              />
         <Dashboard v-else-if="currentView === 'dashboard'" />
         <Resources v-else-if="currentView === 'resources'" @navigate-to-symptoms="navigateToSymptoms" />
         <Symptoms v-else-if="currentView === 'symptoms'" />
@@ -88,6 +90,17 @@ export default {
     navigateToSymptoms() {
       this.currentView = 'symptoms';
       this.activeItem = 'resources'; // Keep resources highlighted in nav
+    },
+    onHomeFeatureButton(id) {
+      // Hero CTA 或 “View Dashboard/Visit Resources”等按钮点击回调
+      if (id === 'tracker') {
+        this.currentView = 'dashboard';
+        this.activeItem = 'dashboard';
+      } else if (id === 'education') {
+        // 如果未来需要跳转到资源
+        this.currentView = 'resources';
+        this.activeItem = 'resources';
+      }
     }
   }
 }

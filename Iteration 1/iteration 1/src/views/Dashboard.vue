@@ -251,6 +251,16 @@ export default {
   },
   
   methods: {
+    // Update the "Last updated" timestamp to current local time (dd-MM-YYYY HH:mm)
+    updateLastUpdated() {
+      const pad = (n) => String(n).padStart(2, '0');
+      const now = new Date();
+      const hours24 = now.getHours();
+      const ampm = hours24 >= 12 ? 'PM' : 'AM';
+      const hours12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
+      const formatted = `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()} ${pad(hours12)}:${pad(now.getMinutes())} ${ampm}`;
+      this.dashboardData.lastUpdated = `Last updated ${formatted}`;
+    },
     // View forecast action - 查看预报行动
     // 查看预报行动
     viewForecast() {
@@ -307,12 +317,14 @@ export default {
       if (match) {
         this.selectedLocation = match;
         this.loadDataForLocation(this.selectedLocation);
+        this.updateLastUpdated();
       } else {
         // 若未精确匹配，尝试使用第一个候选
         if (this.filteredAddresses.length) {
           this.selectedLocation = this.filteredAddresses[0];
           this.locationQuery = this.selectedLocation;
           this.loadDataForLocation(this.selectedLocation);
+          this.updateLastUpdated();
         }
       }
     },
@@ -648,7 +660,7 @@ export default {
 .last-updated {
   font-family: var(--font-heading);
   font-size: 22px;
-  color: var(--text-primary);
+  color: #4A6F6A; /* slightly different tone to distinguish */
   margin: 0;
 }
 

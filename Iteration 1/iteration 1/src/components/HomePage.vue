@@ -12,7 +12,7 @@
       <div class="hero-content">
         <h1 class="hero-title">{{ heroData.title }}</h1>
         <p class="hero-subtitle">{{ heroData.subtitle }}</p>
-        <button class="hero-button" @click="handleGetStarted">
+        <button class="hero-button" @click="goDashboard">
           <span>{{ heroData.buttonText }}</span>
         </button>
       </div>
@@ -115,6 +115,9 @@ export default {
     handleGetStarted() {
       console.log('Get Started button clicked');
       this.$emit('get-started-clicked');
+    },
+    goDashboard() {
+      this.$emit('feature-button-clicked', 'tracker');
     },
     handleFeatureClick(featureId) {
       console.log('Feature card clicked:', featureId);
