@@ -322,7 +322,16 @@ export default {
     async loadDataForLocation(location) {
       try {
         const apiBase = import.meta.env.VITE_API_BASE || '';
-        const url = `${apiBase}/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
+        const original = `http://54.66.150.154:8080/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
+        let url = '';
+        if (apiBase.includes('allorigins') || apiBase.endsWith('url=') || apiBase.endsWith('url=')) {
+          // e.g. https://api.allorigins.win/raw?url=
+          url = `${apiBase}${encodeURIComponent(original)}`;
+        } else if (apiBase) {
+          url = `${apiBase}/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
+        } else {
+          url = original; // fallback (dev)
+        }
         const res = await fetch(url);
         const json = await res.json();
         const item = Array.isArray(json?.data) ? (json.data[0] || {}) : (json?.data || {});
