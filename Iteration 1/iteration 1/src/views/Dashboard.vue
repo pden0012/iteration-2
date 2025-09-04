@@ -347,8 +347,16 @@ export default {
           tree: this.mapPollenLevel(toLevel(item.tree)),
           grass: this.mapPollenLevel(toLevel(item.grass)),
           ragweed: this.mapPollenLevel(toLevel(item.ragweed)),
-          // dust uses air quality scale
-          dust: this.mapDustLevel(this.mapBackendLevelToUi(String(item.dust || '').toLowerCase()))
+          // dust: align to pollen scale (Good→Very Low, Fair→Low, Poor→Moderate, Very Poor→High, Extremely Poor→Very High)
+          dust: (() => {
+            const dustUi = this.mapBackendLevelToUi(String(item.dust || '').toLowerCase());
+            if (dustUi === 'Good') return 'Very Low';
+            if (dustUi === 'Fair') return 'Low';
+            if (dustUi === 'Poor') return 'Moderate';
+            if (dustUi === 'Very Poor') return 'High';
+            if (dustUi === 'Extremely Poor') return 'Very High';
+            return 'None';
+          })()
         };
         this.allergenData.levels = this.allergenData.levels.map(row => {
           const key = row.id;
@@ -442,14 +450,7 @@ export default {
     // 按类别把等级转换为分数(1-5)
     levelToScore(key, level) {
       const l = (level || '').toLowerCase();
-      if (key === 'dust') {
-        if (l === 'good') return 1;
-        if (l === 'fair') return 2;
-        if (l === 'poor') return 3;
-        if (l === 'very poor') return 4;
-        if (l === 'extremely poor') return 5;
-        return null; // None/Unknown
-      }
+      // For dust we have aligned to pollen scale already, so score using pollen rules too
       if (l === 'none') return null;
       if (l.includes('very low')) return 1;
       if (l === 'low') return 2;
