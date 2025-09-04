@@ -417,23 +417,13 @@ export default {
     },
     levelToClass(level, key) {
       const l = (level || '').toLowerCase();
-      // pollen groups (tree/grass/ragweed)
-      if (key !== 'dust') {
-        if (l === 'none') return 'none';
+      // We have aligned dust to pollen scale, so all categories share the same classes
+      if (l === 'none') return 'none';
       if (l.includes('very low')) return 'very-low';
       if (l === 'low') return 'low';
       if (l === 'moderate') return 'moderate';
       if (l === 'high') return 'high';
-        if (l === 'very high') return 'very-high';
-        return 'none';
-      }
-      // dust groups
-      if (l === 'none') return 'none';
-      if (l === 'good') return 'good';
-      if (l === 'fair') return 'fair';
-      if (l === 'poor') return 'poor';
-      if (l === 'very poor') return 'very-poor';
-      if (l === 'extremely poor') return 'extremely-poor';
+      if (l === 'very high') return 'very-high';
       return 'none';
     },
     levelToProgress(level) {
