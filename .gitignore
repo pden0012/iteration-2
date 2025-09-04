@@ -2,3 +2,5 @@
 !.gitignore
 !Iteration 1/
 !Iteration 1/**
+!.github/
+!.github/**
