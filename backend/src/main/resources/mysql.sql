@@ -1,8 +1,8 @@
 CREATE TABLE pollen_forecast (
                                  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                                 region_code VARCHAR(10) NOT NULL,
-                                 forecast_date DATE NOT NULL,
-                                 type VARCHAR(20) NOT NULL,
+                                 region_code VARCHAR(10) ,
+                                 forecast_date DATE,
+                                 type VARCHAR(20),
                                  index_name VARCHAR(100),
                                  index_value INT,
                                  index_category VARCHAR(50)

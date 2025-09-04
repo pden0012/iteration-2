@@ -10,4 +10,13 @@
 
     </insert>
 
+    <insert id="insertBatchPollenForecasts">
+        INSERT INTO pollen_forecast(region_code, forecast_date, type, index_name, index_value, index_category)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.regionCode}, #{item.forecastDate}, #{item.type},
+            #{item.indexName}, #{item.indexValue}, #{item.indexCategory})
+        </foreach>
+    </insert>
+
 </mapper>

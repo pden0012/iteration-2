@@ -18,4 +18,9 @@ class DemoApplicationTests {
     public void runDustFetch() throws Exception {
         service.fetchDustData();
     }
+
+    @Test
+    public void runPollenFetch() throws Exception {
+        service.fetchPollenData();
+    }
 }

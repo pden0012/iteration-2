@@ -4,20 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ce824b35-68ce-490d-99ee-97f165306f67" name="Changes" comment="init">
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/mapper/DashboardMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/pojo/dustResponse/DustResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/pojo/dustResponse/Geometry.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/pojo/dustResponse/SiteHealthAdvice.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/pojo/dustResponse/SiteRecord.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/service/DashboardDataService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/service/Impl/DashboardDataImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/resources/mysql.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/DemoApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/DemoApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/controller/Dashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/controller/Dashboard.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/pojo/DashboardInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/pojo/DustTable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/mapper/ProfileMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/mapper/DashboardMapper.xml" afterDir="false" />
+    <list default="true" id="ce824b35-68ce-490d-99ee-97f165306f67" name="Changes" comment="fetch dustdata">
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/pojo/DashboardVO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/pojo/PollenForecast.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/pojo/pollenDTO/DailyInfo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/pojo/pollenDTO/DateDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/pojo/pollenDTO/IndexInfoDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/pojo/pollenDTO/PollenResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/pojo/pollenDTO/PollenTypeInfoDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/controller/Dashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/controller/DashboardController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/mapper/DashboardMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/mapper/DashboardMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/service/DashboardDataService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/service/DashboardDataService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/service/Impl/DashboardDataImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/main_tp40/service/Impl/DashboardDataImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/mapper/DashboardMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/mapper/DashboardMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/mysql.sql" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/mysql.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/example/main_tp40/DemoApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/example/main_tp40/DemoApplicationTests.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -28,8 +29,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -69,29 +70,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;JUnit.DemoApplicationTests.runDustFetch.executor&quot;: &quot;Run&quot;,
-    &quot;Maven.backend [compile].executor&quot;: &quot;Run&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;Spring Boot.DemoApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;F:/develop/Javadevelop/main_tp40/backend/pom.xml&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.runner&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JUnit.DemoApplicationTests.runDustFetch.executor": "Run",
+    "JUnit.DemoApplicationTests.runPollenFetch.executor": "Run",
+    "Maven.backend [compile].executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "Spring Boot.DemoApplication.executor": "Run",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "F:/develop/Javadevelop/main_tp40/backend/pom.xml",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "reference.settings.project.maven.runner",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="F:\develop\Javadevelop\main_tp40\backend\src\main\resources\mapper" />
@@ -102,7 +104,7 @@
       <recent name="com.example.main_tp40.config" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.DemoApplicationTests.runDustFetch">
+  <component name="RunManager" selected="JUnit.DemoApplicationTests.runPollenFetch">
     <configuration name="DemoApplicationTests.runDustFetch" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="backend" />
       <extension name="coverage">
@@ -119,6 +121,22 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="DemoApplicationTests.runPollenFetch" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.main_tp40.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.example.main_tp40" />
+      <option name="MAIN_CLASS_NAME" value="com.example.main_tp40.DemoApplicationTests" />
+      <option name="METHOD_NAME" value="runPollenFetch" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="DemoApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <option name="SCHEDULED_DEBUGGER" value="true" />
       <module name="backend" />
@@ -129,6 +147,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.DemoApplicationTests.runPollenFetch" />
         <item itemvalue="JUnit.DemoApplicationTests.runDustFetch" />
       </list>
     </recent_temporary>
@@ -151,7 +170,7 @@
       <updated>1756819418167</updated>
       <workItem from="1756819419123" duration="472000" />
       <workItem from="1756884637697" duration="10980000" />
-      <workItem from="1756954862407" duration="1408000" />
+      <workItem from="1756954862407" duration="5779000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <option name="closed" value="true" />
@@ -169,7 +188,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756819873125</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="fetch dustdata">
+      <option name="closed" value="true" />
+      <created>1756956314246</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1756956314246</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -177,6 +204,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="init" />
-    <option name="LAST_COMMIT_MESSAGE" value="init" />
+    <MESSAGE value="fetch dustdata" />
+    <option name="LAST_COMMIT_MESSAGE" value="fetch dustdata" />
   </component>
 </project>
