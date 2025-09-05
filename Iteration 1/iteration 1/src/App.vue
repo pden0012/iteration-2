@@ -83,6 +83,8 @@ export default {
     setActiveItem(itemId) {
       this.activeItem = itemId;
       this.currentView = itemId; // Switch to the corresponding view
+      // Update URL hash
+      window.location.hash = `#${itemId}`;
     },
     
     // Navigate to symptoms page from resources
@@ -90,18 +92,49 @@ export default {
     navigateToSymptoms() {
       this.currentView = 'symptoms';
       this.activeItem = 'resources'; // Keep resources highlighted in nav
+      window.location.hash = '#symptoms';
     },
     onHomeFeatureButton(id) {
-      // Hero CTA 或 “View Dashboard/Visit Resources”等按钮点击回调
+      // Hero CTA 或 "View Dashboard/Visit Resources"等按钮点击回调
       if (id === 'tracker') {
         this.currentView = 'dashboard';
         this.activeItem = 'dashboard';
+        window.location.hash = '#dashboard';
       } else if (id === 'education') {
         // 如果未来需要跳转到资源
         this.currentView = 'resources';
         this.activeItem = 'resources';
+        window.location.hash = '#resources';
+      }
+    },
+    
+    // Handle browser back/forward and direct URL access
+    handleHashChange() {
+      const hash = window.location.hash.substring(1) || 'home';
+      const validViews = ['home', 'dashboard', 'map', 'trends', 'resources', 'support', 'symptoms'];
+      
+      if (validViews.includes(hash)) {
+        this.currentView = hash;
+        this.activeItem = hash === 'symptoms' ? 'resources' : hash;
+      } else {
+        // Default to home for invalid hashes
+        this.currentView = 'home';
+        this.activeItem = 'home';
+        window.location.hash = '#home';
       }
     }
+  },
+  
+  mounted() {
+    // Listen for hash changes (browser back/forward)
+    window.addEventListener('hashchange', this.handleHashChange);
+    // Handle initial page load
+    this.handleHashChange();
+  },
+  
+  beforeUnmount() {
+    // Clean up event listener
+    window.removeEventListener('hashchange', this.handleHashChange);
   }
 }
 </script>
