@@ -147,6 +147,7 @@
             v-for="resource in filteredResources" 
             :key="resource.id"
             class="resource-card"
+            @click="openResource(resource.id)"
           >
             <!-- Card image -->
             <!-- 卡片图片 -->
@@ -159,9 +160,9 @@
             <div class="card-content">
               <div class="card-type">{{ resource.type }}</div>
               <h3 class="card-title">{{ resource.title }}</h3>
-              <button class="card-button" @click="openResource(resource.id)">
+              <div class="card-button">
                 {{ resource.buttonText }}
-              </button>
+              </div>
             </div>
           </article>
         </div>
@@ -832,7 +833,7 @@ export default {
   background: transparent;
   border: none;
   padding: 0;
-  cursor: pointer;
+  cursor: inherit; /* Inherit cursor from parent card */
   transition: all 0.3s ease;
   align-self: flex-start;
   font-family: var(--font-body);
@@ -841,11 +842,12 @@ export default {
   line-height: 120%;
   color: var(--primary-color);
   text-decoration: none;
+  pointer-events: none; /* Prevent button from intercepting clicks */
 }
 
-/* Card button hover effect */
-/* 卡片按钮悬停效果 */
-.card-button:hover {
+/* Card button hover effect - now handled by parent card */
+/* 卡片按钮悬停效果 - 现在由父卡片处理 */
+.resource-card:hover .card-button {
   text-decoration: underline;
   color: #1a7a84;
 }
