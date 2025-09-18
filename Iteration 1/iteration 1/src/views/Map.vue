@@ -22,7 +22,7 @@
     </div>
 
     <!-- Map container -->
-    <!-- 地图容器：Leaflet 会把地图渲染在这里 -->
+    <!-- 地图容器：Google Maps 会把地图渲染在这里 -->
     <div id="leafletMap" class="map-container" ref="mapEl"></div>
   </div>
   
@@ -36,57 +36,57 @@ export default {
       // current filter: 0 Risk, 1 Safe, 2 All
       // 当前筛选：0风险 1安全 2全部
       allergenicity: '2',
-      map: null,        // Leaflet map instance
-      leaflet: null,    // Loaded Leaflet namespace
-      markersLayer: null // Layer group for markers
+      map: null,        // Google Map instance
+      markersLayer: []  // Keep created markers to clear
     };
   },
   methods: {
-    async loadLeafletIfNeeded() {
-      // Dynamically load Leaflet CSS & JS from CDN when first used
-      // 动态加载Leaflet资源：不用安装包，开箱即用
-      if (this.leaflet) return this.leaflet;
-      await new Promise((resolve) => {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        link.onload = resolve; document.head.appendChild(link);
-      });
-      const L = await new Promise((resolve) => {
+    loadGoogleIfNeeded() {
+      // Dynamically load Google Maps JS API using env key
+      // 动态加载 Google Maps JS，使用环境变量中的密钥
+      const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      if (window.google && window.google.maps) return Promise.resolve(window.google);
+      return new Promise((resolve, reject) => {
+        const existing = document.getElementById('google-maps-sdk');
+        if (existing) { existing.onload = () => resolve(window.google); return; }
         const script = document.createElement('script');
-        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-        script.onload = () => resolve(window.L);
+        script.id = 'google-maps-sdk';
+        script.async = true; script.defer = true;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${key || ''}`;
+        script.onload = () => resolve(window.google);
+        script.onerror = reject;
         document.body.appendChild(script);
       });
-      this.leaflet = L;
-      return L;
     },
     async initMap() {
-      // Initialize map centered on Melbourne
-      // 初始化地图，默认中心在墨尔本
-      const L = await this.loadLeafletIfNeeded();
+      // Initialize Google Map centered on Melbourne
+      // 初始化Google地图，默认中心在墨尔本
+      const google = await this.loadGoogleIfNeeded();
       const el = this.$refs.mapEl;
       if (!el) return;
-      this.map = L.map(el).setView([-37.8136, 144.9631], 12);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap'
-      }).addTo(this.map);
-      this.markersLayer = L.layerGroup().addTo(this.map);
-      this.map.on('moveend', this.refreshMarkers);
+      this.map = new google.maps.Map(el, {
+        center: { lat: -37.8136, lng: 144.9631 },
+        zoom: 12,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false
+      });
+      this.map.addListener('idle', this.refreshMarkers);
       await this.refreshMarkers();
     },
     getApiUrl() {
-      // Build API URL using env config (same style as dashboard)
-      // 拼API地址：沿用dashboard的代理/直连逻辑
+      // Build API URL using env config (Google Maps bounds)
+      // 使用Google Maps边界来拼接参数
       const apiBase = import.meta.env.VITE_API_BASE || '';
       const bounds = this.map?.getBounds();
       const zoom = this.map?.getZoom() || 12;
       // bbox format: south,west,north,east
-      const s = bounds.getSouth().toFixed(6);
-      const w = bounds.getWest().toFixed(6);
-      const n = bounds.getNorth().toFixed(6);
-      const e = bounds.getEast().toFixed(6);
+      const sw = bounds.getSouthWest();
+      const ne = bounds.getNorthEast();
+      const s = sw.lat().toFixed(6);
+      const w = sw.lng().toFixed(6);
+      const n = ne.lat().toFixed(6);
+      const e = ne.lng().toFixed(6);
       const bbox = `${s},${w},${n},${e}`;
       const original = `http://13.236.162.216:8080/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       if (apiBase.includes('allorigins') || apiBase.endsWith('url=')) {
@@ -97,37 +97,43 @@ export default {
       return original;
     },
     async refreshMarkers() {
-      // Fetch points from backend and render markers
-      // 拉取后端数据并渲染标记
+      // Fetch points from backend and render markers (Google Maps)
+      // 拉取后端数据并渲染标记（Google地图）
       if (!this.map) return;
       try {
         const url = this.getApiUrl();
         const res = await fetch(url);
         const json = await res.json();
         const list = Array.isArray(json?.data) ? json.data : [];
-        const L = this.leaflet;
-        this.markersLayer.clearLayers();
+        // clear old markers
+        this.markersLayer.forEach(m => m.setMap(null));
+        this.markersLayer = [];
         list.forEach(item => {
           const lat = Number(item.latitude);
           const lng = Number(item.longitude);
           if (!isFinite(lat) || !isFinite(lng)) return;
           const isSafe = String(item.allergenicity) === '1';
           const color = isSafe ? '#2EAF62' : '#E64A3B';
-          const marker = L.circleMarker([lat, lng], {
-            radius: 6,
-            color,
+          const marker = new window.google.maps.Circle({
+            strokeColor: color,
+            strokeOpacity: 1,
+            strokeWeight: 1,
             fillColor: color,
             fillOpacity: 0.9,
-            weight: 1
+            center: { lat, lng },
+            radius: 15,
+            map: this.map
           });
           const riskLabel = isSafe ? 'Safe' : 'Risk';
-          const popup = `<div style="font-family: Inter, sans-serif; font-size:12px;">
-              <strong>${item.commonName || 'Tree'}</strong><br/>
-              <em>${item.scientificName || ''}</em><br/>
-              Risk Level: <span style="color:${color}; font-weight:600;">${riskLabel}</span>
-            </div>`;
-          marker.bindPopup(popup);
-          marker.addTo(this.markersLayer);
+          const info = new window.google.maps.InfoWindow({
+            content: `<div style=\"font-family: Inter, sans-serif; font-size:12px;\">\
+              <strong>${item.commonName || 'Tree'}</strong><br/>\
+              <em>${item.scientificName || ''}</em><br/>\
+              Risk Level: <span style=\"color:${color}; font-weight:600;\">${riskLabel}</span>\
+            </div>`
+          });
+          marker.addListener('click', () => info.open({ anchor: marker, map: this.map }));
+          this.markersLayer.push(marker);
         });
       } catch (e) {
         console.error('Failed to load map data', e);
