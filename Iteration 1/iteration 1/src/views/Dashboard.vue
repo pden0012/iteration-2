@@ -523,7 +523,7 @@ export default {
     async loadDataForLocation(location) {
       try {
         const apiBase = import.meta.env.VITE_API_BASE || '';
-        const original = `http://54.66.150.154:8080/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
+        const original = `http://13.236.162.216:8080/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
         let url = '';
         if (apiBase.includes('allorigins') || apiBase.endsWith('url=') || apiBase.endsWith('url=')) {
           // e.g. https://api.allorigins.win/raw?url=
