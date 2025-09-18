@@ -121,13 +121,30 @@
         </div>
       </section>
 
+    <!-- Navigation Bar - Tab navigation for filtering -->
+    <!-- 导航栏 - 用于过滤的标签导航 -->
+    <section class="navigation-section">
+      <div class="page-container">
+        <nav class="tabs-container">
+          <button 
+            v-for="tab in tabs" 
+            :key="tab.id"
+            :class="['tab-button', { 'active': activeTab === tab.id }]"
+            @click="setActiveTab(tab.id)"
+          >
+            {{ tab.label }}
+          </button>
+        </nav>
+      </div>
+    </section>
+
     <!-- Resources Cards Section - Grid layout for resource cards -->
     <!-- 资源卡片区域 - 资源卡片的网格布局 -->
     <section class="cards-section">
       <div class="page-container">
         <div class="cards-grid">
           <article 
-            v-for="resource in resources" 
+            v-for="resource in filteredResources" 
             :key="resource.id"
             class="resource-card"
             @click="openResource(resource.id)"
@@ -196,6 +213,19 @@ export default {
         subtitle: 'Trusted guides, tips and seasonal hacks to help you stay ahead of hay fever.'
       },
 
+      // Navigation tabs data
+      // 导航标签数据
+      tabs: [
+        { id: 'all', label: 'All' },
+        { id: 'symptoms', label: 'Symptoms' },
+        { id: 'treatments', label: 'Treatments & Remedies' },
+        { id: 'lifestyle', label: 'Lifestyle Tips' }
+      ],
+
+      // Active tab state
+      // 当前激活的标签
+      activeTab: 'all',
+
       // Resources data - placeholder for future API integration
       // 资源数据 - 为将来API集成预留的占位符
       resources: [
@@ -247,7 +277,24 @@ export default {
     }
   },
 
+  computed: {
+    // Filter resources based on active tab
+    // 根据激活标签过滤资源
+    filteredResources() {
+      if (this.activeTab === 'all') {
+        return this.resources;
+      }
+      return this.resources.filter(resource => resource.category === this.activeTab);
+    }
+  },
+
   methods: {
+    // Set active tab and filter resources
+    // 设置激活标签并过滤资源
+    setActiveTab(tabId) {
+      this.activeTab = tabId;
+    },
+
     // Open resource handler - navigate to specific pages or external content
     // 打开资源处理器 - 导航到特定页面或外部内容
     openResource(resourceId) {
@@ -279,6 +326,7 @@ export default {
         }
       }
     },
+
 
 
 
@@ -638,6 +686,57 @@ export default {
   color: #FFFFFF !important;
 }
 
+/* Navigation Section - tabs container */
+/* 导航区域 - 标签容器 */
+.navigation-section {
+  background: var(--background-white);
+  border: 1px solid var(--border-light);
+  border-radius: 2px;
+  padding: 55px 0 16px;
+}
+
+/* Tabs container - horizontal tab navigation */
+/* 标签容器 - 水平标签导航 */
+.tabs-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 32px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+/* Individual tab button */
+/* 单个标签按钮 */
+.tab-button {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0 0 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: none;
+  white-space: nowrap;
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 400;
+  color: #767676;
+}
+
+/* Active tab styling */
+/* 激活标签样式 */
+.tab-button.active {
+  color: #303030;
+  border-bottom: 2px solid #303030;
+}
+
+/* Tab button hover effect */
+/* 标签按钮悬停效果 */
+.tab-button:hover {
+  color: #303030;
+}
+
 /* Cards Section - resource cards grid */
 /* 卡片区域 - 资源卡片网格 */
 .cards-section {
@@ -847,6 +946,10 @@ export default {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
   }
+  
+  .tabs-container {
+    gap: 24px;
+  }
 }
 
 /* Small screens (below 768px) */
@@ -855,6 +958,11 @@ export default {
   .cards-grid {
     grid-template-columns: 1fr;
     gap: 20px;
+  }
+  
+  .tabs-container {
+    gap: 16px;
+    flex-wrap: wrap;
   }
   
   .hero-content {

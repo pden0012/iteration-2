@@ -29,7 +29,6 @@
                 @feature-button-clicked="onHomeFeatureButton"
               />
         <Dashboard v-else-if="currentView === 'dashboard'" />
-        <MapView v-else-if="currentView === 'map'" />
         <Resources v-else-if="currentView === 'resources'" @navigate-to-symptoms="navigateToSymptoms" />
         <Symptoms v-else-if="currentView === 'symptoms'" />
         <div v-else class="coming-soon">
@@ -52,7 +51,6 @@ import HomePage from './components/HomePage.vue'
 import Dashboard from './views/Dashboard.vue'
 import Resources from './views/Resources.vue'
 import Symptoms from './views/Symptoms.vue'
-import MapView from './views/Map.vue'
 
 export default {
   name: 'App',
@@ -60,8 +58,7 @@ export default {
     HomePage,
     Dashboard,
     Resources,
-    Symptoms,
-    MapView
+    Symptoms
   },
   data() {
     return {
