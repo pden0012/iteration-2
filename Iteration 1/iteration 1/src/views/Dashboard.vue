@@ -73,6 +73,8 @@
             <button class="forecast-button" @click="viewForecast">
               {{ chartData.forecastButton }}
             </button>
+
+            
           </div>
 
           <!-- Right Column - Allergen Levels List -->
@@ -119,6 +121,83 @@
         </div>
       </section>
 
+      <!-- Climate & Dispersion Section below the main dashboard -->
+      <!-- 气候与扩散可视化：挪出双列网格，整体居中显示 -->
+      <section class="climate-section">
+        <!-- Scatter plot: rainfall vs wind with medians -->
+        <!-- 散点图：降雨 vs 风速，并带有中位数虚线 -->
+        <div class="viz-card">
+          <h4 class="viz-title">Melbourne — Pollen-friendly vs Pollen-suppressing months</h4>
+          <svg
+            v-if="scatterViz"
+            class="chart-svg"
+            :width="scatterViz.width"
+            :height="scatterViz.height"
+            role="img"
+            aria-label="Monthly average rainfall versus wind speed scatter plot"
+          >
+            <!-- Axes -->
+            <line :x1="scatterViz.padLeft" :y1="scatterViz.padTop + scatterViz.plotH" :x2="scatterViz.padLeft + scatterViz.plotW" :y2="scatterViz.padTop + scatterViz.plotH" class="axis" />
+            <line :x1="scatterViz.padLeft" :y1="scatterViz.padTop" :x2="scatterViz.padLeft" :y2="scatterViz.padTop + scatterViz.plotH" class="axis" />
+
+            <!-- Median dashed lines -->
+            <line :x1="scatterViz.medianX" :y1="scatterViz.padTop" :x2="scatterViz.medianX" :y2="scatterViz.padTop + scatterViz.plotH" class="median-line" />
+            <line :x1="scatterViz.padLeft" :y1="scatterViz.medianY" :x2="scatterViz.padLeft + scatterViz.plotW" :y2="scatterViz.medianY" class="median-line" />
+
+            <!-- Points -->
+            <g v-for="pt in scatterViz.points" :key="pt.month">
+              <circle :cx="pt.x" :cy="pt.y" r="5" class="dot" />
+              <text :x="pt.x + 6" :y="pt.y - 6" class="dot-label">{{ pt.month_abbr }}</text>
+            </g>
+
+            <!-- Axis labels -->
+            <text :x="scatterViz.padLeft + scatterViz.plotW/2" :y="scatterViz.padTop + scatterViz.plotH + 32" class="axis-label" text-anchor="middle">Monthly average rainfall (mm)</text>
+            <text :x="scatterViz.padLeft - 34" :y="scatterViz.padTop + scatterViz.plotH/2" class="axis-label" transform="rotate(-90, {{scatterViz.padLeft - 34}}, {{scatterViz.padTop + scatterViz.plotH/2}})" text-anchor="middle">Monthly average wind (km/h)</text>
+          </svg>
+        </div>
+
+        <!-- Stacked bar: seasonal contributions -->
+        <!-- 堆叠条形图：不同季节三种因素贡献 -->
+        <div class="viz-card">
+          <h4 class="viz-title">Melbourne — What’s driving dispersion by season?</h4>
+          <svg
+            v-if="stackedViz"
+            class="chart-svg"
+            :width="stackedViz.width"
+            :height="stackedViz.height"
+            role="img"
+            aria-label="Seasonal stacked contributions chart"
+          >
+            <!-- Axes -->
+            <line :x1="stackedViz.padLeft" :y1="stackedViz.padTop + stackedViz.plotH" :x2="stackedViz.padLeft + stackedViz.plotW" :y2="stackedViz.padTop + stackedViz.plotH" class="axis" />
+            <line :x1="stackedViz.padLeft" :y1="stackedViz.padTop" :x2="stackedViz.padLeft" :y2="stackedViz.padTop + stackedViz.plotH" class="axis" />
+
+            <!-- Bars -->
+            <g v-for="bar in stackedViz.bars" :key="bar.season">
+              <g v-for="seg in bar.segments" :key="seg.key">
+                <rect :x="bar.x" :y="seg.y" :width="bar.width" :height="seg.h" :fill="seg.color" />
+              </g>
+              <text :x="bar.x + bar.width/2" :y="stackedViz.padTop + stackedViz.plotH + 16" class="tick" text-anchor="middle">{{ bar.shortLabel }}</text>
+            </g>
+
+            <!-- Legend -->
+            <g class="legend" :transform="`translate(${stackedViz.padLeft}, ${stackedViz.padTop - 10})`">
+              <g v-for="(lg, i) in stackedViz.legend" :key="lg.key" :transform="`translate(${i*140}, 0)`">
+                <rect width="12" height="12" :fill="lg.color" rx="2" ry="2" />
+                <text x="18" y="11" class="legend-label">{{ lg.label }}</text>
+              </g>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Short centered explanation below charts -->
+        <!-- 图表下方的简短说明：英文内容，保持简洁并居中对齐 -->
+        <p class="viz-note">
+          Wind, fewer rainy days and drier afternoon air make pollen spread farther. 
+          Use this view to spot months and seasons when dispersion is likely higher in Melbourne.
+        </p>
+      </section>
+
     </div>
 
     <!-- Blue separator bar -->
@@ -153,6 +232,10 @@
 </template>
 
 <script>
+// Import climate JSON data for local rendering
+// 引入本地JSON数据，用于可视化渲染（避免网络请求的不确定性）
+import scatterJson from '../../Iteration 1 Data/melbourne_scatter_points.json';
+import seasonalJson from '../../Iteration 1 Data/melbourne_seasonal_contributions.json';
 export default {
   name: 'Dashboard',
   data() {
@@ -247,6 +330,10 @@ export default {
       pollenProgress: 25, // 花粉指数进度 (0-100) - 将来从API获取 - Will fetch from API
       chartRingColor: '#C8E6C9', // 环形颜色，随整体等级变化
       chartTextColor: '#1E1E1E'  // 圆心文字颜色，随整体等级变化
+      ,
+      // Visualization states - 本地可视化状态数据
+      scatterViz: null,   // 散点图几何与点位
+      stackedViz: null    // 堆叠条形图几何与柱段
     }
   },
   
@@ -287,6 +374,108 @@ export default {
       } catch (e) {
         console.error('Failed to load addresses CSV', e);
       }
+    },
+
+    // Initialize local climate visualizations (scatter + stacked)
+    // 初始化本地气候可视化（散点 + 堆叠柱状）
+    initClimateViz() {
+      try {
+        this.scatterViz = this.buildScatterViz(scatterJson);
+      } catch (e) {
+        console.error('Failed to init scatter viz', e);
+      }
+      try {
+        this.stackedViz = this.buildStackedViz(seasonalJson);
+      } catch (e) {
+        console.error('Failed to init stacked viz', e);
+      }
+    },
+
+    // Build scatter-plot geometry from JSON
+    // 根据JSON计算散点图几何
+    buildScatterViz(json) {
+      const width = 560;    // SVG intrinsic width
+      const height = 380;   // SVG intrinsic height
+      const padLeft = 56;
+      const padRight = 16;
+      const padTop = 18;
+      const padBottom = 46;
+      const plotW = width - padLeft - padRight;
+      const plotH = height - padTop - padBottom;
+      const points = Array.isArray(json?.points) ? json.points : [];
+      const rainVals = points.map(p => p.rain_mm);
+      const windVals = points.map(p => p.wind_kmh);
+      const minRain = Math.min(...rainVals);
+      const maxRain = Math.max(...rainVals);
+      const minWind = Math.min(...windVals);
+      const maxWind = Math.max(...windVals);
+      const xScale = (v) => padLeft + ((v - minRain) / (maxRain - minRain)) * plotW;
+      const yScale = (v) => padTop + (1 - (v - minWind) / (maxWind - minWind)) * plotH;
+      const mapped = points.map(p => ({
+        ...p,
+        x: xScale(p.rain_mm),
+        y: yScale(p.wind_kmh)
+      }));
+      const rainMed = Number(json?.medians?.rain_median ?? (minRain + maxRain) / 2);
+      const windMed = Number(json?.medians?.wind_median ?? (minWind + maxWind) / 2);
+      return {
+        width, height, padLeft, padTop, plotW, plotH,
+        points: mapped,
+        medianX: xScale(rainMed),
+        medianY: yScale(windMed)
+      };
+    },
+
+    // Build stacked bars geometry from JSON
+    // 根据JSON计算堆叠柱形图几何
+    buildStackedViz(json) {
+      const width = 560;
+      const height = 340;
+      const padLeft = 56;
+      const padRight = 16;
+      const padTop = 28;
+      const padBottom = 40;
+      const plotW = width - padLeft - padRight;
+      const plotH = height - padTop - padBottom;
+      const data = Array.isArray(json?.data) ? json.data : [];
+      const barGap = 22;
+      const barWidth = (plotW - barGap * (data.length - 1)) / Math.max(data.length, 1);
+      const colors = {
+        wind: '#4A9EFF',         // wind (dispersion) - blue
+        dryDays: '#F2A737',      // dry days - orange
+        dryAir: '#82D9B4'        // dry air - mint green
+      };
+      const bars = data.map((row, i) => {
+        const x = padLeft + i * (barWidth + barGap);
+        // Values are relative contributions; sum ≤ 1
+        const vWind = Number(row.contrib_wind || 0);
+        const vDryDays = Number(row.contrib_dry_days || 0);
+        const vDryAir = Number(row.contrib_dry_air || 0);
+        // Scale to plot height
+        const hWind = vWind * plotH;
+        const hDryDays = vDryDays * plotH;
+        const hDryAir = vDryAir * plotH;
+        const yWind = padTop + plotH - hWind;
+        const yDryDays = yWind - hDryDays;
+        const yDryAir = yDryDays - hDryAir;
+        return {
+          season: row.season,
+          shortLabel: (row.season || '').split(' ')[0],
+          x,
+          width: barWidth,
+          segments: [
+            { key: 'wind', y: yWind, h: hWind, color: colors.wind },
+            { key: 'dryDays', y: yDryDays, h: hDryDays, color: colors.dryDays },
+            { key: 'dryAir', y: yDryAir, h: hDryAir, color: colors.dryAir }
+          ]
+        };
+      });
+      const legend = [
+        { key: 'wind', label: 'Wind (dispersion)', color: colors.wind },
+        { key: 'dryDays', label: 'Dry days (less rain)', color: colors.dryDays },
+        { key: 'dryAir', label: 'Dry air (lower 3pm humidity)', color: colors.dryAir }
+      ];
+      return { width, height, padLeft, padTop, plotW, plotH, bars, legend };
     },
 
     // 文本变化：过滤
@@ -546,6 +735,9 @@ export default {
     // init ring & text color
     this.chartRingColor = this.colorForOverall(this.pollenData.level);
     this.chartTextColor = this.textColorForOverall(this.pollenData.level);
+      // Initialize local climate visualizations
+      // 初始化本地气候可视化
+      this.initClimateViz();
   }
 }
 </script>
@@ -1068,6 +1260,63 @@ export default {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
+
+/* Climate section container */
+/* 气候可视化区域容器：竖向堆叠两个图表卡片 */
+.climate-section {
+  margin-top: 60px; /* 与上方Dashboard拉开更多距离 */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 区块整体居中 */
+  gap: 16px; /* 两图更集中，减少垂直间距 */
+}
+
+/* Visualization card wrapper */
+/* 可视化卡片外框：白底、轻边框与圆角 */
+.viz-card {
+  width: 100%;
+  max-width: 640px;  /* 稍微更窄，让两图更集中 */
+  margin: 0 auto;    /* 卡片居中 */
+  background: var(--background-white);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 14px 12px 10px;
+}
+
+/* Short note under charts */
+/* 图表下方的简短说明：居中、窄行宽、弱化色 */
+.viz-note {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: #555;
+}
+
+/* Small title for viz */
+/* 可视化小标题 */
+.viz-title {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 6px;
+  text-align: left;
+}
+
+/* Shared SVG styles */
+/* 通用SVG样式：轴线、虚线、点、标签等 */
+.chart-svg { display: block; width: 100%; height: auto; }
+.axis { stroke: #C7CCD1; stroke-width: 1; }
+.median-line { stroke: #C9A74E; stroke-width: 1.5; stroke-dasharray: 4 4; }
+.dot { fill: #F2A737; }
+.dot-label { font-family: var(--font-body); font-size: 12px; fill: #333; }
+.axis-label { font-family: var(--font-body); font-size: 12px; fill: #333; }
+.tick { font-family: var(--font-body); font-size: 12px; fill: #333; }
+.legend-label { font-family: var(--font-body); font-size: 12px; fill: #333; }
 
 /* Allergen section - right column */
 /* 过敏原区域 - 右栏
