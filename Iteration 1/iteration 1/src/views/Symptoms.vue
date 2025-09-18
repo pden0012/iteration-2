@@ -24,6 +24,7 @@
                 :id="symptom.id"
                 v-model="symptom.checked"
                 class="symptom-checkbox"
+                @change="updateAdvice"
               />
               <div class="checkmark">
                 <span class="check-icon">✓</span>
@@ -33,6 +34,12 @@
               {{ symptom.text }}
             </label>
           </div>
+        </div>
+        
+        <!-- Simple advice -->
+        <!-- 简单建议 -->
+        <div class="advice-box" v-if="checkedCount > 0">
+          <p class="advice-text">{{ advice }}</p>
         </div>
       </div>
     </section>
@@ -58,8 +65,35 @@ export default {
         { id: 'pressure', text: 'Sinus pressure or headaches', checked: false },
         { id: 'fatigue', text: 'Fatigue or poor sleep from persistent symptoms', checked: false },
         { id: 'concentration', text: 'Reduced concentration during daytime activities', checked: false }
-      ]
+      ],
+      
+      advice: ''
     }
+  },
+
+  computed: {
+    checkedCount() {
+      return this.symptoms.filter(symptom => symptom.checked).length;
+    }
+  },
+
+  methods: {
+    updateAdvice() {
+      const count = this.checkedCount;
+      if (count <= 3) {
+        this.advice = "💡 Mild symptoms:\n• Try over-the-counter antihistamines (cetirizine, loratadine)\n• Keep windows closed during high pollen periods\n• Use saline nasal sprays\n• Wear sunglasses outdoors\n• Consider using air purifiers at home";
+      } else if (count <= 6) {
+        this.advice = "⚠️ Moderate symptoms:\n• Consider prescription nasal corticosteroid sprays\n• Use combination antihistamine + decongestant medications\n• Get allergen-proof bedding covers\n• Use air purifiers at home\n• Monitor pollen forecasts and plan outdoor activities\n• Shower after outdoor exposure";
+      } else {
+        this.advice = "🚨 Severe symptoms:\n• Consult with an allergist for immunotherapy treatment\n• Use prescription-strength medications\n• Consider short-term oral steroids if recommended by doctor\n• Avoid outdoor activities during peak pollen times\n• Use HEPA air filters\n• Consider moving to coastal areas where pollen levels are lower";
+      }
+    }
+  },
+
+  mounted() {
+    // Initialize advice when page loads
+    // 页面加载时初始化建议
+    this.updateAdvice();
   }
 }
 </script>
@@ -168,6 +202,7 @@ export default {
   width: 24px;
   height: 24px;
   cursor: pointer;
+  z-index: 2;
 }
 
 /* Square Checkmark - Brand color when checked */
@@ -182,6 +217,7 @@ export default {
   border-radius: 4px;
   transition: all 0.3s ease;
   cursor: pointer;
+  pointer-events: none;
 }
 
 .checkmark:hover {
@@ -296,8 +332,24 @@ export default {
 
 /* Ensure first item is checked by default (if needed) */
 /* 确保第一项默认选中（如需要） */
-.symptom-item:first-child .symptom-checkbox {
-  /* This will be handled in Vue data, not CSS */
-  /* 这将在Vue数据中处理，而不是CSS */
+
+/* Simple advice box */
+/* 简单建议框 */
+.advice-box {
+  background: #F0F8FF;
+  border: 1px solid #239BA7;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 24px;
+  margin-bottom: 40px;
+}
+
+.advice-text {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: #333;
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-line;
 }
 </style>
