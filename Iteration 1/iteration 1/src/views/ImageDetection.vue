@@ -155,13 +155,15 @@ export default {
     },
     
     getApiUrl(path) {
-      // 开发环境使用本地代理，生产环境直接访问后端API
+      // 开发环境使用本地代理，生产环境使用HTTPS代理解决Mixed Content问题
       const isDev = import.meta.env.DEV;
       if (isDev) {
         return `/api${path}`;
       } else {
-        // 生产环境直接访问后端API，后端已配置CORS
-        return `http://13.236.162.216:8080${path}`;
+        // 生产环境使用HTTPS代理解决Mixed Content问题
+        const backendUrl = `http://13.236.162.216:8080${path}`;
+        // 使用支持文件上传的HTTPS代理服务
+        return `https://corsproxy.io/?${encodeURIComponent(backendUrl)}`;
       }
     },
     
