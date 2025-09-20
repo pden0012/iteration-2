@@ -626,43 +626,178 @@ export default {
   }
 }
 
-@media (max-width: 768px) {
+/* 📱 Complete Responsive Design System for HomePage */
+/* 📱 Mobile devices (320px - 767px) */
+@media (max-width: 767px) {
+  .page-container {
+    padding: 0 16px;
+  }
+  
+  .hero-content {
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 0 20px;
+  }
+  
   .hero-title {
-    font-size: 48px;
+    font-size: clamp(36px, 8vw, 48px);
     width: 100%;
     height: auto;
+    text-align: center;
+  }
+  
+  .hero-subtitle {
+    font-size: clamp(18px, 4vw, 24px);
+    width: 100%;
+    height: auto;
+    text-align: center;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr; /* Mobile: single column */
+    gap: 16px;
+    padding: 0 8px;
+  }
+  
+  .feature-card {
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    min-height: 180px;
+    margin: 0 auto;
+  }
+  
+  .info-title {
+    font-size: clamp(28px, 6vw, 32px);
+    width: 100%;
+    height: auto;
+    text-align: center;
+  }
+  
+  .info-description {
+    font-size: clamp(16px, 4vw, 20px);
+    width: 100%;
+    height: auto;
+    text-align: center;
+  }
+}
+
+/* 📱 Large mobile (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  .hero-title {
+    font-size: 48px;
   }
   
   .hero-subtitle {
     font-size: 24px;
-    width: 100%;
-    height: auto;
   }
   
-  .features-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  /* Mobile feature card adjustments */
-  /* 移动端功能卡片调整 - 自适应高度和宽度 */
   .feature-card {
-    width: 100%;
     max-width: 320px;
-    height: auto;
     min-height: 200px;
   }
   
   .info-title {
     font-size: 32px;
-    width: 100%;
-    height: auto;
   }
   
   .info-description {
     font-size: 20px;
-    width: 100%;
-    height: auto;
+  }
+}
+
+/* 📱 Tablet devices (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .page-container {
+    padding: 0 32px;
+  }
+  
+  .hero-content {
+    left: 4%;
+    padding: 0 24px;
+  }
+  
+  .hero-title {
+    font-size: 56px;
+  }
+  
+  .hero-subtitle {
+    font-size: 28px;
+  }
+  
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr); /* Tablet: 2 columns */
+    gap: 24px;
+  }
+  
+  .feature-card {
+    max-width: none;
+    min-height: 220px;
+  }
+  
+  .info-title {
+    font-size: 36px;
+  }
+  
+  .info-description {
+    font-size: 22px;
+  }
+}
+
+/* 🖥️ Desktop (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .page-container {
+    padding: 0 36px;
+  }
+  
+  .hero-content {
+    left: 5%;
+  }
+  
+  .features-grid {
+    grid-template-columns: repeat(3, 1fr); /* Desktop: 3 columns */
+    gap: 28px;
+  }
+  
+  .feature-card {
+    min-height: 240px;
+  }
+}
+
+/* 📱 Very small screens (<320px) */
+@media (max-width: 319px) {
+  .page-container {
+    padding: 0 12px;
+  }
+  
+  .hero-content {
+    padding: 0 12px;
+  }
+  
+  .hero-title {
+    font-size: 32px;
+  }
+  
+  .hero-subtitle {
+    font-size: 16px;
+  }
+  
+  .features-grid {
+    gap: 12px;
+  }
+  
+  .feature-card {
+    max-width: 240px;
+    min-height: 160px;
+  }
+  
+  .info-title {
+    font-size: 24px;
+  }
+  
+  .info-description {
+    font-size: 14px;
   }
 }
 

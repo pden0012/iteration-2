@@ -827,43 +827,151 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Responsive Design - Large screens (1200px+) */
-/* 响应式设计 - 大屏幕 (1200px+) */
-@media (min-width: 1200px) {
+/* 📱 Complete Responsive Design System for Resources */
+/* 📱 Mobile devices (320px - 767px) */
+@media (max-width: 767px) {
   .page-container {
-    padding: 0 40px;
+    padding: 0 12px;
   }
   
   .cards-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 28px;
-  }
-}
-
-/* Medium screens (768px-1199px) */
-/* 中等屏幕 (768px-1199px) */
-@media (min-width: 768px) and (max-width: 1199px) {
-  .cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px;
-  }
-}
-
-/* Small screens (below 768px) */
-/* 小屏幕 (768px以下) */
-@media (max-width: 767px) {
-  .cards-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
+    grid-template-columns: 1fr; /* Mobile: single column */
+    gap: 16px;
   }
   
   .hero-content {
-    padding: 40px 20px;
+    padding: 32px 16px;
+  }
+  
+  .knowledge-content {
+    padding: 0 16px;
+  }
+  
+  .resource-card {
+    padding: 16px;
+  }
+  
+  .resource-title {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  
+  .learn-more-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
+
+/* 📱 Large mobile (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  .page-container {
+    padding: 0 16px;
+  }
+  
+  .hero-content {
+    padding: 36px 20px;
   }
   
   .knowledge-content {
     padding: 0 20px;
   }
+}
+
+/* 📱 Tablet devices (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .page-container {
+    padding: 0 24px;
+  }
+  
+  .cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)); /* Tablet: 2 columns */
+    gap: 20px;
+  }
+  
+  .hero-content {
+    padding: 48px 24px;
+  }
+  
+  .knowledge-content {
+    padding: 0 24px;
+  }
+}
+
+/* 🖥️ Desktop (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .page-container {
+    padding: 0 32px;
+  }
+  
+  .cards-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)); /* Desktop: 3 columns */
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  
+  .hero-content {
+    padding: 56px 32px;
+  }
+  
+  .knowledge-content {
+    padding: 0 32px;
+  }
+}
+
+/* 🖥️ Large desktop (1440px+) */
+@media (min-width: 1440px) {
+  .page-container {
+    padding: 0 40px;
+  }
+  
+  .cards-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)); /* Large desktop: 3 columns */
+    gap: 28px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .hero-content {
+    padding: 64px 40px;
+  }
+  
+  .knowledge-content {
+    padding: 0 40px;
+  }
+}
+
+/* 📱 Very small screens (<320px) */
+@media (max-width: 319px) {
+  .page-container {
+    padding: 0 8px;
+  }
+  
+  .cards-grid {
+    gap: 12px;
+  }
+  
+  .hero-content {
+    padding: 24px 12px;
+  }
+  
+  .knowledge-content {
+    padding: 0 12px;
+  }
+  
+  .resource-card {
+    padding: 12px;
+  }
+  
+  .resource-title {
+    font-size: 14px;
+  }
+  
+  .learn-more-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
 
 
 
@@ -911,4 +1019,5 @@ export default {
 .card-image:has(img)::before {
   display: none;
 }
+</style>
 </style>

@@ -665,27 +665,151 @@ export default {
   flex-grow: 1; /* 让描述占用剩余空间 */
 }
 
-/* 响应式设计 */
-@media (max-width: 768px) {
+/* 📱 Complete Responsive Design System */
+/* 📱 Mobile devices (320px - 767px) */
+@media (max-width: 767px) {
   .image-page {
-    padding: 16px 0 20px 0; /* 移动端减少更多底部padding */
+    padding: 16px 0 20px 0;
+    background-size: 100% 480px; /* Mobile: smaller background */
   }
   
   .image-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 0 16px;
+    grid-template-columns: 1fr; /* Mobile: single column layout */
+    gap: 16px;
+    padding: 0 12px;
+    max-width: 100%;
+  }
+  
+  .left-panel {
+    min-height: 400px; /* Mobile: reduce height */
+    justify-content: center;
+    margin-top: -20px;
   }
   
   .upload-box,
   .upload-btn,
   .preview-wrapper {
-    width: 280px;
+    width: 100%;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+  
+  .upload-box {
+    height: 200px; /* Mobile: smaller upload area */
   }
   
   .result-card {
-    min-height: 100px; /* 移动端稍微小一点 */
-    padding: 16px 14px;
+    min-height: 80px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .result-card.primary-result {
+    transform: scale(1); /* Mobile: no scaling for primary */
   }
 }
+
+/* 📱 Large mobile / Small tablet (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  .upload-box,
+  .upload-btn,
+  .preview-wrapper {
+    width: 320px;
+  }
+  
+  .upload-box {
+    height: 240px;
+  }
+}
+
+/* 📱 Tablet devices (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .image-page {
+    background-size: 100% 580px;
+  }
+  
+  .image-grid {
+    grid-template-columns: 1fr 1.2fr; /* Tablet: adjust ratio */
+    gap: 24px;
+    padding: 0 20px;
+    max-width: 900px;
+  }
+  
+  .left-panel {
+    min-height: 500px;
+    margin-top: -30px;
+  }
+  
+  .upload-box {
+    width: 300px;
+    height: 280px;
+  }
+  
+  .result-card {
+    min-height: 90px;
+    padding: 14px;
+  }
+}
+
+/* 🖥️ Desktop (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .image-page {
+    background-size: 100% 620px;
+  }
+  
+  .image-grid {
+    grid-template-columns: 1fr 1.4fr;
+    gap: 32px;
+    max-width: 1100px;
+  }
+  
+  .left-panel {
+    min-height: 600px;
+    margin-top: -40px;
+  }
+}
+
+/* 🖥️ Large desktop (1440px+) */
+@media (min-width: 1440px) {
+  .image-page {
+    background-size: 100% 620px;
+  }
+  
+  .image-grid {
+    grid-template-columns: 1fr 1.4fr;
+    gap: 40px;
+    max-width: 1280px;
+  }
+  
+  .left-panel {
+    min-height: 600px;
+    margin-top: -40px;
+  }
+}
+
+/* 📱 Very small screens (<320px) */
+@media (max-width: 319px) {
+  .image-grid {
+    padding: 0 8px;
+    gap: 12px;
+  }
+  
+  .upload-box,
+  .upload-btn,
+  .preview-wrapper {
+    width: 100%;
+    max-width: 240px;
+  }
+  
+  .upload-box {
+    height: 180px;
+  }
+  
+  .result-card {
+    min-height: 70px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+}
+</style>
 </style>

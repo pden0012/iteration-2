@@ -239,7 +239,6 @@ export default {
               commonName: item.commonName || 'Tree',
               scientificName: item.scientificName || '',
               allergenicity: item.allergenicity,
-              amount: item.amount || 1, // 聚合点的树木数量
               isSafe: isSafe,
               color: color
             },
@@ -263,19 +262,14 @@ export default {
         const feature = event.feature;
         const commonName = feature.getProperty('commonName');
         const scientificName = feature.getProperty('scientificName');
-        const amount = feature.getProperty('amount') || 1; // 获取聚合数量
         const isSafe = feature.getProperty('isSafe');
         const color = feature.getProperty('color');
         const riskLabel = isSafe ? 'Safe' : 'Risk';
-        
-        // 根据数量显示不同的内容
-        const amountText = amount > 1 ? `<br/>Trees Count: <strong>${amount}</strong>` : '';
         
         const content = `<div style="font-family: Inter, sans-serif; font-size:12px;">
             <strong>${commonName}</strong><br/>
             <em>${scientificName}</em><br/>
             Risk Level: <span style="color:${color}; font-weight:600;">${riskLabel}</span>
-            ${amountText}
           </div>`;
         
         this.infoWindow.setContent(content);
@@ -561,13 +555,63 @@ export default {
 
 .map-container {
   width: 100%;
-  max-width: 680px; /* 限制最大宽度 */
-  height: 680px; /* 更高的正方形 */
-  margin: 0 auto; /* 居中显示 */
+  max-width: 1200px; /* Desktop: large screen width */
+  aspect-ratio: 16 / 9; /* Default 16:9 widescreen ratio */
+  margin: 0 auto; /* Center alignment */
+  padding: 0 16px; /* Prevent edge sticking */
   border: 1px solid rgba(0,0,0,0.1);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08); /* 添加阴影 */
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08); /* Shadow effect */
+}
+
+/* 📱 Mobile devices (320px - 767px) */
+@media (max-width: 767px) {
+  .map-container {
+    max-width: 100%;
+    margin: 0 12px; /* Mobile: small side margins */
+    aspect-ratio: 4 / 3; /* Mobile: 4:3 ratio better for phones */
+    border-radius: 8px; /* Mobile: smaller border radius */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+}
+
+/* 📱 Tablet devices (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .map-container {
+    max-width: 720px;
+    margin: 0 24px; /* Tablet: moderate margins */
+    aspect-ratio: 16 / 9; /* Tablet: keep 16:9 ratio */
+    border-radius: 10px;
+  }
+}
+
+/* 🖥️ Desktop (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .map-container {
+    max-width: 960px;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+  }
+}
+
+/* 🖥️ Large desktop (1440px+) */
+@media (min-width: 1440px) {
+  .map-container {
+    max-width: 1200px;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+  }
+}
+
+/* 📱 Very small screens (<320px) */
+@media (max-width: 319px) {
+  .map-container {
+    margin: 0 8px;
+    aspect-ratio: 1 / 1; /* Very small: square ratio */
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
 }
 
 .empty-hint {

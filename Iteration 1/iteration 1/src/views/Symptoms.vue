@@ -274,25 +274,51 @@ export default {
 /* Responsive Design - Progressive enhancement */
 /* 响应式设计 - 渐进式增强 */
 
-/* Tablet adjustments */
-/* 平板调整 */
-@media (max-width: 900px) {
-  .page-title {
-    font-size: 32px;
-  }
-  
-  .title-section {
-    margin-bottom: 32px;
+/* 📱 Complete Responsive Design System for Symptoms */
+/* 📱 Mobile devices (320px - 767px) */
+@media (max-width: 767px) {
+  .page-container {
+    padding: 0 16px;
   }
   
   .symptoms-page {
-    padding: 44px 0;
+    padding: 32px 0;
+  }
+  
+  .page-title {
+    font-size: clamp(24px, 6vw, 28px);
+    margin-bottom: 20px;
+  }
+  
+  .title-section {
+    margin-bottom: 24px;
+  }
+  
+  .checklist-grid {
+    gap: 12px;
+  }
+  
+  .symptom-item {
+    padding: 12px 16px;
+  }
+  
+  .symptom-label {
+    font-size: 14px;
+  }
+  
+  .advice-box {
+    padding: 16px;
+    margin-top: 20px;
+    margin-bottom: 32px;
+  }
+  
+  .advice-text {
+    font-size: 14px;
   }
 }
 
-/* Mobile optimizations */
-/* 移动端优化 */
-@media (max-width: 768px) {
+/* 📱 Large mobile (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
   .page-container {
     padding: 0 20px;
   }
@@ -302,25 +328,157 @@ export default {
   }
   
   .checklist-grid {
-    gap: 16px;
+    gap: 14px;
   }
   
-  .symptoms-page {
-    padding: 40px 0;
-  }
-}
-
-@media (max-width: 600px) {
-  .page-container {
-    padding: 0 16px;
+  .symptom-item {
+    padding: 14px 18px;
   }
   
   .symptom-label {
     font-size: 15px;
   }
+}
+
+/* 📱 Tablet devices (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .page-container {
+    padding: 0 32px;
+  }
+  
+  .symptoms-page {
+    padding: 44px 0;
+  }
+  
+  .page-title {
+    font-size: 32px;
+  }
+  
+  .title-section {
+    margin-bottom: 32px;
+  }
   
   .checklist-grid {
-    gap: 14px;
+    gap: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .symptom-item {
+    padding: 16px 20px;
+  }
+  
+  .advice-box {
+    max-width: 600px;
+    margin: 32px auto 40px;
+    padding: 20px;
+  }
+}
+
+/* 🖥️ Desktop (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .page-container {
+    padding: 0 40px;
+  }
+  
+  .symptoms-page {
+    padding: 56px 0;
+  }
+  
+  .page-title {
+    font-size: 36px;
+  }
+  
+  .title-section {
+    margin-bottom: 40px;
+  }
+  
+  .checklist-grid {
+    gap: 18px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  
+  .symptom-item {
+    padding: 18px 22px;
+  }
+  
+  .advice-box {
+    max-width: 700px;
+    margin: 40px auto 48px;
+    padding: 24px;
+  }
+}
+
+/* 🖥️ Large desktop (1440px+) */
+@media (min-width: 1440px) {
+  .page-container {
+    padding: 0 48px;
+  }
+  
+  .symptoms-page {
+    padding: 64px 0;
+  }
+  
+  .page-title {
+    font-size: 40px;
+  }
+  
+  .title-section {
+    margin-bottom: 48px;
+  }
+  
+  .checklist-grid {
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .symptom-item {
+    padding: 20px 24px;
+  }
+  
+  .advice-box {
+    max-width: 800px;
+    margin: 48px auto 56px;
+    padding: 28px;
+  }
+}
+
+/* 📱 Very small screens (<320px) */
+@media (max-width: 319px) {
+  .page-container {
+    padding: 0 12px;
+  }
+  
+  .symptoms-page {
+    padding: 24px 0;
+  }
+  
+  .page-title {
+    font-size: 22px;
+  }
+  
+  .checklist-grid {
+    gap: 10px;
+  }
+  
+  .symptom-item {
+    padding: 10px 14px;
+  }
+  
+  .symptom-label {
+    font-size: 13px;
+  }
+  
+  .advice-box {
+    padding: 12px;
+    margin-top: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .advice-text {
+    font-size: 13px;
   }
 }
 
