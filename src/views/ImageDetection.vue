@@ -213,26 +213,25 @@ export default {
           
           // 尝试多个支持文件上传的CORS代理服务
           const proxyServices = [
-            // 前缀式代理 - 支持POST和文件上传
+            // 更可靠的代理服务
             { 
-              name: 'CORS-Anywhere', 
-              url: 'https://cors-anywhere.herokuapp.com/',
+              name: 'AllOrigins', 
+              url: 'https://api.allorigins.win/raw?url=',
               type: 'prefix'
             },
             { 
-              name: 'ThingProxy', 
-              url: 'https://thingproxy.freeboard.io/fetch/',
+              name: 'CORS-Bridged', 
+              url: 'https://cors.bridged.cc/',
               type: 'prefix' 
             },
             {
-              name: 'Proxy-Any-Origin',
-              url: 'https://api.codetabs.com/v1/proxy/?quest=',
+              name: 'YACDN-Proxy',
+              url: 'https://yacdn.org/proxy/',
               type: 'prefix'
             },
-            // 新的代理服务
             {
-              name: 'Crossorigin-Me',
-              url: 'https://crossorigin.me/',
+              name: 'CodeTabs-Proxy',
+              url: 'https://api.codetabs.com/v1/proxy/?quest=',
               type: 'prefix'
             }
           ];
@@ -292,7 +291,16 @@ export default {
           }
         }
         
-        if (!json) throw new Error('All proxy services failed');
+        if (!json) {
+          // 如果所有代理都失败，显示更友好的错误信息
+          this.results = [{
+            title: 'Service Unavailable',
+            scientificName: '',
+            risk: 'unknown',
+            description: 'Image analysis service is temporarily unavailable. Please try again later or contact support.'
+          }];
+          return;
+        }
         
         console.log('Detection result:', json);
         
