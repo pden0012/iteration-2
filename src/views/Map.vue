@@ -141,14 +141,12 @@ export default {
           return `/api/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
         }
       } else {
-        // 生产环境使用CORS代理解决Mixed Content问题
-        let backendUrl;
+        // 生产环境使用自建代理服务器
         if (this.allergenicity === 'all') {
-          backendUrl = `http://13.236.162.216:8080/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+          return `https://hayfever-cors-proxy.onrender.com/api/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
         } else {
-          backendUrl = `http://13.236.162.216:8080/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+          return `https://hayfever-cors-proxy.onrender.com/api/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
         }
-        return `https://api.allorigins.win/raw?url=${encodeURIComponent(backendUrl)}`;
       }
     },
 

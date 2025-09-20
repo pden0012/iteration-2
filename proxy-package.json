@@ -1,11 +1,12 @@
 {
   "name": "cors-proxy-server",
   "version": "1.0.0",
-  "description": "Simple CORS proxy for image detection API",
+  "description": "CORS Proxy Server for Hay Fever Management App",
   "main": "cors-proxy-server.js",
   "scripts": {
     "start": "node cors-proxy-server.js",
-    "dev": "node cors-proxy-server.js"
+    "dev": "nodemon cors-proxy-server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "express": "^4.18.2",
@@ -14,8 +15,18 @@
     "node-fetch": "^2.7.0",
     "form-data": "^4.0.0"
   },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "cors",
+    "proxy",
+    "express",
+    "api"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
   "engines": {
-    "node": ">=16"
+    "node": ">=16.0.0"
   }
 }
-

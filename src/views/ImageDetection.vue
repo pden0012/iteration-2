@@ -178,21 +178,10 @@ export default {
       try {
         this.isLoading = true;
         
-        // 在生产环境尝试多个代理服务
         const isDev = import.meta.env.DEV;
-        const proxyServices = isDev ? [] : [
-          // 备选代理服务列表 - 按可靠性排序
-          'https://api.allorigins.win/raw?url=',
-          'https://cors.bridged.cc/',
-          'https://yacdn.org/proxy/',
-          'https://api.codetabs.com/v1/proxy/?quest=',
-          'https://cors-anywhere.herokuapp.com/'
-        ];
-        
         let json = null;
-        const backendUrl = `http://13.236.162.216:8080/ai/image`;
         
-        // 开发环境直接使用本地代理
+        // 开发环境使用本地代理
         if (isDev) {
           const url = '/api/ai/image';
           const form = new FormData();
@@ -208,86 +197,26 @@ export default {
             json = await res.json();
           }
         } else {
-          // 生产环境使用多个CORS代理服务尝试
-          const backendUrl = 'http://13.236.162.216:8080/ai/image';
+          // 生产环境使用自建代理服务器
+          const proxyUrl = 'https://hayfever-cors-proxy.onrender.com/api/ai/image';
           
-          // 尝试多个支持文件上传的CORS代理服务
-          const proxyServices = [
-            // 更可靠的代理服务
-            { 
-              name: 'AllOrigins', 
-              url: 'https://api.allorigins.win/raw?url=',
-              type: 'prefix'
-            },
-            { 
-              name: 'CORS-Bridged', 
-              url: 'https://cors.bridged.cc/',
-              type: 'prefix' 
-            },
-            {
-              name: 'YACDN-Proxy',
-              url: 'https://yacdn.org/proxy/',
-              type: 'prefix'
-            },
-            {
-              name: 'CodeTabs-Proxy',
-              url: 'https://api.codetabs.com/v1/proxy/?quest=',
-              type: 'prefix'
-            }
-          ];
+          console.log('🔄 使用自建代理服务器进行图片分析...');
           
-          let proxyWorked = false;
+          const form = new FormData();
+          form.append('image', file);
+          form.append('text', ' ');
           
-          for (const proxyService of proxyServices) {
-            try {
-              const requestUrl = `${proxyService.url}${encodeURIComponent(backendUrl)}`;
-              
-              console.log(`🔄 尝试代理: ${proxyService.name}`);
-              
-              const form = new FormData();
-              form.append('image', file);
-              form.append('text', ' ');
-              
-              const res = await fetch(requestUrl, {
-                method: 'POST',
-                body: form,
-                mode: 'cors'
-              });
-              
-              if (res.ok) {
-                const result = await res.json();
-                json = result;
-                console.log(`✅ ${proxyService.name} 代理成功！`);
-                proxyWorked = true;
-                break;
-              } else {
-                console.log(`❌ ${proxyService.name} 返回状态: ${res.status}`);
-              }
-            } catch (e) {
-              console.log(`❌ ${proxyService.name} 失败:`, e.message);
-              continue;
-            }
-          }
+          const res = await fetch(proxyUrl, {
+            method: 'POST',
+            body: form,
+            mode: 'cors'
+          });
           
-          if (!proxyWorked) {
-            // 最后尝试：直接访问（某些情况下可能工作）
-            console.log('🔄 最后尝试：直接访问后端...');
-            try {
-              const form = new FormData();
-              form.append('image', file);
-              form.append('text', ' ');
-              
-              const res = await fetch(backendUrl, {
-                method: 'POST',
-                body: form,
-                mode: 'no-cors'
-              });
-              
-              // no-cors模式无法读取响应，但可以尝试
-              console.log('直接访问已发送，但无法读取响应 (no-cors模式)');
-            } catch (e) {
-              console.log('直接访问也失败:', e.message);
-            }
+          if (res.ok) {
+            json = await res.json();
+            console.log('✅ 自建代理服务器成功！');
+          } else {
+            throw new Error(`Proxy server responded with status: ${res.status}`);
           }
         }
         

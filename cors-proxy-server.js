@@ -1,86 +1,205 @@
-// CORS Proxy Server for Render deployment
-// Super simple proxy to forward image detection requests
-
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const fetch = require('node-fetch');
-const FormData = require('form-data');
+const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Enable CORS for all routes
 app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: ['https://iteration-2.onrender.com', 'http://localhost:3000'],
+  credentials: true
 }));
 
+// Parse JSON bodies
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
 // Configure multer for file uploads
-const upload = multer({ 
+const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+  limits: {
+    fileSize: 2 * 1024 * 1024, // 2MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Allow only image files
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'), false);
+    }
+  }
 });
 
+// Backend API base URL
+const BACKEND_URL = 'http://13.236.162.216:8080';
+
 // Health check endpoint
-app.get('/', (req, res) => {
+app.get('/health', (req, res) => {
   res.json({ 
-    status: 'CORS Proxy Server is running',
-    endpoints: ['/api/image-detection']
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    service: 'CORS Proxy Server'
   });
 });
 
-// Main proxy endpoint
-app.post('/api/image-detection', upload.single('image'), async (req, res) => {
+// Proxy for map data (GET requests)
+app.get('/api/map/*', async (req, res) => {
   try {
-    console.log('Received image detection request');
+    const path = req.params[0];
+    const queryString = req.url.split('?')[1] || '';
+    const url = `${BACKEND_URL}/map/${path}${queryString ? '?' + queryString : ''}`;
     
-    // Check if image was uploaded
-    if (!req.file) {
-      return res.status(400).json({ error: 'No image file provided' });
-    }
+    console.log(`🗺️ Proxying map request: ${url}`);
     
-    // Create FormData for backend request
-    const form = new FormData();
-    form.append('image', req.file.buffer, {
-      filename: req.file.originalname,
-      contentType: req.file.mimetype
-    });
-    form.append('text', req.body.text || ' ');
-    
-    // Forward to your backend
-    const backendUrl = 'http://13.236.162.216:8080/ai/image';
-    console.log('Forwarding to backend:', backendUrl);
-    
-    const response = await fetch(backendUrl, {
-      method: 'POST',
-      body: form,
-      headers: form.getHeaders()
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'CORS-Proxy-Server/1.0'
+      }
     });
     
     if (!response.ok) {
-      console.error('Backend error:', response.status, response.statusText);
-      return res.status(response.status).json({ 
-        error: `Backend returned ${response.status}` 
-      });
+      throw new Error(`Backend responded with status: ${response.status}`);
     }
     
     const data = await response.json();
-    console.log('Backend response received:', data);
-    
     res.json(data);
     
   } catch (error) {
-    console.error('Proxy error:', error);
-    res.status(500).json({ 
-      error: 'Proxy server error', 
-      message: error.message 
+    console.error('❌ Map proxy error:', error.message);
+    res.status(500).json({
+      error: 'Failed to fetch map data',
+      message: error.message,
+      timestamp: new Date().toISOString()
     });
   }
 });
 
-app.listen(port, () => {
-  console.log(`CORS Proxy Server running on port ${port}`);
+// Proxy for image analysis (POST requests with file upload)
+app.post('/api/ai/image', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        error: 'No image file provided',
+        message: 'Please upload an image file'
+      });
+    }
+    
+    console.log(`🖼️ Proxying image analysis request`);
+    console.log(`📁 File: ${req.file.originalname}, Size: ${req.file.size} bytes`);
+    
+    // Create FormData for the backend
+    const FormData = require('form-data');
+    const formData = new FormData();
+    
+    // Add the image file
+    formData.append('image', req.file.buffer, {
+      filename: req.file.originalname,
+      contentType: req.file.mimetype
+    });
+    
+    // Add text parameter if provided
+    const text = req.body.text || ' ';
+    formData.append('text', text);
+    
+    // Forward to backend
+    const response = await fetch(`${BACKEND_URL}/ai/image`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        ...formData.getHeaders(),
+        'User-Agent': 'CORS-Proxy-Server/1.0'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Backend responded with status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    res.json(data);
+    
+  } catch (error) {
+    console.error('❌ Image analysis proxy error:', error.message);
+    res.status(500).json({
+      error: 'Failed to analyze image',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
+// Generic proxy for other API endpoints
+app.all('/api/*', async (req, res) => {
+  try {
+    const path = req.params[0];
+    const queryString = req.url.split('?')[1] || '';
+    const url = `${BACKEND_URL}/${path}${queryString ? '?' + queryString : ''}`;
+    
+    console.log(`🔄 Proxying ${req.method} request: ${url}`);
+    
+    const options = {
+      method: req.method,
+      headers: {
+        'Content-Type': req.get('Content-Type') || 'application/json',
+        'User-Agent': 'CORS-Proxy-Server/1.0'
+      }
+    };
+    
+    // Add body for POST/PUT/PATCH requests
+    if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+      options.body = JSON.stringify(req.body);
+    }
+    
+    const response = await fetch(url, options);
+    
+    if (!response.ok) {
+      throw new Error(`Backend responded with status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    res.json(data);
+    
+  } catch (error) {
+    console.error('❌ Generic proxy error:', error.message);
+    res.status(500).json({
+      error: 'Failed to proxy request',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Error handling middleware
+app.use((error, req, res, next) => {
+  console.error('🚨 Server error:', error);
+  res.status(500).json({
+    error: 'Internal server error',
+    message: error.message,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({
+    error: 'Not found',
+    message: `Route ${req.method} ${req.originalUrl} not found`,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 CORS Proxy Server running on port ${PORT}`);
+  console.log(`🌐 Health check: http://localhost:${PORT}/health`);
+  console.log(`🗺️ Map proxy: http://localhost:${PORT}/api/map/*`);
+  console.log(`🖼️ Image proxy: http://localhost:${PORT}/api/ai/image`);
+  console.log(`🔄 Generic proxy: http://localhost:${PORT}/api/*`);
+});
+
+module.exports = app;
