@@ -325,16 +325,16 @@ export default {
 /* 中文：页面整体采用浅色背景；右侧卡片白底。
    English: page background is light; cards use plain white. */
 .image-page {
-  /* 修复背景图片底部留白问题 */
+  /* 背景图片高度控制，覆盖到第三个卡片下面一点 */
   width: 100%;
   margin: 0;
-  padding: 24px 0 40px 0; /* 减少底部padding */
+  padding: 24px 0 40px 0;
   background-color: #f3faf5;
   background-image: url('/images/Image Detection Background.png');
   background-repeat: no-repeat;
-  background-position: center top; /* 改为顶部对齐 */
-  background-size: cover; /* 覆盖整个容器 */
-  /* 移除 background-attachment: fixed 和 min-height */
+  background-position: center top;
+  background-size: 100% 520px; /* 固定背景图片高度，大概覆盖到第三个卡片位置 */
+  min-height: 100vh; /* 确保页面有足够高度 */
 }
 
 .image-grid {
@@ -354,6 +354,7 @@ export default {
   justify-content: center; /* 垂直居中对齐 */
   gap: 16px;
   min-height: 600px; /* 确保有足够的高度进行居中 */
+  margin-top: -40px; /* 稍微向上移动一点点 */
 }
 
 .upload-section {
