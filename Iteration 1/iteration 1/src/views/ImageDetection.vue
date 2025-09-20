@@ -199,10 +199,9 @@ export default {
             json = await res.json();
           }
         } else {
-          // 生产环境使用自建CORS代理服务
-          // TODO: 部署代理服务后，将此URL替换为你的代理服务URL
-          // 例如: https://your-proxy-service.onrender.com/api/image-detection
-          const proxyUrl = 'https://your-cors-proxy.onrender.com/api/image-detection';
+          // 生产环境使用CORS代理服务
+          // 当前使用可靠的公共代理，你也可以部署自建代理服务
+          const proxyUrl = 'https://cors.bridged.cc/http://13.236.162.216:8080/ai/image';
           
           try {
             console.log('使用自建CORS代理服务...');
