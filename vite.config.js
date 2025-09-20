@@ -5,7 +5,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const apiTarget = env.VITE_API_TARGET || 'http://13.236.162.216:8080'
   return {
-    base: '/main_tp40/',
+    base: '/',
     plugins: [vue()],
     server: {
       port: 3000,
