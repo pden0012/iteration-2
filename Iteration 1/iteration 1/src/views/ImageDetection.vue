@@ -812,4 +812,3 @@ export default {
   }
 }
 </style>
-</style>

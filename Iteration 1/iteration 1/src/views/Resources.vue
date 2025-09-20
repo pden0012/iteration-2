@@ -973,10 +973,9 @@ export default {
   }
 }
 
-
-
-  /* Video detail responsive design */
-  /* 视频详情响应式设计 */
+/* Video detail responsive design */
+/* 视频详情响应式设计 */
+@media (max-width: 767px) {
   .video-detail-page {
     padding: 20px 0;
   }
@@ -994,8 +993,6 @@ export default {
   .back-button {
     margin-bottom: 24px;
   }
-
-
 }
 
 /* Placeholder styling for missing images */
@@ -1019,5 +1016,4 @@ export default {
 .card-image:has(img)::before {
   display: none;
 }
-</style>
 </style>
