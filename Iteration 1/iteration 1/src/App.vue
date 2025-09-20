@@ -31,6 +31,7 @@
         <Dashboard v-else-if="currentView === 'dashboard'" />
         <MapView v-else-if="currentView === 'map'" />
         <Resources v-else-if="currentView === 'resources'" @navigate-to-symptoms="navigateToSymptoms" />
+        <ImageDetection v-else-if="currentView === 'image'" />
         <Symptoms v-else-if="currentView === 'symptoms'" />
         <div v-else class="coming-soon">
         <h2>Coming Soon</h2>
@@ -53,6 +54,7 @@ import Dashboard from './views/Dashboard.vue'
 import Resources from './views/Resources.vue'
 import Symptoms from './views/Symptoms.vue'
 import MapView from './views/Map.vue'
+import ImageDetection from './views/ImageDetection.vue'
 
 export default {
   name: 'App',
@@ -61,7 +63,8 @@ export default {
     Dashboard,
     Resources,
     Symptoms,
-    MapView
+    MapView,
+    ImageDetection
   },
   data() {
     return {
@@ -71,6 +74,7 @@ export default {
         { id: 'home', text: 'Home', href: '#home' },
         { id: 'dashboard', text: 'Pollen Dashboard', href: '#dashboard' },
         { id: 'map', text: 'Allergen Map', href: '#map' },
+        { id: 'image', text: 'Image Detection', href: '#image' },
         { id: 'trends', text: 'Trends', href: '#trends' },
         { id: 'resources', text: 'Resources', href: '#resources' },
         { id: 'support', text: 'Support', href: '#support' }
@@ -114,7 +118,7 @@ export default {
     // Handle browser back/forward and direct URL access
     handleHashChange() {
       const hash = window.location.hash.substring(1) || 'home';
-      const validViews = ['home', 'dashboard', 'map', 'trends', 'resources', 'support', 'symptoms'];
+      const validViews = ['home', 'dashboard', 'map', 'image', 'trends', 'resources', 'support', 'symptoms'];
       
       if (validViews.includes(hash)) {
         this.currentView = hash;

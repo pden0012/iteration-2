@@ -1,0 +1,528 @@
+<template>
+  <div class="image-page">
+    <div class="image-grid">
+      <!-- Left side: upload -->
+      <div class="left-panel">
+        <div class="upload-section">
+          <div class="upload-box" @click="triggerFileInput">
+            <div class="upload-icon">📷</div>
+            <p class="upload-tip">Upload a plant photo<br />(JPG, PNG, WEBP, HEIC, HEIF)</p>
+          </div>
+          
+          <input
+            ref="fileInput"
+            type="file"
+            accept="image/jpeg, image/jpg, image/png, image/webp, image/heic, image/heif"
+            class="hidden-input"
+            @change="onFileChange"
+          />
+          
+          <button class="upload-btn" @click="triggerFileInput">
+            Upload Image
+          </button>
+          
+          <div v-if="uploadSuccess && !isLoading" class="upload-success">
+            Image uploaded successfully.
+          </div>
+          
+          <!-- Loading indicator -->
+          <div v-if="isLoading" class="loading-indicator">
+            <div class="spinner"></div>
+            <p class="loading-text">Analyzing image...</p>
+          </div>
+          
+          <div v-if="imagePreview" class="preview-wrapper">
+            <img :src="imagePreview" alt="Preview" class="preview-img" />
+            <button class="close-preview" @click="clearPreview">×</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right side: results -->
+      <div class="right-panel">
+        <div v-for="(result, idx) in topResults" :key="`result-${idx}`" class="result-card" :class="{ 'loading-card': result.isLoading }">
+          <div class="card-header">
+            <h3 class="card-title">{{ result.title || 'Plant Species' }}</h3>
+            <span 
+              class="badge" 
+              :class="result.risk === 'safe' ? 'safe' : result.risk === 'risk' ? 'risk' : 'unknown'"
+            >
+              {{ result.risk === 'safe' ? 'Safe' : result.risk === 'risk' ? 'Risk' : 'Unknown' }}
+            </span>
+          </div>
+          <!-- 删除了 scientific name 这一行 -->
+          <p class="card-confidence" v-if="!result.isLoading">Confidence Level: {{ idx + 1 }}</p>
+          <p class="card-confidence" v-else>
+            <span class="loading-dots">Analyzing</span>
+          </p>
+          <p class="card-description">{{ result.description || 'Analysis in progress...' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'ImageDetection',
+  data() {
+    return {
+      selectedFile: null,
+      imagePreview: null,
+      uploadSuccess: false,
+      results: [], // 后端返回的结果
+      isLoading: false
+    };
+  },
+  computed: {
+    // 显示前3个结果，按后端返回顺序
+    topResults() {
+      // 如果正在加载，显示加载状态
+      if (this.isLoading) {
+        return [
+          { title: 'Analyzing...', scientificName: '', risk: 'unknown', description: 'AI is analyzing your image...', isLoading: true },
+          { title: 'Processing...', scientificName: '', risk: 'unknown', description: 'Identifying plant species...', isLoading: true },
+          { title: 'Almost done...', scientificName: '', risk: 'unknown', description: 'Determining safety level...', isLoading: true }
+        ];
+      }
+      
+      const placeholders = [
+        { title: 'Waiting for analysis...', scientificName: '', risk: 'unknown', description: 'Upload an image to get started.' },
+        { title: 'Waiting for analysis...', scientificName: '', risk: 'unknown', description: 'Upload an image to get started.' },
+        { title: 'Waiting for analysis...', scientificName: '', risk: 'unknown', description: 'Upload an image to get started.' }
+      ];
+      
+      if (this.results.length === 0) {
+        return placeholders;
+      }
+      
+      // 使用后端返回的前3个结果，如果不足3个就用占位符补充
+      const actualResults = this.results.slice(0, 3);
+      while (actualResults.length < 3) {
+        actualResults.push({ 
+          title: 'No additional matches', 
+          scientificName: '', 
+          risk: 'unknown', 
+          description: 'No more species identified.' 
+        });
+      }
+      
+      return actualResults;
+    }
+  },
+  methods: {
+    triggerFileInput() {
+      this.$refs.fileInput.click();
+    },
+    
+    async onFileChange(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      
+      // 验证文件类型：jpg, png, webp, heic, heif
+      if (!/^image\/(jpeg|jpg|png|webp|heic|heif)$/.test(file.type)) {
+        alert('Only JPG, PNG, WEBP, HEIC, and HEIF image files are allowed.');
+        return;
+      }
+      
+      // 验证文件大小：< 2MB
+      const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+      if (file.size > maxSize) {
+        alert('Image size must be less than 2MB.');
+        return;
+      }
+      
+      this.selectedFile = file;
+      this.uploadSuccess = true;
+      
+      // 创建预览
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.imagePreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+      
+      // 发送到后端进行检测
+      await this.detectImage(file);
+    },
+    
+    clearPreview() {
+      this.imagePreview = null;
+      this.uploadSuccess = false;
+      this.selectedFile = null;
+      this.results = [];
+      this.$refs.fileInput.value = '';
+    },
+    
+    getApiUrl(path) {
+      const apiBase = import.meta.env.VITE_API_BASE || '/api';
+      return `${apiBase}${path}`;
+    },
+    
+    async detectImage(file) {
+      try {
+        this.isLoading = true;
+        
+        // 使用新的 API 路径 /ai/image
+        const candidates = ['/ai/image'];
+        let json = null;
+        for (const p of candidates) {
+          const url = this.getApiUrl(p);
+          const form = new FormData();
+          form.append('image', file);
+          form.append('text', ' '); // 发送空格作为text参数
+          
+          try {
+            const res = await fetch(url, {
+              method: 'POST',
+              body: form
+            });
+            
+            if (res.ok) {
+              json = await res.json();
+              break;
+            } else if (res.status === 404) {
+              console.log(`API path ${p} not found, trying next...`);
+              continue;
+            } else {
+              throw new Error(`HTTP ${res.status}`);
+            }
+          } catch (e) {
+            console.log(`Failed to call ${p}:`, e.message);
+            continue;
+          }
+        }
+        
+        if (!json) throw new Error('Failed to connect to /ai/image endpoint');
+        
+        console.log('Detection result:', json);
+        
+        // 处理后端返回的数据
+        if (json.data && Array.isArray(json.data)) {
+          this.results = json.data.map(item => ({
+            title: item.commonName || item.name || 'Unknown Species',
+            scientificName: item.scientificName || item.scientific_name || '',
+            description: this.getRiskDescription(item.isHarmful),
+            risk: this.mapRiskLevel(item.isHarmful)
+          }));
+        } else {
+          console.warn('Unexpected API response format:', json);
+          this.results = [];
+        }
+        
+      } catch (error) {
+        console.error('Image detection failed:', error);
+        alert('Failed to analyze image. Please try again.');
+        this.results = [];
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    
+    mapRiskLevel(isHarmful) {
+      // 将后端的 isHarmful 映射到前端的 risk 级别
+      if (isHarmful === '1' || isHarmful === true || isHarmful === 1) {
+        return 'risk';
+      } else if (isHarmful === '0' || isHarmful === false || isHarmful === 0) {
+        return 'safe';
+      } else {
+        return 'unknown';
+      }
+    },
+    
+    getRiskDescription(isHarmful) {
+      const risk = this.mapRiskLevel(isHarmful);
+      switch (risk) {
+        case 'safe':
+          return 'This plant is generally safe for most people.';
+        case 'risk':
+          return 'Potential allergen risk. Avoid close contact.';
+        default:
+          return 'Risk level unknown. Exercise caution.';
+      }
+    }
+  }
+};
+</script>
+
+<style scoped>
+/* 中文：页面整体采用浅色背景；右侧卡片白底。
+   English: page background is light; cards use plain white. */
+.image-page {
+  /* 修复背景图片底部留白问题 */
+  width: 100%;
+  margin: 0;
+  padding: 24px 0 40px 0; /* 减少底部padding */
+  background-color: #f3faf5;
+  background-image: url('/images/Image Detection Background.png');
+  background-repeat: no-repeat;
+  background-position: center top; /* 改为顶部对齐 */
+  background-size: cover; /* 覆盖整个容器 */
+  /* 移除 background-attachment: fixed 和 min-height */
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr; /* left:right ratio */
+  gap: 28px;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 20px; /* 内容区域的左右padding */
+}
+
+/* Left panel: upload area */
+.left-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.upload-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.upload-box {
+  width: 320px;
+  height: 200px;
+  border: 2px dashed #c8ddd0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.upload-box:hover {
+  border-color: #24b36b;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.upload-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.upload-tip {
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.hidden-input {
+  display: none;
+}
+
+.upload-btn {
+  height: 44px;
+  width: 320px; /* 与上传框同宽对齐 */
+  padding: 0 16px;
+  border-radius: 10px;
+  border: none;
+  background: #24b36b;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.06s ease, background 0.2s ease;
+}
+.upload-btn:hover { background: #1aa361; }
+.upload-btn:active { transform: translateY(1px); }
+
+.upload-success {
+  background: #fff7cc;
+  border: 1px solid #ffec99;
+  color: #6a5e00;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* Loading indicator styles */
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  border: 1px solid #e7ecea;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f0f0f0;
+  border-top: 3px solid #24b36b;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+  text-align: center;
+}
+
+/* Loading dots animation for result cards */
+.loading-dots::after {
+  content: '';
+  animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+  100% { content: ''; }
+}
+
+.preview-wrapper {
+  position: relative;
+  width: 320px;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e7ecea;
+}
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.close-preview {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: #ff5a5a;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Right panel: results */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.result-card {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 18px 16px; /* 增加padding：从12px 14px改为18px 16px */
+  min-height: 110px; /* 增加最小高度 */
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 1px solid rgba(231, 236, 234, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* 内容均匀分布 */
+  transition: all 0.3s ease;
+}
+
+.result-card.loading-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #24b36b;
+  box-shadow: 0 2px 12px rgba(36, 179, 107, 0.15);
+  animation: pulse-card 2s ease-in-out infinite;
+}
+
+@keyframes pulse-card {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 2px 12px rgba(36, 179, 107, 0.15);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 4px 16px rgba(36, 179, 107, 0.25);
+  }
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px; /* 增加间距：从6px改为8px */
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+  flex: 1;
+  margin-right: 8px;
+  line-height: 1.3; /* 增加行高 */
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.badge.safe { background: #d4edda; color: #155724; }
+.badge.risk { background: #f8d7da; color: #721c24; }
+.badge.unknown { background: #e2e3e5; color: #6c757d; }
+
+.card-confidence {
+  font-size: 12px;
+  color: #495057;
+  font-weight: 500;
+  margin: 0 0 8px 0; /* 增加间距：从6px改为8px */
+}
+
+.card-description {
+  color: #6c757d;
+  font-size: 13px;
+  line-height: 1.5; /* 增加行高 */
+  margin: 0;
+  flex-grow: 1; /* 让描述占用剩余空间 */
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .image-page {
+    padding: 16px 0 20px 0; /* 移动端减少更多底部padding */
+  }
+  
+  .image-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 16px;
+  }
+  
+  .upload-box,
+  .upload-btn,
+  .preview-wrapper {
+    width: 280px;
+  }
+  
+  .result-card {
+    min-height: 100px; /* 移动端稍微小一点 */
+    padding: 16px 14px;
+  }
+}
+</style>
