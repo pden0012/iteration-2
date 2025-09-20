@@ -307,10 +307,38 @@ export default {
   margin: 0;
 }
 
-/* Responsive Design */
+/* 📱 Responsive Navigation Design */
 @media (max-width: 768px) {
+  .nav-container {
+    flex-direction: column;
+    padding: 8px 12px;
+    gap: 12px;
+  }
+  
+  .logo {
+    margin-bottom: 8px;
+  }
+  
   .nav-menu {
-    display: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .nav-item {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+  
+  .nav-link {
+    font-size: 14px;
+  }
+  
+  .navbar {
+    height: auto;
+    min-height: 80px;
   }
 }
 </style>
