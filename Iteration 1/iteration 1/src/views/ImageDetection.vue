@@ -199,41 +199,43 @@ export default {
             json = await res.json();
           }
         } else {
-          // 首先尝试直接HTTPS访问（万一后端支持）
+          // 生产环境使用自建CORS代理服务
+          // TODO: 部署代理服务后，将此URL替换为你的代理服务URL
+          // 例如: https://your-proxy-service.onrender.com/api/image-detection
+          const proxyUrl = 'https://your-cors-proxy.onrender.com/api/image-detection';
+          
           try {
-            const httpsUrl = backendUrl.replace('http:', 'https:');
+            console.log('使用自建CORS代理服务...');
+            
             const form = new FormData();
             form.append('image', file);
             form.append('text', ' ');
             
-            const res = await fetch(httpsUrl, {
+            const res = await fetch(proxyUrl, {
               method: 'POST',
               body: form
             });
             
             if (res.ok) {
               json = await res.json();
-              console.log('成功使用HTTPS直接访问后端');
+              console.log('✅ 自建代理服务成功！');
             } else {
-              console.log(`HTTPS直接访问失败，状态: ${res.status}`);
+              console.log(`❌ 代理服务返回状态: ${res.status}`);
+              // 如果自建代理失败，回退到公共代理
+              throw new Error(`Proxy returned ${res.status}`);
             }
           } catch (e) {
-            console.log('HTTPS直接访问失败:', e.message);
-          }
-          
-          // 如果直接HTTPS失败，尝试代理服务
-          if (!json) {
-            for (const proxy of proxyServices) {
+            console.log('自建代理失败，尝试备选方案...', e.message);
+            
+            // 备选方案：尝试一些可靠的公共代理
+            const fallbackProxies = [
+              'https://cors.bridged.cc/',
+              'https://yacdn.org/proxy/'
+            ];
+            
+            for (const proxy of fallbackProxies) {
               try {
-                let url;
-                if (proxy.includes('allorigins.win')) {
-                  // allorigins.win 不支持POST，跳过
-                  console.log('跳过 allorigins.win (不支持文件上传)');
-                  continue;
-                } else {
-                  url = `${proxy}${encodeURIComponent(backendUrl)}`;
-                }
-                
+                const url = `${proxy}${encodeURIComponent(backendUrl)}`;
                 const form = new FormData();
                 form.append('image', file);
                 form.append('text', ' ');
@@ -245,14 +247,14 @@ export default {
                 
                 if (res.ok) {
                   json = await res.json();
-                  console.log(`成功使用代理: ${proxy}`);
+                  console.log(`✅ 备选代理成功: ${proxy}`);
                   break;
                 } else {
-                  console.log(`代理 ${proxy} 返回状态: ${res.status}`);
+                  console.log(`❌ 备选代理 ${proxy} 返回状态: ${res.status}`);
                   continue;
                 }
               } catch (e) {
-                console.log(`代理 ${proxy} 失败:`, e.message);
+                console.log(`❌ 备选代理 ${proxy} 失败:`, e.message);
                 continue;
               }
             }
