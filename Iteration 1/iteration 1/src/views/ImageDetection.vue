@@ -334,7 +334,7 @@ export default {
   background-repeat: no-repeat;
   background-position: center top;
   background-size: 100% 620px; /* 刚好覆盖到第三个卡片下面一点点 */
-  min-height: 100vh; /* 确保页面有足够高度 */
+  /* 移除 min-height，让页面高度适应内容，消除下方空隙 */
 }
 
 .image-grid {
