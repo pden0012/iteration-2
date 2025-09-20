@@ -351,7 +351,9 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center; /* 垂直居中对齐 */
   gap: 16px;
+  min-height: 600px; /* 确保有足够的高度进行居中 */
 }
 
 .upload-section {
