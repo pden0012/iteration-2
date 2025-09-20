@@ -325,7 +325,7 @@ export default {
 /* 中文：页面整体采用浅色背景；右侧卡片白底。
    English: page background is light; cards use plain white. */
 .image-page {
-  /* 背景图片高度控制，覆盖到第三个卡片下面一点 */
+  /* 背景图片高度控制，完全覆盖到第三个卡片下面 */
   width: 100%;
   margin: 0;
   padding: 24px 0 40px 0;
@@ -333,7 +333,7 @@ export default {
   background-image: url('/images/Image Detection Background.png');
   background-repeat: no-repeat;
   background-position: center top;
-  background-size: 100% 520px; /* 固定背景图片高度，大概覆盖到第三个卡片位置 */
+  background-size: 100% 750px; /* 增加背景图片高度，完全覆盖第三个卡片 */
   min-height: 100vh; /* 确保页面有足够高度 */
 }
 

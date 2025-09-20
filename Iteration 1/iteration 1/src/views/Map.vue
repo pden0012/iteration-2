@@ -239,6 +239,7 @@ export default {
               commonName: item.commonName || 'Tree',
               scientificName: item.scientificName || '',
               allergenicity: item.allergenicity,
+              amount: item.amount || 1, // 聚合点的树木数量
               isSafe: isSafe,
               color: color
             },
@@ -262,14 +263,19 @@ export default {
         const feature = event.feature;
         const commonName = feature.getProperty('commonName');
         const scientificName = feature.getProperty('scientificName');
+        const amount = feature.getProperty('amount') || 1; // 获取聚合数量
         const isSafe = feature.getProperty('isSafe');
         const color = feature.getProperty('color');
         const riskLabel = isSafe ? 'Safe' : 'Risk';
+        
+        // 根据数量显示不同的内容
+        const amountText = amount > 1 ? `<br/>Trees Count: <strong>${amount}</strong>` : '';
         
         const content = `<div style="font-family: Inter, sans-serif; font-size:12px;">
             <strong>${commonName}</strong><br/>
             <em>${scientificName}</em><br/>
             Risk Level: <span style="color:${color}; font-weight:600;">${riskLabel}</span>
+            ${amountText}
           </div>`;
         
         this.infoWindow.setContent(content);
