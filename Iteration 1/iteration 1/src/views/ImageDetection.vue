@@ -333,7 +333,7 @@ export default {
   background-image: url('/images/Image Detection Background.png');
   background-repeat: no-repeat;
   background-position: center top;
-  background-size: 100% 750px; /* 增加背景图片高度，完全覆盖第三个卡片 */
+  background-size: 100% 620px; /* 刚好覆盖到第三个卡片下面一点点 */
   min-height: 100vh; /* 确保页面有足够高度 */
 }
 
