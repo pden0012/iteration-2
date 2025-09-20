@@ -155,15 +155,13 @@ export default {
     },
     
     getApiUrl(path) {
-      // 开发环境使用本地代理，生产环境使用HTTPS代理解决Mixed Content问题
+      // 这个函数现在主要用于开发环境，生产环境的代理逻辑在detectImage中处理
       const isDev = import.meta.env.DEV;
       if (isDev) {
         return `/api${path}`;
       } else {
-        // 生产环境使用HTTPS代理解决Mixed Content问题
-        const backendUrl = `http://13.236.162.216:8080${path}`;
-        // 使用支持文件上传的HTTPS代理服务
-        return `https://corsproxy.io/?${encodeURIComponent(backendUrl)}`;
+        // 生产环境将在detectImage函数中处理多个代理服务
+        return `http://13.236.162.216:8080${path}`;
       }
     },
     
@@ -171,37 +169,63 @@ export default {
       try {
         this.isLoading = true;
         
-        // 使用新的 API 路径 /ai/image
-        const candidates = ['/ai/image'];
+        // 在生产环境尝试多个代理服务
+        const isDev = import.meta.env.DEV;
+        const proxyServices = isDev ? [] : [
+          // 备选代理服务列表
+          'https://cors-anywhere.herokuapp.com/',
+          'https://api.codetabs.com/v1/proxy/?quest=',
+          'https://thingproxy.freeboard.io/fetch/'
+        ];
+        
         let json = null;
-        for (const p of candidates) {
-          const url = this.getApiUrl(p);
+        const backendUrl = `http://13.236.162.216:8080/ai/image`;
+        
+        // 开发环境直接使用本地代理
+        if (isDev) {
+          const url = '/api/ai/image';
           const form = new FormData();
           form.append('image', file);
-          form.append('text', ' '); // 发送空格作为text参数
+          form.append('text', ' ');
           
-          try {
-            const res = await fetch(url, {
-              method: 'POST',
-              body: form
-            });
-            
-            if (res.ok) {
-              json = await res.json();
-              break;
-            } else if (res.status === 404) {
-              console.log(`API path ${p} not found, trying next...`);
+          const res = await fetch(url, {
+            method: 'POST',
+            body: form
+          });
+          
+          if (res.ok) {
+            json = await res.json();
+          }
+        } else {
+          // 生产环境尝试多个代理服务
+          for (const proxy of proxyServices) {
+            try {
+              const url = `${proxy}${encodeURIComponent(backendUrl)}`;
+              const form = new FormData();
+              form.append('image', file);
+              form.append('text', ' ');
+              
+              const res = await fetch(url, {
+                method: 'POST',
+                body: form
+              });
+              
+              if (res.ok) {
+                json = await res.json();
+                console.log(`成功使用代理: ${proxy}`);
+                break;
+              } else {
+                console.log(`代理 ${proxy} 返回状态: ${res.status}`);
+                continue;
+              }
+            } catch (e) {
+              console.log(`代理 ${proxy} 失败:`, e.message);
               continue;
-            } else {
-              throw new Error(`HTTP ${res.status}`);
             }
-          } catch (e) {
-            console.log(`Failed to call ${p}:`, e.message);
-            continue;
           }
         }
         
-        if (!json) throw new Error('Failed to connect to /ai/image endpoint');
+        if (!json) throw new Error('All proxy services failed');
         
         console.log('Detection result:', json);
         
