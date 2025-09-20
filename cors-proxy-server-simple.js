@@ -2,88 +2,65 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const fetch = require('node-fetch');
-const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Enable CORS for all routes
+// 简化的CORS配置 - 允许所有来源进行测试
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    const allowedOrigins = [
-      'https://iteration-2.onrender.com',
-      'http://localhost:3000',
-      'http://localhost:5173' // Vite dev server
-    ];
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      console.log('🚫 CORS blocked origin:', origin);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true, // 允许所有来源
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }));
 
-// Parse JSON bodies
+// 处理预检请求
+app.options('*', (req, res) => {
+  console.log('🔄 Preflight request for:', req.path);
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  res.status(200).end();
+});
+
+// 解析JSON和URL编码
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Configure multer for file uploads
+// 文件上传配置
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 2 * 1024 * 1024, // 2MB limit
-  },
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
   fileFilter: (req, file, cb) => {
-    // Allow only image files
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
     } else {
-      cb(new Error('Only image files are allowed'), false);
+      cb(new Error('Only image files allowed'), false);
     }
   }
 });
 
-// Backend API base URL
 const BACKEND_URL = 'http://13.236.162.216:8080';
 
-// Handle preflight requests
-app.options('*', (req, res) => {
-  console.log('🔄 Handling preflight request for:', req.path);
-  res.status(200).end();
-});
-
-// Health check endpoint
+// 健康检查
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
+  res.json({
+    status: 'OK',
     timestamp: new Date().toISOString(),
     service: 'CORS Proxy Server',
-    cors: 'Enabled',
-    allowedOrigins: [
-      'https://iteration-2.onrender.com',
-      'http://localhost:3000',
-      'http://localhost:5173'
-    ]
+    cors: 'Enabled for all origins',
+    backend: BACKEND_URL
   });
 });
 
-// Proxy for map data (GET requests)
+// 地图数据代理
 app.get('/api/map/*', async (req, res) => {
   try {
     const path = req.params[0];
     const queryString = req.url.split('?')[1] || '';
     const url = `${BACKEND_URL}/map/${path}${queryString ? '?' + queryString : ''}`;
     
-    console.log(`🗺️ Proxying map request from origin: ${req.get('Origin')}`);
-    console.log(`🗺️ Request URL: ${url}`);
+    console.log(`🗺️ Map request from ${req.get('Origin')}: ${url}`);
     
     const response = await fetch(url, {
       method: 'GET',
@@ -94,51 +71,48 @@ app.get('/api/map/*', async (req, res) => {
     });
     
     if (!response.ok) {
-      throw new Error(`Backend responded with status: ${response.status}`);
+      throw new Error(`Backend error: ${response.status}`);
     }
     
     const data = await response.json();
-    console.log(`✅ Map data received, ${data.data ? data.data.length : 0} items`);
+    console.log(`✅ Map data: ${data.data ? data.data.length : 0} items`);
+    
+    // 确保CORS头
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
     res.json(data);
     
   } catch (error) {
     console.error('❌ Map proxy error:', error.message);
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
     res.status(500).json({
-      error: 'Failed to fetch map data',
+      error: 'Map data fetch failed',
       message: error.message,
       timestamp: new Date().toISOString()
     });
   }
 });
 
-// Proxy for image analysis (POST requests with file upload)
+// 图片分析代理
 app.post('/api/ai/image', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
+      res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
       return res.status(400).json({
-        error: 'No image file provided',
-        message: 'Please upload an image file'
+        error: 'No image file provided'
       });
     }
     
-    console.log(`🖼️ Proxying image analysis request`);
-    console.log(`📁 File: ${req.file.originalname}, Size: ${req.file.size} bytes`);
+    console.log(`🖼️ Image analysis from ${req.get('Origin')}: ${req.file.originalname}`);
     
-    // Create FormData for the backend
     const FormData = require('form-data');
     const formData = new FormData();
     
-    // Add the image file
     formData.append('image', req.file.buffer, {
       filename: req.file.originalname,
       contentType: req.file.mimetype
     });
+    formData.append('text', req.body.text || ' ');
     
-    // Add text parameter if provided
-    const text = req.body.text || ' ';
-    formData.append('text', text);
-    
-    // Forward to backend
     const response = await fetch(`${BACKEND_URL}/ai/image`, {
       method: 'POST',
       body: formData,
@@ -149,30 +123,35 @@ app.post('/api/ai/image', upload.single('image'), async (req, res) => {
     });
     
     if (!response.ok) {
-      throw new Error(`Backend responded with status: ${response.status}`);
+      throw new Error(`Backend error: ${response.status}`);
     }
     
     const data = await response.json();
+    console.log(`✅ Image analysis completed`);
+    
+    // 确保CORS头
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
     res.json(data);
     
   } catch (error) {
-    console.error('❌ Image analysis proxy error:', error.message);
+    console.error('❌ Image proxy error:', error.message);
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
     res.status(500).json({
-      error: 'Failed to analyze image',
+      error: 'Image analysis failed',
       message: error.message,
       timestamp: new Date().toISOString()
     });
   }
 });
 
-// Generic proxy for other API endpoints
+// 通用代理
 app.all('/api/*', async (req, res) => {
   try {
     const path = req.params[0];
     const queryString = req.url.split('?')[1] || '';
     const url = `${BACKEND_URL}/${path}${queryString ? '?' + queryString : ''}`;
     
-    console.log(`🔄 Proxying ${req.method} request: ${url}`);
+    console.log(`🔄 ${req.method} request from ${req.get('Origin')}: ${url}`);
     
     const options = {
       method: req.method,
@@ -182,7 +161,6 @@ app.all('/api/*', async (req, res) => {
       }
     };
     
-    // Add body for POST/PUT/PATCH requests
     if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
       options.body = JSON.stringify(req.body);
     }
@@ -190,25 +168,30 @@ app.all('/api/*', async (req, res) => {
     const response = await fetch(url, options);
     
     if (!response.ok) {
-      throw new Error(`Backend responded with status: ${response.status}`);
+      throw new Error(`Backend error: ${response.status}`);
     }
     
     const data = await response.json();
+    
+    // 确保CORS头
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
     res.json(data);
     
   } catch (error) {
     console.error('❌ Generic proxy error:', error.message);
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
     res.status(500).json({
-      error: 'Failed to proxy request',
+      error: 'Proxy request failed',
       message: error.message,
       timestamp: new Date().toISOString()
     });
   }
 });
 
-// Error handling middleware
+// 错误处理
 app.use((error, req, res, next) => {
   console.error('🚨 Server error:', error);
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.status(500).json({
     error: 'Internal server error',
     message: error.message,
@@ -216,8 +199,9 @@ app.use((error, req, res, next) => {
   });
 });
 
-// 404 handler
+// 404处理
 app.use('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.status(404).json({
     error: 'Not found',
     message: `Route ${req.method} ${req.originalUrl} not found`,
@@ -225,13 +209,13 @@ app.use('*', (req, res) => {
   });
 });
 
-// Start server
+// 启动服务器
 app.listen(PORT, () => {
   console.log(`🚀 CORS Proxy Server running on port ${PORT}`);
-  console.log(`🌐 Health check: http://localhost:${PORT}/health`);
-  console.log(`🗺️ Map proxy: http://localhost:${PORT}/api/map/*`);
-  console.log(`🖼️ Image proxy: http://localhost:${PORT}/api/ai/image`);
-  console.log(`🔄 Generic proxy: http://localhost:${PORT}/api/*`);
+  console.log(`🌐 Health: http://localhost:${PORT}/health`);
+  console.log(`🗺️ Map API: http://localhost:${PORT}/api/map/*`);
+  console.log(`🖼️ Image API: http://localhost:${PORT}/api/ai/image`);
+  console.log(`🔄 Generic API: http://localhost:${PORT}/api/*`);
 });
 
 module.exports = app;
