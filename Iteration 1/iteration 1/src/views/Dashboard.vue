@@ -524,8 +524,14 @@ export default {
       try {
         // 根据环境选择API URL
         const isDev = import.meta.env.DEV;
-        const baseApiUrl = isDev ? '/api' : 'http://13.236.162.216:8080';
-        const url = `${baseApiUrl}/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
+        let url;
+        if (isDev) {
+          url = `/api/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
+        } else {
+          // 生产环境使用CORS代理解决Mixed Content问题
+          const backendUrl = `http://13.236.162.216:8080/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
+          url = `https://api.allorigins.win/raw?url=${encodeURIComponent(backendUrl)}`;
+        }
         const res = await fetch(url);
         const json = await res.json();
         const item = Array.isArray(json?.data) ? (json.data[0] || {}) : (json?.data || {});

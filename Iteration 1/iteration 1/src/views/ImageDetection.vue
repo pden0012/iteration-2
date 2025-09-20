@@ -155,13 +155,14 @@ export default {
     },
     
     getApiUrl(path) {
-      // 生产环境直接使用后端API，开发环境使用代理
+      // 生产环境使用CORS代理解决Mixed Content问题，开发环境使用本地代理
       const isDev = import.meta.env.DEV;
       if (isDev) {
         return `/api${path}`;
       } else {
-        // 生产环境直接调用后端
-        return `http://13.236.162.216:8080${path}`;
+        // 生产环境使用CORS代理
+        const backendUrl = `http://13.236.162.216:8080${path}`;
+        return `https://api.allorigins.win/raw?url=${encodeURIComponent(backendUrl)}`;
       }
     },
     

@@ -130,17 +130,25 @@ export default {
       const e = ne.lng().toFixed(6);
       const bbox = `${s},${w},${n},${e}`;
       
-      // 根据环境选择API基础URL
+      // 根据环境选择API URL构建方式
       const isDev = import.meta.env.DEV;
-      const baseApiUrl = isDev ? '/api' : 'http://13.236.162.216:8080';
       
-      // 根据筛选类型构建URL
-      if (this.allergenicity === 'all') {
-        // Show All: 不传 allergenicity 参数
-        return `${baseApiUrl}/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+      if (isDev) {
+        // 开发环境使用本地代理
+        if (this.allergenicity === 'all') {
+          return `/api/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+        } else {
+          return `/api/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+        }
       } else {
-        // Safe=0, Risk=1, None=2: 正常传参数
-        return `${baseApiUrl}/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+        // 生产环境使用CORS代理解决Mixed Content问题
+        let backendUrl;
+        if (this.allergenicity === 'all') {
+          backendUrl = `http://13.236.162.216:8080/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+        } else {
+          backendUrl = `http://13.236.162.216:8080/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+        }
+        return `https://api.allorigins.win/raw?url=${encodeURIComponent(backendUrl)}`;
       }
     },
 
