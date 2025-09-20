@@ -184,7 +184,26 @@ npm run build
 #### Backend API Issues
 - **CORS Problem**: HTTPS site trying to access HTTP backend
 - **Mixed Content Error**: Browser blocks HTTP requests from HTTPS pages
-- **Solution**: Use CORS proxy services or configure backend with HTTPS
+- **Solution**: Use self-hosted CORS proxy server (recommended) or configure backend with HTTPS
+
+#### Self-Hosted CORS Proxy Server
+We provide a self-hosted CORS proxy server to solve API access issues:
+
+1. **Deploy Proxy Server**:
+   - Create new Render service: `hayfever-cors-proxy`
+   - Use `cors-proxy-server.js` as main file
+   - Set start command: `node cors-proxy-server.js`
+
+2. **Proxy Server Features**:
+   - Handles CORS for HTTPS frontend
+   - Supports file uploads for image analysis
+   - Proxies map data requests
+   - Includes error handling and logging
+
+3. **Configuration**:
+   - Backend URL: `http://13.236.162.216:8080`
+   - Allowed origins: `https://iteration-2.onrender.com`
+   - File size limit: 2MB
 
 #### Environment Variables
 Create a `.env` file in the project root:
