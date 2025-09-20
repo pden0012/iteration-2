@@ -555,10 +555,13 @@ export default {
 
 .map-container {
   width: 100%;
-  height: 540px; /* 足够浏览标记 */
+  max-width: 680px; /* 限制最大宽度 */
+  height: 680px; /* 更高的正方形 */
+  margin: 0 auto; /* 居中显示 */
   border: 1px solid rgba(0,0,0,0.1);
   border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08); /* 添加阴影 */
 }
 
 .empty-hint {

@@ -4,9 +4,17 @@
       <!-- Left side: upload -->
       <div class="left-panel">
         <div class="upload-section">
-          <div class="upload-box" @click="triggerFileInput">
-            <div class="upload-icon">📷</div>
-            <p class="upload-tip">Upload a plant photo<br />(JPG, PNG, WEBP, HEIC, HEIF)</p>
+          <!-- 上传区域现在会被图片覆盖 -->
+          <div class="upload-box" @click="triggerFileInput" :class="{ 'has-image': imagePreview }">
+            <!-- 显示图片预览或上传提示 -->
+            <div v-if="imagePreview" class="preview-overlay">
+              <img :src="imagePreview" alt="Preview" class="preview-img" />
+              <button class="close-preview" @click.stop="clearPreview">×</button>
+            </div>
+            <div v-else class="upload-placeholder">
+              <div class="upload-icon">📷</div>
+              <p class="upload-tip">Upload a plant photo<br />(JPG, PNG, WEBP, HEIC, HEIF)</p>
+            </div>
           </div>
           
           <input
@@ -18,7 +26,7 @@
           />
           
           <button class="upload-btn" @click="triggerFileInput">
-            Upload Image
+            {{ imagePreview ? 'Change Image' : 'Upload Image' }}
           </button>
           
           <div v-if="uploadSuccess && !isLoading" class="upload-success">
@@ -30,17 +38,18 @@
             <div class="spinner"></div>
             <p class="loading-text">Analyzing image...</p>
           </div>
-          
-          <div v-if="imagePreview" class="preview-wrapper">
-            <img :src="imagePreview" alt="Preview" class="preview-img" />
-            <button class="close-preview" @click="clearPreview">×</button>
-          </div>
         </div>
       </div>
       
       <!-- Right side: results -->
       <div class="right-panel">
-        <div v-for="(result, idx) in topResults" :key="`result-${idx}`" class="result-card" :class="{ 'loading-card': result.isLoading }">
+        <div v-for="(result, idx) in topResults" :key="`result-${idx}`" 
+             class="result-card" 
+             :class="{ 
+               'loading-card': result.isLoading, 
+               'primary-result': idx === 0, 
+               'secondary-result': idx > 0 
+             }">
           <div class="card-header">
             <h3 class="card-title">{{ result.title || 'Plant Species' }}</h3>
             <span 
@@ -330,11 +339,11 @@ export default {
 
 .image-grid {
   display: grid;
-  grid-template-columns: 1fr 1.2fr; /* left:right ratio */
-  gap: 28px;
-  max-width: 1120px;
+  grid-template-columns: 1fr 1.4fr; /* 增加右侧结果区域宽度 */
+  gap: 32px; /* 增加间距 */
+  max-width: 1280px; /* 扩大整体宽度 */
   margin: 0 auto;
-  padding: 0 20px; /* 内容区域的左右padding */
+  padding: 0 20px;
 }
 
 /* Left panel: upload area */
@@ -364,10 +373,66 @@ export default {
   align-items: center;
   cursor: pointer;
   transition: border-color 0.2s ease, background 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
+
 .upload-box:hover {
   border-color: #24b36b;
   background: rgba(255, 255, 255, 0.9);
+}
+
+.upload-box.has-image {
+  border: 2px solid #24b36b;
+  background: transparent;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* 图片预览覆盖层 */
+.preview-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.preview-overlay .preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.preview-overlay .close-preview {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 90, 90, 0.9);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  z-index: 10;
+}
+
+.preview-overlay .close-preview:hover {
+  background: #ff5a5a;
 }
 
 .upload-icon {
@@ -459,33 +524,7 @@ export default {
   100% { content: ''; }
 }
 
-.preview-wrapper {
-  position: relative;
-  width: 320px;
-  height: 200px;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #ffffff;
-  border: 1px solid #e7ecea;
-}
-.preview-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.close-preview {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: none;
-  background: #ff5a5a;
-  color: #fff;
-  font-weight: 700;
-  cursor: pointer;
-}
+/* 旧的预览样式已移除，现在使用覆盖层预览 */
 
 /* Right panel: results */
 .right-panel {
@@ -496,15 +535,46 @@ export default {
 
 .result-card {
   background: rgba(255, 255, 255, 0.9);
-  padding: 18px 16px; /* 增加padding：从12px 14px改为18px 16px */
-  min-height: 110px; /* 增加最小高度 */
+  padding: 18px 16px;
+  min-height: 110px;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   border: 1px solid rgba(231, 236, 234, 0.8);
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* 内容均匀分布 */
+  justify-content: space-between;
   transition: all 0.3s ease;
+}
+
+/* 第一个结果卡片(最高置信度)更大更显眼 */
+.result-card.primary-result {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 24px 20px; /* 更大的内边距 */
+  min-height: 140px; /* 更高 */
+  border: 2px solid #24b36b; /* 绿色边框突出显示 */
+  box-shadow: 0 4px 16px rgba(36, 179, 107, 0.15);
+  transform: scale(1.02); /* 稍微放大 */
+}
+
+.result-card.primary-result .card-title {
+  font-size: 18px; /* 更大的标题 */
+  font-weight: 700; /* 更粗的字体 */
+}
+
+.result-card.primary-result .card-confidence {
+  font-size: 14px; /* 更大的置信度文字 */
+  font-weight: 600;
+  color: #24b36b; /* 绿色高亮 */
+}
+
+.result-card.primary-result .card-description {
+  font-size: 14px; /* 更大的描述文字 */
+}
+
+/* 其他结果卡片稍小一些 */
+.result-card.secondary-result {
+  opacity: 0.9;
+  transform: scale(0.98);
 }
 
 .result-card.loading-card {
