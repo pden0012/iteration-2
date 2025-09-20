@@ -132,9 +132,45 @@ npm run preview
 5. Website uses component-based design for easy maintenance and extension
 
 ## Deployment
-1. Run `npm run build` to build production version
-2. Deploy `dist/` directory to web server
-3. Ensure image resources are properly placed
+
+### Build Production Version
+```bash
+npm run build
+```
+
+### Deploy to Web Server
+1. Deploy the entire `dist/` directory to your web server
+2. Ensure image resources are properly placed
+3. Make sure your web server serves static files with correct MIME types
+
+### Common Deployment Issues & Solutions
+
+#### Issue 1: CSS Files Not Loading (MIME Type Error)
+**Problem**: CSS files are served with `text/plain` MIME type instead of `text/css`
+**Solution**: 
+- Configure your web server to serve `.css` files with `text/css` MIME type
+- For Apache: Add `AddType text/css .css` to `.htaccess`
+- For Nginx: Ensure `text/css` is in the MIME types configuration
+
+#### Issue 2: 404 Errors for JavaScript/CSS Files
+**Problem**: Files are not found due to incorrect base path configuration
+**Solution**: 
+- Make sure `base: '/'` is set correctly in `vite.config.js`
+- Ensure all files in `dist/assets/` are uploaded to the server
+- Check that file names match exactly (including hash suffixes)
+
+#### Issue 3: White Screen on Load
+**Problem**: JavaScript files fail to load or execute
+**Solution**:
+- Check browser console for specific error messages
+- Verify all assets are uploaded correctly
+- Ensure JavaScript files are served with correct MIME type (`application/javascript`)
+
+### Render.com Deployment Notes
+- Upload the entire `dist/` folder contents to your Render static site
+- Ensure the build command is `npm run build`
+- Set the publish directory to `dist`
+- The site should work at the root domain (no subdirectory needed)
 
 ## Component Description
 
