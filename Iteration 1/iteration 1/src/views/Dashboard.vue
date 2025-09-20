@@ -522,8 +522,10 @@ export default {
     // 为特定地点加载数据
     async loadDataForLocation(location) {
       try {
-        // 使用本地代理 /api 来访问后端，避免CORS问题
-        const url = `/api/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
+        // 根据环境选择API URL
+        const isDev = import.meta.env.DEV;
+        const baseApiUrl = isDev ? '/api' : 'http://13.236.162.216:8080';
+        const url = `${baseApiUrl}/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
         const res = await fetch(url);
         const json = await res.json();
         const item = Array.isArray(json?.data) ? (json.data[0] || {}) : (json?.data || {});

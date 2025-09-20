@@ -155,8 +155,14 @@ export default {
     },
     
     getApiUrl(path) {
-      const apiBase = import.meta.env.VITE_API_BASE || '/api';
-      return `${apiBase}${path}`;
+      // 生产环境直接使用后端API，开发环境使用代理
+      const isDev = import.meta.env.DEV;
+      if (isDev) {
+        return `/api${path}`;
+      } else {
+        // 生产环境直接调用后端
+        return `http://13.236.162.216:8080${path}`;
+      }
     },
     
     async detectImage(file) {

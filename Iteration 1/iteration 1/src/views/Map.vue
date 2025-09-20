@@ -117,13 +117,11 @@ export default {
       this.currentZoom = this.map.getZoom();
     },
     getApiUrl() {
-      // Build API URL using env config (Google Maps bounds)
-      // 使用Google Maps边界来拼接参数
-      const apiBase = import.meta.env.VITE_API_BASE || '';
+      // Build API URL for both dev and production
       const bounds = this.map?.getBounds();
       const zoom = this.map?.getZoom() || 12;
-      // bbox format: south,west,north,east
       if (!bounds) return null;
+      
       const sw = bounds.getSouthWest();
       const ne = bounds.getNorthEast();
       const s = sw.lat().toFixed(6);
@@ -131,31 +129,19 @@ export default {
       const n = ne.lat().toFixed(6);
       const e = ne.lng().toFixed(6);
       const bbox = `${s},${w},${n},${e}`;
-      const ts = Date.now();
-      const rand = Math.random().toString(36).substring(7);
-      const cacheBuster = `${ts}_${rand}_${Math.floor(Math.random() * 1000000)}`;
+      
+      // 根据环境选择API基础URL
+      const isDev = import.meta.env.DEV;
+      const baseApiUrl = isDev ? '/api' : 'http://13.236.162.216:8080';
       
       // 根据筛选类型构建URL
-      let baseUrl;
       if (this.allergenicity === 'all') {
         // Show All: 不传 allergenicity 参数
-        baseUrl = `http://13.236.162.216:8080/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}&_cb=${cacheBuster}`;
+        return `${baseApiUrl}/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       } else {
         // Safe=0, Risk=1, None=2: 正常传参数
-        baseUrl = `http://13.236.162.216:8080/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}&_cb=${cacheBuster}`;
+        return `${baseApiUrl}/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       }
-      
-      if (apiBase.includes('allorigins') || apiBase.endsWith('url=')) {
-        return `${apiBase}${encodeURIComponent(baseUrl)}`;
-      } else if (apiBase) {
-        // 当 VITE_API_BASE=/api 时走本地代理
-        if (this.allergenicity === 'all') {
-          return `${apiBase}/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}&_cb=${cacheBuster}`;
-        } else {
-          return `${apiBase}/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}&_cb=${cacheBuster}`;
-        }
-      }
-      return baseUrl;
     },
 
     async refreshMarkers() {
