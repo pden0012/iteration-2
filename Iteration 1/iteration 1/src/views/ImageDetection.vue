@@ -208,63 +208,86 @@ export default {
             json = await res.json();
           }
         } else {
-          // 生产环境使用CORS代理服务
-          // 当前使用可靠的公共代理，你也可以部署自建代理服务
-          const proxyUrl = 'https://cors.bridged.cc/http://13.236.162.216:8080/ai/image';
+          // 生产环境使用多个CORS代理服务尝试
+          const backendUrl = 'http://13.236.162.216:8080/ai/image';
           
-          try {
-            console.log('使用自建CORS代理服务...');
-            
-            const form = new FormData();
-            form.append('image', file);
-            form.append('text', ' ');
-            
-            const res = await fetch(proxyUrl, {
-              method: 'POST',
-              body: form
-            });
-            
-            if (res.ok) {
-              json = await res.json();
-              console.log('✅ 自建代理服务成功！');
-            } else {
-              console.log(`❌ 代理服务返回状态: ${res.status}`);
-              // 如果自建代理失败，回退到公共代理
-              throw new Error(`Proxy returned ${res.status}`);
+          // 尝试多个支持文件上传的CORS代理服务
+          const proxyServices = [
+            // 前缀式代理 - 支持POST和文件上传
+            { 
+              name: 'CORS-Anywhere', 
+              url: 'https://cors-anywhere.herokuapp.com/',
+              type: 'prefix'
+            },
+            { 
+              name: 'ThingProxy', 
+              url: 'https://thingproxy.freeboard.io/fetch/',
+              type: 'prefix' 
+            },
+            {
+              name: 'Proxy-Any-Origin',
+              url: 'https://api.codetabs.com/v1/proxy/?quest=',
+              type: 'prefix'
+            },
+            // 新的代理服务
+            {
+              name: 'Crossorigin-Me',
+              url: 'https://crossorigin.me/',
+              type: 'prefix'
             }
-          } catch (e) {
-            console.log('自建代理失败，尝试备选方案...', e.message);
-            
-            // 备选方案：尝试一些可靠的公共代理
-            const fallbackProxies = [
-              'https://cors.bridged.cc/',
-              'https://yacdn.org/proxy/'
-            ];
-            
-            for (const proxy of fallbackProxies) {
-              try {
-                const url = `${proxy}${encodeURIComponent(backendUrl)}`;
-                const form = new FormData();
-                form.append('image', file);
-                form.append('text', ' ');
-                
-                const res = await fetch(url, {
-                  method: 'POST',
-                  body: form
-                });
-                
-                if (res.ok) {
-                  json = await res.json();
-                  console.log(`✅ 备选代理成功: ${proxy}`);
-                  break;
-                } else {
-                  console.log(`❌ 备选代理 ${proxy} 返回状态: ${res.status}`);
-                  continue;
-                }
-              } catch (e) {
-                console.log(`❌ 备选代理 ${proxy} 失败:`, e.message);
-                continue;
+          ];
+          
+          let proxyWorked = false;
+          
+          for (const proxyService of proxyServices) {
+            try {
+              const requestUrl = `${proxyService.url}${encodeURIComponent(backendUrl)}`;
+              
+              console.log(`🔄 尝试代理: ${proxyService.name}`);
+              
+              const form = new FormData();
+              form.append('image', file);
+              form.append('text', ' ');
+              
+              const res = await fetch(requestUrl, {
+                method: 'POST',
+                body: form,
+                mode: 'cors'
+              });
+              
+              if (res.ok) {
+                const result = await res.json();
+                json = result;
+                console.log(`✅ ${proxyService.name} 代理成功！`);
+                proxyWorked = true;
+                break;
+              } else {
+                console.log(`❌ ${proxyService.name} 返回状态: ${res.status}`);
               }
+            } catch (e) {
+              console.log(`❌ ${proxyService.name} 失败:`, e.message);
+              continue;
+            }
+          }
+          
+          if (!proxyWorked) {
+            // 最后尝试：直接访问（某些情况下可能工作）
+            console.log('🔄 最后尝试：直接访问后端...');
+            try {
+              const form = new FormData();
+              form.append('image', file);
+              form.append('text', ' ');
+              
+              const res = await fetch(backendUrl, {
+                method: 'POST',
+                body: form,
+                mode: 'no-cors'
+              });
+              
+              // no-cors模式无法读取响应，但可以尝试
+              console.log('直接访问已发送，但无法读取响应 (no-cors模式)');
+            } catch (e) {
+              console.log('直接访问也失败:', e.message);
             }
           }
         }
