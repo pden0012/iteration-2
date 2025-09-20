@@ -78,8 +78,8 @@ export default {
         const script = document.createElement('script');
         script.id = 'google-maps-sdk';
         script.async = true; script.defer = true;
-        // 暂时使用一个基础的API key，你需要替换为你的有效key
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${key || 'AIzaSyDnje6Fe_PaFQphEP7Uzx9bk'}`;
+        // Use environment variable for API key, fallback to a placeholder
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${key || 'YOUR_GOOGLE_MAPS_API_KEY'}`;
         script.onload = () => resolve(window.google);
         script.onerror = (error) => {
           console.error('Failed to load Google Maps API:', error);

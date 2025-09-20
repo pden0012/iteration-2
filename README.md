@@ -172,6 +172,28 @@ npm run build
 - Set the publish directory to `dist`
 - The site should work at the root domain (no subdirectory needed)
 
+### API Configuration
+
+#### Google Maps API Key
+1. Go to [Google Cloud Console](https://console.cloud.google.com/google/maps-apis)
+2. Create a new project or select existing one
+3. Enable the "Maps JavaScript API"
+4. Create credentials (API Key)
+5. Set up environment variable: `VITE_GOOGLE_MAPS_API_KEY=your_actual_api_key`
+
+#### Backend API Issues
+- **CORS Problem**: HTTPS site trying to access HTTP backend
+- **Mixed Content Error**: Browser blocks HTTP requests from HTTPS pages
+- **Solution**: Use CORS proxy services or configure backend with HTTPS
+
+#### Environment Variables
+Create a `.env` file in the project root:
+```env
+VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+VITE_API_TARGET=http://13.236.162.216:8080
+VITE_APP_PASSWORD=123456
+```
+
 ## Component Description
 
 ### App.vue
