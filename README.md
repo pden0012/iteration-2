@@ -168,10 +168,37 @@ npm run build
 - Ensure JavaScript files are served with correct MIME type (`application/javascript`)
 
 ### Render.com Deployment Notes
-- Upload the entire `dist/` folder contents to your Render static site
-- Ensure the build command is `npm run build`
-- Set the publish directory to `dist`
-- The site should work at the root domain (no subdirectory needed)
+
+#### Step-by-step Render Deployment:
+
+1. **Connect Repository**: Link your GitHub repository to Render
+2. **Build Settings**:
+   - Build Command: `npm run build`
+   - Publish Directory: `dist`
+   - Node Version: 18 or latest
+
+3. **Environment Variables** (Critical!):
+   - Go to your service's "Environment" tab in Render dashboard
+   - Add: `VITE_GOOGLE_MAPS_API_KEY` with your Google Maps API key
+   - Add: `VITE_API_BASE_URL` (optional, defaults to auto-detection)
+
+4. **Deploy**: Click "Manual Deploy" or push to your connected branch
+
+#### Common Render Deployment Issues:
+
+**Issue**: "Error loading tree data" on deployed site
+- **Cause**: Mixed content (HTTPS site loading HTTP API) or CORS issues
+- **Solution**: The code includes automatic HTTPS/HTTP fallback handling
+
+**Issue**: Blank map or Google Maps errors  
+- **Cause**: Missing or invalid Google Maps API key
+- **Solution**: Verify `VITE_GOOGLE_MAPS_API_KEY` is set in Render environment variables
+
+**Issue**: Network errors in production
+- **Cause**: Backend API server issues or CORS configuration
+- **Solution**: Ensure backend allows requests from your Render domain
+
+For detailed troubleshooting, see `render-deployment.md` in the project root.
 
 ### API Configuration
 
@@ -186,8 +213,15 @@ npm run build
 Create a `.env` file in the project root:
 ```env
 VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+VITE_API_BASE_URL=http://13.236.162.216:8080
 VITE_APP_PASSWORD=123456
 ```
+
+**For Render.com deployment**, set these environment variables in your Render dashboard:
+- `VITE_GOOGLE_MAPS_API_KEY`: Your Google Maps JavaScript API key
+- `VITE_API_BASE_URL` (optional): Backend API URL with protocol
+
+**Important**: Replace `your_google_maps_api_key` with your actual Google Maps API key from [Google Cloud Console](https://console.cloud.google.com/google/maps-apis)
 
 ## Component Description
 
