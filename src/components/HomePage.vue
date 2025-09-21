@@ -422,8 +422,8 @@ export default {
 .feature-card:nth-child(2) { grid-column: 3 / 5; grid-row: 1; } /* 占据3-4列 */
 .feature-card:nth-child(3) { grid-column: 5 / 7; grid-row: 1; } /* 占据5-6列 */
 
-/* Bottom row: 3 cards centered */
-/* 底部行：3个卡片居中 */
+/* Bottom row: 3 cards perfectly aligned */
+/* 底部行：3个卡片完美对齐 */
 .feature-card:nth-child(4) { grid-column: 1 / 3; grid-row: 2; } /* 占据1-2列 */
 .feature-card:nth-child(5) { grid-column: 3 / 5; grid-row: 2; } /* 占据3-4列 */
 .feature-card:nth-child(6) { grid-column: 5 / 7; grid-row: 2; } /* 占据5-6列 */
@@ -515,10 +515,21 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  max-width: 100%;
+  max-height: 100%;
 }
 
-/* Feature icon image styling - removed placeholder, now using actual images */
-/* 功能图标图片样式 - 移除占位符，现在使用实际图片 */
+/* Ensure all icons have consistent sizing */
+/* 确保所有图标有一致的尺寸 */
+.feature-icon {
+  width: 68px;
+  height: 68px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
 
 .feature-card-title {
   width: 100%;
