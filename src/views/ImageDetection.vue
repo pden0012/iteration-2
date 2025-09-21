@@ -197,55 +197,30 @@ export default {
             json = await res.json();
           }
         } else {
-          // 生产环境使用iframe代理避免Mixed Content问题
-          console.log('🔄 使用iframe代理进行图片分析...');
+          // 生产环境使用Express代理服务器
+          const url = '/api/ai/image';
           
-          return new Promise((resolve, reject) => {
-            // 创建隐藏的iframe
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = '/image-proxy.html';
-            
-            // 监听iframe响应
-            const handleMessage = (event) => {
-              if (event.data.type === 'DETECT_RESULT') {
-                document.body.removeChild(iframe);
-                window.removeEventListener('message', handleMessage);
-                
-                if (event.data.success) {
-                  try {
-                    const result = JSON.parse(event.data.data);
-                    resolve(result);
-                  } catch (parseError) {
-                    reject(new Error('Invalid JSON response from proxy'));
-                  }
-                } else {
-                  reject(new Error(event.data.error || 'Proxy request failed'));
-                }
-              }
-            };
-            
-            window.addEventListener('message', handleMessage);
-            
-            // 等待iframe加载完成后发送请求
-            iframe.onload = () => {
-              iframe.contentWindow.postMessage({
-                type: 'DETECT_IMAGE',
-                file: file
-              }, '*');
-            };
-            
-            document.body.appendChild(iframe);
-            
-            // 超时处理
-            setTimeout(() => {
-              if (document.body.contains(iframe)) {
-                document.body.removeChild(iframe);
-                window.removeEventListener('message', handleMessage);
-                reject(new Error('Proxy request timeout'));
-              }
-            }, 30000);
+          console.log('🔄 使用Express代理服务器进行图片分析...', url);
+          
+          const form = new FormData();
+          form.append('image', file);
+          form.append('text', ' ');
+          
+          const res = await fetch(url, {
+            method: 'POST',
+            body: form
           });
+          
+          console.log('Response status:', res.status);
+          
+          if (res.ok) {
+            json = await res.json();
+            console.log('✅ Express代理成功！');
+          } else {
+            const errorText = await res.text();
+            console.error('代理服务器错误:', errorText);
+            throw new Error(`Proxy server error: ${res.status} - ${errorText}`);
+          }
         }
         
         if (!json) {
