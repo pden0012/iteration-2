@@ -172,7 +172,7 @@ export default {
         return `http://localhost:3003/api${path}`;
       } else {
         // 生产环境使用我们自己的代理服务器
-        const proxyUrl = 'https://your-proxy-server.onrender.com'; // 替换为你的代理服务器URL
+        const proxyUrl = 'https://iteration-2-hayfree.onrender.com';
         return `${proxyUrl}/api${path}`;
       }
     },
