@@ -152,17 +152,23 @@ export default {
   padding: 0 24px;
 }
 
-/* Hero区域样式 - 页面顶部的蓝色区域，包含主标题和按钮
+/* Hero区域样式 - 页面顶部的背景图区域，包含主标题和按钮
    - position: relative 相对定位，作为子元素的定位参考点
    - width: 100% 占满容器宽度
    - height: 824px 固定高度824像素
-   - background: #239BA7 青蓝色背景(RGB: 35, 155, 167)
+   - background: url('/images/prototype images/background home page.png') 使用背景图片
+   - background-size: cover 背景图片覆盖整个区域
+   - background-position: center 背景图片居中显示
+   - background-repeat: no-repeat 背景图片不重复
    - overflow: hidden 隐藏超出区域的内容，防止装饰元素溢出 */
 .hero-section {
   position: relative;
   width: 100%;
   height: 824px;
-  background: #239BA7;
+  background: url('/images/prototype images/background home page.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   overflow: hidden;
 }
 
