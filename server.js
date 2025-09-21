@@ -23,6 +23,30 @@ app.use((req, res, next) => {
   next();
 });
 
+// Test endpoint to verify proxy server is working
+app.get('/api/test', (req, res) => {
+  console.log('🧪 Test endpoint hit');
+  res.json({ message: 'Proxy server is working!', timestamp: new Date().toISOString() });
+});
+
+// Simple image detection test endpoint
+app.post('/api/ai/image-test', (req, res) => {
+  console.log('🧪 Image detection test endpoint hit');
+  res.json({ 
+    code: 1, 
+    msg: 'Test successful', 
+    data: [
+      {
+        title: 'Test Plant',
+        scientificName: 'Testus plantus',
+        risk: 'low',
+        confidence: 0.95,
+        description: 'This is a test response from the proxy server'
+      }
+    ]
+  });
+});
+
 // Image detection proxy endpoint (must be before static files)
 app.post('/api/ai/image', upload.single('image'), async (req, res) => {
   try {

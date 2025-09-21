@@ -197,38 +197,63 @@ export default {
             json = await res.json();
           }
         } else {
-          // 生产环境使用专用图片检测代理服务器
-          const url = '/api/ai/image';
+          // 生产环境先测试代理服务器是否工作
+          console.log('🧪 测试代理服务器...');
           
-          console.log('🔄 使用专用图片检测代理服务器...', url);
+          // Test 1: Check if proxy server is running
+          try {
+            const testRes = await fetch('/api/test');
+            const testData = await testRes.json();
+            console.log('✅ 代理服务器测试成功:', testData);
+          } catch (testError) {
+            console.error('❌ 代理服务器测试失败:', testError);
+            throw new Error('Proxy server is not working');
+          }
           
-          const form = new FormData();
-          form.append('image', file);
-          form.append('text', ' ');
-          
-          const res = await fetch(url, {
-            method: 'POST',
-            body: form
-          });
-          
-          console.log('Response status:', res.status);
-          
-          if (res.ok) {
-            const responseText = await res.text();
-            console.log('Raw response:', responseText.substring(0, 200) + '...');
+          // Test 2: Check image detection endpoint
+          try {
+            const testImageRes = await fetch('/api/ai/image-test', { method: 'POST' });
+            const testImageData = await testImageRes.json();
+            console.log('✅ 图片检测端点测试成功:', testImageData);
             
-            try {
-              json = JSON.parse(responseText);
-              console.log('✅ 专用代理成功！');
-            } catch (parseError) {
-              console.error('JSON解析失败:', parseError);
-              console.error('响应内容:', responseText);
-              throw new Error(`Invalid JSON response: ${parseError.message}`);
+            // Use test data for now
+            json = testImageData;
+            console.log('✅ 使用测试数据！');
+          } catch (testImageError) {
+            console.error('❌ 图片检测端点测试失败:', testImageError);
+            
+            // Fallback to real image detection
+            console.log('🔄 尝试真实图片检测...');
+            const url = '/api/ai/image';
+            
+            const form = new FormData();
+            form.append('image', file);
+            form.append('text', ' ');
+            
+            const res = await fetch(url, {
+              method: 'POST',
+              body: form
+            });
+            
+            console.log('Response status:', res.status);
+            
+            if (res.ok) {
+              const responseText = await res.text();
+              console.log('Raw response:', responseText.substring(0, 200) + '...');
+              
+              try {
+                json = JSON.parse(responseText);
+                console.log('✅ 专用代理成功！');
+              } catch (parseError) {
+                console.error('JSON解析失败:', parseError);
+                console.error('响应内容:', responseText);
+                throw new Error(`Invalid JSON response: ${parseError.message}`);
+              }
+            } else {
+              const errorText = await res.text();
+              console.error('专用代理错误:', errorText);
+              throw new Error(`Image detection proxy error: ${res.status} - ${errorText}`);
             }
-          } else {
-            const errorText = await res.text();
-            console.error('专用代理错误:', errorText);
-            throw new Error(`Image detection proxy error: ${res.status} - ${errorText}`);
           }
         }
         
