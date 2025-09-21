@@ -148,7 +148,7 @@ export default {
         } else {
           backendUrl = `http://13.236.162.216:8080/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
         }
-        return `https://api.allorigins.win/raw?url=${encodeURIComponent(backendUrl)}`;
+        return `https://hayfever-cors-proxy.onrender.com/api/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}${this.allergenicity !== 'all' ? '&allergenicity=' + this.allergenicity : ''}`;
       }
     },
 

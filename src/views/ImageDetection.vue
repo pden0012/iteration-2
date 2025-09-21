@@ -197,18 +197,16 @@ export default {
             json = await res.json();
           }
         } else {
-          // 生产环境使用CORS代理服务
-          const backendUrl = 'http://13.236.162.216:8080/ai/image';
-          const proxyUrl = 'https://api.allorigins.win/raw?url=';
-          const requestUrl = `${proxyUrl}${encodeURIComponent(backendUrl)}`;
+          // 生产环境使用自建代理服务器
+          const url = 'https://hayfever-cors-proxy.onrender.com/api/ai/image';
           
-          console.log('🔄 使用CORS代理进行图片分析...');
+          console.log('🔄 使用自建代理服务器进行图片分析...');
           
           const form = new FormData();
           form.append('image', file);
           form.append('text', ' ');
           
-          const res = await fetch(requestUrl, {
+          const res = await fetch(url, {
             method: 'POST',
             body: form,
             mode: 'cors'
@@ -216,9 +214,9 @@ export default {
           
           if (res.ok) {
             json = await res.json();
-            console.log('✅ CORS代理成功！');
+            console.log('✅ 自建代理服务器成功！');
           } else {
-            throw new Error(`Proxy responded with status: ${res.status}`);
+            throw new Error(`Proxy server responded with status: ${res.status}`);
           }
         }
         
