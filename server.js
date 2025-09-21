@@ -63,13 +63,28 @@ app.post('/api/ai/image', upload.single('image'), async (req, res) => {
     console.log('📥 Backend response status:', response.status);
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Backend API error:', errorText);
       throw new Error(`Backend API error: ${response.status} ${response.statusText}`);
     }
 
-    const result = await response.json();
-    console.log('✅ Image detection successful');
+    // Get response text first to debug
+    const responseText = await response.text();
+    console.log('📄 Backend response text:', responseText.substring(0, 200) + '...');
     
-    res.json(result);
+    try {
+      const result = JSON.parse(responseText);
+      console.log('✅ Image detection successful');
+      res.json(result);
+    } catch (parseError) {
+      console.error('❌ JSON parse error:', parseError);
+      console.error('❌ Response text:', responseText);
+      res.status(500).json({
+        code: 0,
+        msg: `Invalid JSON response from backend: ${parseError.message}`,
+        data: null
+      });
+    }
 
   } catch (error) {
     console.error('❌ Image detection error:', error);
