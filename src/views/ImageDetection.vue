@@ -197,23 +197,26 @@ export default {
             json = await res.json();
           }
         } else {
-          // 生产环境使用相对路径，通过Vite代理
-          const url = '/api/ai/image';
+          // 生产环境使用CORS代理服务
+          const backendUrl = 'http://13.236.162.216:8080/ai/image';
+          const proxyUrl = 'https://api.allorigins.win/raw?url=';
+          const requestUrl = `${proxyUrl}${encodeURIComponent(backendUrl)}`;
           
-          console.log('🔄 使用Vite代理进行图片分析...');
+          console.log('🔄 使用CORS代理进行图片分析...');
           
           const form = new FormData();
           form.append('image', file);
           form.append('text', ' ');
           
-          const res = await fetch(url, {
+          const res = await fetch(requestUrl, {
             method: 'POST',
-            body: form
+            body: form,
+            mode: 'cors'
           });
           
           if (res.ok) {
             json = await res.json();
-            console.log('✅ Vite代理成功！');
+            console.log('✅ CORS代理成功！');
           } else {
             throw new Error(`Proxy responded with status: ${res.status}`);
           }
