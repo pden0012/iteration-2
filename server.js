@@ -21,12 +21,16 @@ app.use('/api/ai/image', createProxyMiddleware({
   pathRewrite: {
     '^/api/ai/image': '/ai/image'
   },
+  logLevel: 'debug',
   onError: (err, req, res) => {
     console.error('Image proxy error:', err);
     res.status(500).json({ error: 'Image proxy server error' });
   },
   onProxyReq: (proxyReq, req, res) => {
     console.log('Proxying image request to:', proxyReq.path);
+  },
+  onProxyRes: (proxyRes, req, res) => {
+    console.log('Image proxy response status:', proxyRes.statusCode);
   }
 }));
 
@@ -37,12 +41,16 @@ app.use('/api/map', createProxyMiddleware({
   pathRewrite: {
     '^/api/map': '/map'
   },
+  logLevel: 'debug',
   onError: (err, req, res) => {
     console.error('Map proxy error:', err);
     res.status(500).json({ error: 'Map proxy server error' });
   },
   onProxyReq: (proxyReq, req, res) => {
     console.log('Proxying map request to:', proxyReq.path);
+  },
+  onProxyRes: (proxyRes, req, res) => {
+    console.log('Map proxy response status:', proxyRes.statusCode);
   }
 }));
 
