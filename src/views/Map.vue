@@ -141,11 +141,11 @@ export default {
           return `/api/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
         }
       } else {
-        // 生产环境使用自建代理服务器
+        // 生产环境使用相对路径，通过Vite代理
         if (this.allergenicity === 'all') {
-          return `https://hayfever-cors-proxy.onrender.com/api/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+          return `/api/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
         } else {
-          return `https://hayfever-cors-proxy.onrender.com/api/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+          return `/api/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
         }
       }
     },
