@@ -30,8 +30,17 @@ app.use(express.static(path.join(__dirname, 'dist')));
 app.post('/api/ai/image', upload.single('image'), async (req, res) => {
   try {
     console.log('🔄 Processing image detection request...');
+    console.log('📋 Request headers:', req.headers);
+    console.log('📋 Request body keys:', Object.keys(req.body || {}));
+    console.log('📋 File info:', req.file ? {
+      fieldname: req.file.fieldname,
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size
+    } : 'No file');
     
     if (!req.file) {
+      console.log('❌ No image file provided');
       return res.status(400).json({ 
         code: 0, 
         msg: 'No image file provided', 
