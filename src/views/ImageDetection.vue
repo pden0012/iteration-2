@@ -214,11 +214,25 @@ export default {
             body: form
           });
           
+          console.log('Response status:', res.status);
+          console.log('Response headers:', res.headers);
+          
           if (res.ok) {
-            json = await res.json();
-            console.log('✅ CORS代理成功！');
+            const responseText = await res.text();
+            console.log('Raw response:', responseText);
+            
+            try {
+              json = JSON.parse(responseText);
+              console.log('✅ CORS代理成功！');
+            } catch (parseError) {
+              console.error('JSON解析失败:', parseError);
+              console.error('响应内容:', responseText);
+              throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}...`);
+            }
           } else {
-            throw new Error(`CORS proxy responded with status: ${res.status}`);
+            const errorText = await res.text();
+            console.error('API错误响应:', errorText);
+            throw new Error(`CORS proxy responded with status: ${res.status} - ${errorText}`);
           }
         }
         
