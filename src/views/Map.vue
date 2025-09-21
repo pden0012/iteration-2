@@ -117,7 +117,7 @@ export default {
       this.currentZoom = this.map.getZoom();
     },
     getApiUrl() {
-      // Build API URL for both dev and production
+      // Build API URL - 直接使用后端URL
       const bounds = this.map?.getBounds();
       const zoom = this.map?.getZoom() || 12;
       if (!bounds) return null;
@@ -130,23 +130,11 @@ export default {
       const e = ne.lng().toFixed(6);
       const bbox = `${s},${w},${n},${e}`;
       
-      // 根据环境选择API URL构建方式
-      const isDev = import.meta.env.DEV;
-      
-      if (isDev) {
-        // 开发环境使用本地代理
-        if (this.allergenicity === 'all') {
-          return `/api/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
-        } else {
-          return `/api/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
-        }
+      // 直接使用后端API URL
+      if (this.allergenicity === 'all') {
+        return `http://13.236.162.216:8080/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       } else {
-        // 生产环境使用相对路径，通过静态网站重写规则处理
-        if (this.allergenicity === 'all') {
-          return `/api/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
-        } else {
-          return `/api/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
-        }
+        return `http://13.236.162.216:8080/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       }
     },
 

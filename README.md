@@ -143,28 +143,6 @@ npm run build
 2. Ensure image resources are properly placed
 3. Make sure your web server serves static files with correct MIME types
 
-### Recent Fixes (2025-01-21)
-
-#### Issue: Map Tree Data Loading Failed (404 Error)
-**Problem**: The allergy exposure map was showing "Error loading tree data" with 404 errors in the browser console.
-
-**Root Cause**: 
-- Backend API (`http://13.236.162.216:8080/map/tree`) was working correctly
-- CORS proxy server configuration had incorrect allowed origins
-- Static site redirect rules were not properly configured
-
-**Solution Applied**:
-1. ✅ Simplified API URL building logic in Map.vue component
-2. ✅ Fixed static site redirect rules in `_redirects` file
-3. ✅ Removed complex CORS proxy configuration (not needed for static sites)
-4. ✅ Updated documentation to reflect simplified approach
-
-**Files Modified**:
-- `src/views/Map.vue` - Simplified API URL building logic
-- `_redirects` - Fixed redirect rules for static site deployment
-- `README.md` - Updated documentation
-
-**Next Steps**: Simply redeploy the static site - no additional services needed.
 
 ### Common Deployment Issues & Solutions
 
@@ -204,39 +182,12 @@ npm run build
 4. Create credentials (API Key)
 5. Set up environment variable: `VITE_GOOGLE_MAPS_API_KEY=your_actual_api_key`
 
-#### Backend API Issues
-- **CORS Problem**: HTTPS site trying to access HTTP backend
-- **Mixed Content Error**: Browser blocks HTTP requests from HTTPS pages
-- **Solution**: Use self-hosted CORS proxy server (recommended) or configure backend with HTTPS
-
-#### Self-Hosted CORS Proxy Server
-We provide a self-hosted CORS proxy server to solve API access issues:
-
-1. **Deploy Proxy Server**:
-   - Create new Render service: `hayfever-cors-proxy`
-   - Use `cors-proxy-server.js` as main file
-   - Set start command: `node cors-proxy-server.js`
-
-2. **Proxy Server Features**:
-   - Handles CORS for HTTPS frontend
-   - Supports file uploads for image analysis
-   - Proxies map data requests
-   - Includes error handling and logging
-
-3. **Configuration**:
-   - Backend URL: `http://13.236.162.216:8080`
-   - Allowed origins: `https://iteration-2.onrender.com`
-   - File size limit: 2MB
-
 #### Environment Variables
 Create a `.env` file in the project root:
 ```env
 VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
-VITE_API_TARGET=http://13.236.162.216:8080
 VITE_APP_PASSWORD=123456
 ```
-
-**Note**: API routing is handled by the `_redirects` file for static site deployment.
 
 ## Component Description
 
