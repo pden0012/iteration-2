@@ -109,7 +109,7 @@ export default {
           title: 'Plant Risk Identifier',
           description: 'Upload a plant photo to instantly identify species and check hay fever risk levels.',
           buttonText: 'Find Now',
-          iconText: '/images/prototype images/9941758449562_.pic.jpg'
+          iconText: '/images/prototype images/9951758450144_.pic.jpg'
         }
       ],
       infoData: {
