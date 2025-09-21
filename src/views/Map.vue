@@ -148,19 +148,14 @@ export default {
       const e = ne.lng().toFixed(6);
       const bbox = `${s},${w},${n},${e}`;
       
-      // Use CORS proxy service to avoid Mixed Content issues
-      // 使用CORS代理服务避免Mixed Content问题
-      const proxyBase = import.meta.env.VITE_API_BASE || 'https://api.allorigins.win/raw?url=';
-      const backendUrl = 'http://13.236.162.216:8080';
-      
-      let targetUrl;
+      // Use Express proxy server to avoid Mixed Content issues
+      // 使用Express代理服务器避免Mixed Content问题
+      let apiUrl;
       if (this.allergenicity === 'all') {
-        targetUrl = `${backendUrl}/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+        apiUrl = `/api/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       } else {
-        targetUrl = `${backendUrl}/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+        apiUrl = `/api/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       }
-      
-      const apiUrl = `${proxyBase}${encodeURIComponent(targetUrl)}`;
       
       console.log('Generated API URL:', apiUrl); // Debug log
       return apiUrl;
