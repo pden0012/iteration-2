@@ -197,10 +197,13 @@ export default {
             json = await res.json();
           }
         } else {
-          // 生产环境使用相对路径，通过静态网站重写规则处理
-          const url = '/api/ai/image';
+          // 生产环境使用CORS代理服务，就像地图功能一样
+          const proxyBase = import.meta.env.VITE_API_BASE || 'https://api.allorigins.win/raw?url=';
+          const backendUrl = 'http://13.236.162.216:8080';
+          const targetUrl = `${backendUrl}/ai/image`;
+          const url = `${proxyBase}${encodeURIComponent(targetUrl)}`;
           
-          console.log('🔄 使用静态网站重写规则进行图片分析...');
+          console.log('🔄 使用CORS代理进行图片分析...', url);
           
           const form = new FormData();
           form.append('image', file);
@@ -213,9 +216,9 @@ export default {
           
           if (res.ok) {
             json = await res.json();
-            console.log('✅ 静态网站重写规则成功！');
+            console.log('✅ CORS代理成功！');
           } else {
-            throw new Error(`Static site rewrite responded with status: ${res.status}`);
+            throw new Error(`CORS proxy responded with status: ${res.status}`);
           }
         }
         
