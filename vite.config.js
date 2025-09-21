@@ -6,7 +6,24 @@ export default defineConfig(({ mode }) => {
   const apiTarget = env.VITE_API_TARGET || 'http://13.236.162.216:8080'
   return {
     base: '/',
-    plugins: [vue()],
+    plugins: [
+      vue(),
+      {
+        name: 'copy-redirects',
+        generateBundle() {
+          this.emitFile({
+            type: 'asset',
+            fileName: '_redirects',
+            source: `# Render.com Static Site Rewrite Rules
+# This file tells Render how to handle API requests
+
+# Rewrite API requests to backend (remove /api prefix)
+/api/map/* http://13.236.162.216:8080/map/:splat 200
+/api/ai/* http://13.236.162.216:8080/ai/:splat 200`
+          });
+        }
+      }
+    ],
     server: {
       port: 3000,
       open: true,
@@ -22,7 +39,8 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'dist',
       assetsDir: 'assets'
-    }
+    },
+    publicDir: 'public'
   }
 })
 
