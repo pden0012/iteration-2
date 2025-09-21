@@ -197,56 +197,89 @@ export default {
             json = await res.json();
           }
         } else {
-          // 生产环境使用CORS代理服务进行图片检测
-          console.log('🔄 使用CORS代理服务进行图片检测...');
+          // 生产环境使用多个CORS代理服务进行图片检测
+          console.log('🔄 Using CORS proxy services for image detection...');
           
-          // 使用cors-anywhere作为代理
-          const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-          const backendUrl = 'http://13.236.162.216:8080/ai/image';
-          const fullUrl = `${proxyUrl}${backendUrl}`;
-          
-          console.log('代理URL:', fullUrl);
-          
+          // 准备FormData
           const form = new FormData();
           form.append('image', file);
           form.append('text', ' ');
           
-          const res = await fetch(fullUrl, {
-            method: 'POST',
-            body: form,
-            headers: {
-              'X-Requested-With': 'XMLHttpRequest'
+          // 多个CORS代理服务列表，按优先级排序
+          const proxyServices = [
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?',
+            'https://thingproxy.freeboard.io/fetch/',
+            'https://cors-anywhere.herokuapp.com/'
+          ];
+          
+          const backendUrl = 'http://13.236.162.216:8080/ai/image';
+          
+          // 尝试每个代理服务
+          for (let i = 0; i < proxyServices.length; i++) {
+            const proxyUrl = proxyServices[i];
+            let fullUrl;
+            
+            // 根据不同的代理服务调整URL格式
+            if (proxyUrl.includes('allorigins.win')) {
+              fullUrl = `${proxyUrl}${encodeURIComponent(backendUrl)}`;
+            } else {
+              fullUrl = `${proxyUrl}${backendUrl}`;
             }
-          });
-          
-          console.log('Response status:', res.status);
-          
-          if (res.ok) {
-            const responseText = await res.text();
-            console.log('Raw response:', responseText.substring(0, 200) + '...');
+            
+            console.log(`Trying proxy ${i + 1}/${proxyServices.length}:`, proxyUrl);
             
             try {
-              json = JSON.parse(responseText);
-              console.log('✅ CORS代理成功！');
-            } catch (parseError) {
-              console.error('JSON解析失败:', parseError);
-              console.error('响应内容:', responseText);
-              throw new Error(`Invalid JSON response: ${parseError.message}`);
+              const res = await fetch(fullUrl, {
+                method: 'POST',
+                body: form,
+                headers: {
+                  'X-Requested-With': 'XMLHttpRequest'
+                }
+              });
+              
+              console.log(`Proxy ${i + 1} response status:`, res.status);
+              
+              if (res.ok) {
+                const responseText = await res.text();
+                console.log(`Proxy ${i + 1} raw response:`, responseText.substring(0, 200) + '...');
+                
+                try {
+                  json = JSON.parse(responseText);
+                  console.log(`✅ CORS proxy ${i + 1} success!`);
+                  break; // 成功则跳出循环
+                } catch (parseError) {
+                  console.error(`Proxy ${i + 1} JSON parse failed:`, parseError);
+                  console.error('Response content:', responseText);
+                  // 继续尝试下一个代理
+                  continue;
+                }
+              } else {
+                const errorText = await res.text();
+                console.error(`Proxy ${i + 1} error:`, res.status, errorText);
+                // 继续尝试下一个代理
+                continue;
+              }
+            } catch (fetchError) {
+              console.error(`Proxy ${i + 1} fetch error:`, fetchError);
+              // 继续尝试下一个代理
+              continue;
             }
-          } else {
-            const errorText = await res.text();
-            console.error('CORS代理错误:', errorText);
-            throw new Error(`CORS proxy error: ${res.status} - ${errorText}`);
+          }
+          
+          // 如果所有代理都失败了
+          if (!json) {
+            throw new Error('All CORS proxy services failed. Please try again later.');
           }
         }
         
         if (!json) {
           // 如果所有代理都失败，显示更友好的错误信息
           this.results = [{
-            title: 'Service Unavailable',
+            title: 'Service Temporarily Unavailable',
             scientificName: '',
             risk: 'unknown',
-            description: 'Image analysis service is temporarily unavailable. Please try again later or contact support.'
+            description: 'The image analysis service is currently experiencing issues. Please try again in a few minutes. If the problem persists, please contact support.'
           }];
           return;
         }
@@ -263,13 +296,34 @@ export default {
           }));
         } else {
           console.warn('Unexpected API response format:', json);
-          this.results = [];
+          this.results = [{
+            title: 'Analysis Complete',
+            scientificName: '',
+            risk: 'unknown',
+            description: 'Image analysis completed, but no specific plant species were identified. Please try with a clearer image.'
+          }];
         }
         
       } catch (error) {
         console.error('Image detection failed:', error);
-        alert('Failed to analyze image. Please try again.');
-        this.results = [];
+        
+        // 根据错误类型显示不同的用户提示
+        let errorMessage = 'Failed to analyze image. ';
+        if (error.message.includes('CORS proxy')) {
+          errorMessage += 'Network service is temporarily unavailable. Please try again later.';
+        } else if (error.message.includes('All CORS proxy services failed')) {
+          errorMessage += 'All network services are currently unavailable. Please try again in a few minutes.';
+        } else {
+          errorMessage += 'Please check your internet connection and try again.';
+        }
+        
+        // 显示错误结果而不是弹窗
+        this.results = [{
+          title: 'Analysis Failed',
+          scientificName: '',
+          risk: 'unknown',
+          description: errorMessage
+        }];
       } finally {
         this.isLoading = false;
       }
