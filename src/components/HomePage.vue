@@ -519,8 +519,8 @@ export default {
 /* Ensure all icons have consistent sizing */
 /* 确保所有图标有一致的尺寸 */
 .feature-icon {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   margin-bottom: 15px;
   display: flex;
   align-items: center;
