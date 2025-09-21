@@ -1,0 +1,5 @@
+# Render.com Static Site Rewrite Rules
+# This file tells Render how to handle API requests
+
+# Rewrite API requests to backend
+/api/* http://13.236.162.216:8080/:splat 200

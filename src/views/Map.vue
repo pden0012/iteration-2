@@ -148,7 +148,12 @@ export default {
         } else {
           backendUrl = `http://13.236.162.216:8080/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
         }
-        return `https://hayfever-cors-proxy.onrender.com/api/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}${this.allergenicity !== 'all' ? '&allergenicity=' + this.allergenicity : ''}`;
+        // 生产环境使用相对路径，通过静态网站重写规则处理
+        if (this.allergenicity === 'all') {
+          return `/api/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+        } else {
+          return `/api/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+        }
       }
     },
 
