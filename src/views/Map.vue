@@ -141,13 +141,6 @@ export default {
           return `/api/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
         }
       } else {
-        // 生产环境使用CORS代理服务
-        let backendUrl;
-        if (this.allergenicity === 'all') {
-          backendUrl = `http://13.236.162.216:8080/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
-        } else {
-          backendUrl = `http://13.236.162.216:8080/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
-        }
         // 生产环境使用相对路径，通过静态网站重写规则处理
         if (this.allergenicity === 'all') {
           return `/api/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
