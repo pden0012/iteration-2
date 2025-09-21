@@ -23,10 +23,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static files from dist directory
-app.use(express.static(path.join(__dirname, 'dist')));
-
-// Image detection proxy endpoint
+// Image detection proxy endpoint (must be before static files)
 app.post('/api/ai/image', upload.single('image'), async (req, res) => {
   try {
     console.log('🔄 Processing image detection request...');
@@ -104,6 +101,9 @@ app.post('/api/ai/image', upload.single('image'), async (req, res) => {
     });
   }
 });
+
+// Serve static files from dist directory (after API routes)
+app.use(express.static(path.join(__dirname, 'dist')));
 
 // Handle all other routes by serving the Vue app
 app.get('*', (req, res) => {
