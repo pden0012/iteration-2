@@ -197,50 +197,55 @@ export default {
             json = await res.json();
           }
         } else {
-          // 生产环境直接使用后端API，添加错误处理
-          const backendUrl = 'http://13.236.162.216:8080';
-          const url = `${backendUrl}/ai/image`;
+          // 生产环境使用iframe代理避免Mixed Content问题
+          console.log('🔄 使用iframe代理进行图片分析...');
           
-          console.log('🔄 直接使用后端API进行图片分析...', url);
-          
-          const form = new FormData();
-          form.append('image', file);
-          form.append('text', ' ');
-          
-          const res = await fetch(url, {
-            method: 'POST',
-            body: form,
-            mode: 'cors' // 明确指定CORS模式
-          });
-          
-          console.log('Response status:', res.status);
-          console.log('Response headers:', res.headers);
-          
-          if (res.ok) {
-            const responseText = await res.text();
-            console.log('Raw response:', responseText);
+          return new Promise((resolve, reject) => {
+            // 创建隐藏的iframe
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = '/image-proxy.html';
             
-            try {
-              json = JSON.parse(responseText);
-              console.log('✅ CORS代理成功！');
-            } catch (parseError) {
-              console.error('JSON解析失败:', parseError);
-              console.error('响应内容:', responseText);
-              
-              // 检查是否是Mixed Content错误
-              if (responseText.includes('Mixed Content') || responseText.includes('insecure resource')) {
-                throw new Error('Mixed Content Error: HTTPS site cannot load HTTP resources. Please use HTTP version of this site or contact administrator.');
-              } else if (responseText.includes('Whitelabel Error Page')) {
-                throw new Error('Backend API Error: The image detection service is not responding correctly. Please try again later.');
-              } else {
-                throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}...`);
+            // 监听iframe响应
+            const handleMessage = (event) => {
+              if (event.data.type === 'DETECT_RESULT') {
+                document.body.removeChild(iframe);
+                window.removeEventListener('message', handleMessage);
+                
+                if (event.data.success) {
+                  try {
+                    const result = JSON.parse(event.data.data);
+                    resolve(result);
+                  } catch (parseError) {
+                    reject(new Error('Invalid JSON response from proxy'));
+                  }
+                } else {
+                  reject(new Error(event.data.error || 'Proxy request failed'));
+                }
               }
-            }
-          } else {
-            const errorText = await res.text();
-            console.error('API错误响应:', errorText);
-            throw new Error(`CORS proxy responded with status: ${res.status} - ${errorText}`);
-          }
+            };
+            
+            window.addEventListener('message', handleMessage);
+            
+            // 等待iframe加载完成后发送请求
+            iframe.onload = () => {
+              iframe.contentWindow.postMessage({
+                type: 'DETECT_IMAGE',
+                file: file
+              }, '*');
+            };
+            
+            document.body.appendChild(iframe);
+            
+            // 超时处理
+            setTimeout(() => {
+              if (document.body.contains(iframe)) {
+                document.body.removeChild(iframe);
+                window.removeEventListener('message', handleMessage);
+                reject(new Error('Proxy request timeout'));
+              }
+            }, 30000);
+          });
         }
         
         if (!json) {
