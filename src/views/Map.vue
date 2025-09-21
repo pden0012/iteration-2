@@ -70,21 +70,38 @@ export default {
     loadGoogleIfNeeded() {
       // Dynamically load Google Maps JS API using env key
       // 动态加载 Google Maps JS，使用环境变量中的密钥
-      const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
       if (window.google && window.google.maps) return Promise.resolve(window.google);
+      
       return new Promise((resolve, reject) => {
         const existing = document.getElementById('google-maps-sdk');
-        if (existing) { existing.onload = () => resolve(window.google); return; }
+        if (existing) { 
+          existing.onload = () => resolve(window.google); 
+          return; 
+        }
+        
+        const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+        if (!key || key === 'your_google_maps_api_key_here') {
+          console.error('Google Maps API key is not configured. Please set VITE_GOOGLE_MAPS_API_KEY in your environment.');
+          reject(new Error('Google Maps API key not configured'));
+          return;
+        }
+        
         const script = document.createElement('script');
         script.id = 'google-maps-sdk';
-        script.async = true; script.defer = true;
-        // Use environment variable for API key, fallback to a placeholder
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${key || 'YOUR_GOOGLE_MAPS_API_KEY'}`;
-        script.onload = () => resolve(window.google);
+        script.async = true; 
+        script.defer = true;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${key}`;
+        
+        script.onload = () => {
+          console.log('Google Maps API loaded successfully');
+          resolve(window.google);
+        };
+        
         script.onerror = (error) => {
           console.error('Failed to load Google Maps API:', error);
-          reject(error);
+          reject(new Error('Failed to load Google Maps API. Please check your API key and network connection.'));
         };
+        
         document.body.appendChild(script);
       });
     },
@@ -117,7 +134,8 @@ export default {
       this.currentZoom = this.map.getZoom();
     },
     getApiUrl() {
-      // Build API URL - 直接使用后端URL
+      // Build API URL with environment-aware protocol handling
+      // 构建API URL，根据环境自动选择协议
       const bounds = this.map?.getBounds();
       const zoom = this.map?.getZoom() || 12;
       if (!bounds) return null;
@@ -130,12 +148,23 @@ export default {
       const e = ne.lng().toFixed(6);
       const bbox = `${s},${w},${n},${e}`;
       
-      // 直接使用后端完整URL
+      // Use environment variable for API base URL, fallback for development
+      // 使用环境变量配置API基础URL，为开发环境提供备用方案
+      const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 
+                     (isDevelopment ? 'http://13.236.162.216:8080' : 'https://13.236.162.216:8080');
+      
+      // Try HTTPS first for production, fallback to HTTP if needed
+      // 生产环境优先使用HTTPS，必要时回退到HTTP
+      let apiUrl;
       if (this.allergenicity === 'all') {
-        return `http://13.236.162.216:8080/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+        apiUrl = `${baseUrl}/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       } else {
-        return `http://13.236.162.216:8080/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+        apiUrl = `${baseUrl}/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       }
+      
+      console.log('Generated API URL:', apiUrl); // Debug log
+      return apiUrl;
     },
 
     async refreshMarkers() {
@@ -153,11 +182,58 @@ export default {
       try {
         this.isLoading = true;
         this.clearData();
-        const url = this.getApiUrl();
+        let url = this.getApiUrl();
         if (!url) return;
         
-        const res = await fetch(url);
+        console.log('Fetching data from:', url); // Debug log
+        
+        const fetchWithFallback = async (primaryUrl) => {
+          try {
+            // Try primary URL first (usually HTTPS for production)
+            const res = await fetch(primaryUrl, {
+              method: 'GET',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              signal: AbortSignal.timeout(15000) // 15 second timeout
+            });
+            
+            if (!res.ok) {
+              throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+            }
+            
+            return res;
+          } catch (error) {
+            // If HTTPS fails and we're in production, try HTTP fallback
+            if (primaryUrl.startsWith('https://') && !window.location.hostname.includes('localhost')) {
+              console.log('HTTPS request failed, trying HTTP fallback...');
+              const httpUrl = primaryUrl.replace('https://', 'http://');
+              console.log('Fallback URL:', httpUrl);
+              
+              const fallbackRes = await fetch(httpUrl, {
+                method: 'GET',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                signal: AbortSignal.timeout(15000)
+              });
+              
+              if (!fallbackRes.ok) {
+                throw new Error(`HTTP ${fallbackRes.status}: ${fallbackRes.statusText}`);
+              }
+              
+              return fallbackRes;
+            }
+            throw error;
+          }
+        };
+        
+        const res = await fetchWithFallback(url);
         const json = await res.json();
+        console.log('Received data:', json); // Debug log
+        
         const list = Array.isArray(json?.data) ? json.data : [];
         
         this.renderAsGeoJSON(list, String(this.allergenicity));
@@ -166,7 +242,17 @@ export default {
         this.emptyMessage = list.length === 0 ? 'No trees in current view.' : '';
       } catch (e) {
         console.error('Failed to load map data', e);
-        this.emptyMessage = 'Error loading tree data';
+        
+        // Provide specific error message for different scenarios
+        if (e.name === 'TimeoutError') {
+          this.emptyMessage = 'Request timeout. The server might be slow or unavailable.';
+        } else if (e.message.includes('NetworkError') || e.message.includes('Failed to fetch') || e.message.includes('CORS')) {
+          this.emptyMessage = 'Network error. This might be due to CORS policy or server unavailability.';
+        } else if (e.message.includes('Mixed Content')) {
+          this.emptyMessage = 'Security error: Cannot load HTTP content from HTTPS site.';
+        } else {
+          this.emptyMessage = `Error loading tree data: ${e.message}`;
+        }
       } finally {
         this.isLoading = false;
       }
