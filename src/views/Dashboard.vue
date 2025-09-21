@@ -68,12 +68,6 @@
               </div>
             </div>
             
-            <!-- View Forecast Button -->
-            <!-- 查看预报按钮 -->
-            <button class="forecast-button" @click="viewForecast">
-              {{ chartData.forecastButton }}
-            </button>
-
             
           </div>
 
@@ -106,15 +100,6 @@
                   {{ allergen.level }}
                 </span>
               </div>
-            </div>
-            
-            <!-- Quiz CTA -->
-            <!-- 测验行动号召 -->
-            <div class="quiz-cta">
-              <p class="quiz-question">{{ quizData.question }}</p>
-              <button class="quiz-button" @click="takeQuiz">
-                {{ quizData.buttonText }}
-              </button>
             </div>
           </div>
 
@@ -251,8 +236,7 @@ export default {
       // 图表区域数据
       chartData: {
         title: 'Current Pollen Index',
-        size: '342 x 342', // 图表尺寸显示
-        forecastButton: 'View 7-day Forecast'
+        size: '342 x 342' // 图表尺寸显示
       },
       
       // Pollen data - current level and progress
@@ -303,13 +287,6 @@ export default {
         ]
       },
       
-      // Quiz CTA data - 测验行动号召数据
-      // 测验行动号召数据
-      quizData: {
-        question: 'Not sure which affects you?',
-        buttonText: 'Take the Quiz'
-      },
-      
       // Tips section data - 提示区域数据
       // 提示区域数据
       tipsData: {
@@ -347,19 +324,6 @@ export default {
       const hours12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
       const formatted = `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()} ${pad(hours12)}:${pad(now.getMinutes())} ${ampm}`;
       this.dashboardData.lastUpdated = `Last updated ${formatted}`;
-    },
-    // View forecast action - 查看预报行动
-    // 查看预报行动
-    viewForecast() {
-      console.log('Viewing 7-day forecast...');
-      // 这里将实现7天预报功能 - Will implement 7-day forecast functionality
-    },
-    
-    // Take quiz action - 参加测验行动
-    // 参加测验行动
-    takeQuiz() {
-      console.log('Starting allergen quiz...');
-      // 这里将实现过敏原测验功能 - Will implement allergen quiz functionality
     },
     
     // 初始化：读取CSV地址
@@ -1217,48 +1181,6 @@ export default {
   border-radius: 4px;
 }
 
-/* Forecast button - view 7-day forecast */
-/* 预报按钮 - 查看7天预报
-   - display: inline-flex 内联弹性布局
-   - align-items: center 垂直居中
-   - justify-content: center 水平居中
-   - padding: 12px 24px 内边距：上下12px，左右24px
-   - font-family: var(--font-body) 使用正文字体变量Inter
-   - font-size: 16px 字体大小16像素
-   - font-weight: 600 字体粗细600(粗体)
-   - background: var(--secondary-color) 次要颜色背景(黄色)
-   - border: 1px solid var(--secondary-color) 边框颜色与背景一致
-   - border-radius: 16px 圆角16像素
-   - color: #303030 深灰色文本
-   - cursor: pointer 鼠标指针样式
-   - transition: all 0.3s ease 所有属性0.3秒缓动过渡
-   - margin-top: 20px 顶部外边距20像素 */
-.forecast-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 24px;
-  font-family: var(--font-body);
-  font-size: 16px;
-  font-weight: 600;
-  background: var(--secondary-color);
-  border: 1px solid var(--secondary-color);
-  border-radius: 16px;
-  color: #303030;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 20px;
-  background-color: #F9D65C;
-}
-
-/* Forecast button hover effect */
-/* 预报按钮悬停效果
-   - transform: translateY(-2px) Y轴向上移动2像素
-   - box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) 增强阴影效果 */
-.forecast-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
 
 /* Climate section container */
 /* 气候可视化区域容器：竖向堆叠两个图表卡片 */
@@ -1518,72 +1440,6 @@ export default {
   color: #616161;
 }
 
-/* Quiz CTA section */
-/* 测验行动号召区域
-   - text-align: center 文本居中
-   - padding: 24px 内边距24像素
-   - background: #f8f9fa 浅灰色背景
-   - border-radius: 12px 圆角12像素 */
-.quiz-cta {
-  text-align: center;
-  padding: 24px;
-  background: #f8f9fa;
-  border-radius: 12px;
-}
-
-/* Quiz question text */
-/* 测验问题文本
-   - font-family: var(--font-body) 使用正文字体变量Inter
-   - font-size: 16px 字体大小16像素
-   - color: var(--text-secondary) 次要文本颜色(深灰色)
-   - margin: 0 0 16px 底部外边距16像素 */
-.quiz-question {
-  font-family: var(--font-body);
-  font-size: 16px;
-  color: var(--text-secondary);
-  margin: 0 0 16px;
-}
-
-/* Quiz button styling */
-/* 测验按钮样式
-   - display: inline-flex 内联弹性布局
-   - align-items: center 垂直居中
-   - justify-content: center 水平居中
-   - padding: 10px 20px 内边距：上下10px，左右20px
-   - font-family: var(--font-body) 使用正文字体变量Inter
-   - font-size: 14px 字体大小14像素
-   - font-weight: 500 字体粗细500(中等粗体)
-   - background: transparent 透明背景
-   - border: 1px solid var(--text-secondary) 次要文本颜色边框
-   - border-radius: 8px 圆角8像素
-   - color: var(--text-secondary) 次要文本颜色(深灰色)
-   - cursor: pointer 鼠标指针样式
-   - transition: all 0.3s ease 所有属性0.3秒缓动过渡 */
-.quiz-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 20px;
-  font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 500;
-  background: transparent;
-  border: 1px solid var(--text-secondary);
-  border-radius: 8px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: #4A9EFF;
-}
-
-/* Quiz button hover effect */
-/* 测验按钮悬停效果
-   - background: var(--text-secondary) 次要文本颜色背景(深灰色)
-   - color: white 白色文本 */
-.quiz-button:hover {
-  background: var(--text-secondary);
-  color: white;
-}
 
 /* Blue separator bar - divider between sections */
 /* 蓝色分隔条 - 区域间分隔线
