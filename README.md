@@ -167,6 +167,14 @@ npm run build
 - Verify all assets are uploaded correctly
 - Ensure JavaScript files are served with correct MIME type (`application/javascript`)
 
+#### Issue 4: CORS Proxy Errors in Image Detection
+**Problem**: Image detection fails with 403 Forbidden errors from CORS proxy services
+**Solution**: 
+- The application now uses multiple CORS proxy services as fallback options
+- Services include: allorigins.win, corsproxy.io, thingproxy.freeboard.io, and cors-anywhere.herokuapp.com
+- If all proxies fail, users will see a friendly error message instead of technical errors
+- The system automatically tries each proxy service in sequence until one succeeds
+
 ### Render.com Deployment Notes
 
 #### Step-by-step Render Deployment:
