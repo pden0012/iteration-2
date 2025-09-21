@@ -15,6 +15,7 @@ app.use(cors({
     
     const allowedOrigins = [
       'https://iteration-2.onrender.com',
+      'https://iteration-2-underdeployment.onrender.com', // 添加实际的部署域名
       'http://localhost:3000',
       'http://localhost:5173' // Vite dev server
     ];
@@ -69,6 +70,7 @@ app.get('/health', (req, res) => {
     cors: 'Enabled',
     allowedOrigins: [
       'https://iteration-2.onrender.com',
+      'https://iteration-2-underdeployment.onrender.com', // 添加实际的部署域名
       'http://localhost:3000',
       'http://localhost:5173'
     ]

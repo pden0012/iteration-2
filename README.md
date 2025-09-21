@@ -143,6 +143,29 @@ npm run build
 2. Ensure image resources are properly placed
 3. Make sure your web server serves static files with correct MIME types
 
+### Recent Fixes (2025-01-21)
+
+#### Issue: Map Tree Data Loading Failed (404 Error)
+**Problem**: The allergy exposure map was showing "Error loading tree data" with 404 errors in the browser console.
+
+**Root Cause**: 
+- Backend API (`http://13.236.162.216:8080/map/tree`) was working correctly
+- CORS proxy server configuration had incorrect allowed origins
+- Static site redirect rules were not properly configured
+
+**Solution Applied**:
+1. ✅ Simplified API URL building logic in Map.vue component
+2. ✅ Fixed static site redirect rules in `_redirects` file
+3. ✅ Removed complex CORS proxy configuration (not needed for static sites)
+4. ✅ Updated documentation to reflect simplified approach
+
+**Files Modified**:
+- `src/views/Map.vue` - Simplified API URL building logic
+- `_redirects` - Fixed redirect rules for static site deployment
+- `README.md` - Updated documentation
+
+**Next Steps**: Simply redeploy the static site - no additional services needed.
+
 ### Common Deployment Issues & Solutions
 
 #### Issue 1: CSS Files Not Loading (MIME Type Error)
@@ -212,6 +235,8 @@ VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 VITE_API_TARGET=http://13.236.162.216:8080
 VITE_APP_PASSWORD=123456
 ```
+
+**Note**: API routing is handled by the `_redirects` file for static site deployment.
 
 ## Component Description
 
