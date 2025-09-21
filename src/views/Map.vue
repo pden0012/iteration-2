@@ -63,7 +63,9 @@ export default {
       boundaryAdded: false, // 防止重复添加
       emptyMessage: '', // 当当前筛选结果为空时提示
       currentZoom: 12, // 当前缩放级别
-      isLoading: false // 加载状态
+      isLoading: false, // 加载状态
+      retryCount: 0, // 重试计数器
+      maxRetries: 1 // 最大重试次数
     };
   },
   methods: {
@@ -230,6 +232,21 @@ export default {
       } catch (e) {
         console.error('Failed to load map data', e);
         
+        // 自动重试逻辑
+        if (this.retryCount < this.maxRetries) {
+          this.retryCount++;
+          console.log(`Retrying data load (attempt ${this.retryCount}/${this.maxRetries})...`);
+          
+          // 延迟1秒后重试
+          setTimeout(() => {
+            this.refreshMarkers();
+          }, 1000);
+          return; // 不显示错误消息，等待重试
+        }
+        
+        // 重试次数用完，显示错误消息
+        this.retryCount = 0; // 重置计数器
+        
         // Provide specific error message for different scenarios
         if (e.name === 'TimeoutError') {
           this.emptyMessage = 'Request timeout. The server might be slow or unavailable.';
@@ -345,11 +362,11 @@ export default {
         return;
       }
       
-      // 切换筛选时重新请求数据
-      this.refreshMarkers();
-    },
+    // 切换筛选时重新请求数据
+    this.refreshMarkers();
+  },
 
-    // debounce helper to reduce refresh frequency
+  // debounce helper to reduce refresh frequency
     debounce(fn, wait) {
       let t = null;
       return (...args) => {
