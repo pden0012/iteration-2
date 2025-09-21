@@ -80,7 +80,9 @@ export default {
       imagePreview: null,
       uploadSuccess: false,
       results: [], // 后端返回的结果
-      isLoading: false
+      isLoading: false,
+      retryCount: 0,
+      maxRetries: 1
     };
   },
   computed: {
@@ -216,10 +218,10 @@ export default {
           const proxyServices = [
             'https://api.allorigins.win/raw?url=',
             'https://corsproxy.io/?',
+            'https://cors.bridged.cc/',
             'https://thingproxy.freeboard.io/fetch/',
-            'https://cors-anywhere.herokuapp.com/',
             'https://api.codetabs.com/v1/proxy?quest=',
-            'https://cors.bridged.cc/'
+            'https://cors-anywhere.herokuapp.com/'
           ];
           
           const backendUrl = 'http://13.236.162.216:8080/ai/image';
@@ -246,7 +248,8 @@ export default {
                 body: form,
                 headers: {
                   'X-Requested-With': 'XMLHttpRequest'
-                }
+                },
+                signal: AbortSignal.timeout(10000) // 10 second timeout per proxy
               });
               
               console.log(`Proxy ${i + 1} response status:`, res.status);
@@ -319,7 +322,19 @@ export default {
             }
             
             if (!json) {
-              throw new Error('All CORS proxy services failed. Please try again later.');
+              // 如果所有代理都失败，尝试重试一次
+              if (this.retryCount < this.maxRetries) {
+                this.retryCount++;
+                console.log(`All proxies failed, retrying in 3 seconds (attempt ${this.retryCount}/${this.maxRetries})...`);
+                
+                // 等待3秒后重试
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // 递归调用自己进行重试
+                return await this.detectImage(file);
+              } else {
+                throw new Error('All CORS proxy services failed. Please try again later.');
+              }
             }
           }
         }
@@ -336,6 +351,9 @@ export default {
         }
         
         console.log('Detection result:', json);
+        
+        // 重置重试计数器
+        this.retryCount = 0;
         
         // 处理后端返回的数据
         if (json.data && Array.isArray(json.data)) {
@@ -373,8 +391,11 @@ export default {
           title: 'Analysis Failed',
           scientificName: '',
           risk: 'unknown',
-          description: errorMessage
+          description: errorMessage + ' Click "Change Image" to try again.'
         }];
+        
+        // 重置重试计数器
+        this.retryCount = 0;
       } finally {
         this.isLoading = false;
       }
