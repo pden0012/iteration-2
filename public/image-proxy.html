@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Detection Proxy</title>
+</head>
+<body>
+    <h1>Image Detection Proxy</h1>
+    <p>This page acts as a proxy for image detection to avoid Mixed Content issues.</p>
+    
+    <script>
+        // Simple proxy to handle image detection requests
+        // 简单的代理来处理图片检测请求
+        if (window.parent !== window) {
+            // This is running in an iframe
+            // 这是在iframe中运行
+            window.addEventListener('message', async function(event) {
+                if (event.data.type === 'DETECT_IMAGE') {
+                    try {
+                        const formData = new FormData();
+                        formData.append('image', event.data.file);
+                        formData.append('text', ' ');
+                        
+                        const response = await fetch('http://13.236.162.216:8080/ai/image', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        const result = await response.text();
+                        
+                        // Send result back to parent
+                        // 将结果发送回父窗口
+                        window.parent.postMessage({
+                            type: 'DETECT_RESULT',
+                            success: response.ok,
+                            data: result,
+                            status: response.status
+                        }, '*');
+                        
+                    } catch (error) {
+                        window.parent.postMessage({
+                            type: 'DETECT_RESULT',
+                            success: false,
+                            error: error.message
+                        }, '*');
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
