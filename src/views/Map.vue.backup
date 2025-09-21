@@ -65,7 +65,7 @@ export default {
       currentZoom: 12, // 当前缩放级别
       isLoading: false, // 加载状态
       retryCount: 0, // 重试计数器
-      maxRetries: 2 // 最大重试次数（总共试3次）
+      maxRetries: 1 // 最大重试次数
     };
   },
   methods: {
@@ -155,8 +155,8 @@ export default {
       }
     },
     getApiUrl() {
-      // Build API URL - use our own proxy server
-      // 构建API URL - 使用我们自己的代理服务器
+      // Build API URL - use direct backend URL
+      // 构建API URL - 直接使用后端URL
       const bounds = this.map?.getBounds();
       const zoom = this.map?.getZoom() || 12;
       if (!bounds) return null;
@@ -169,19 +169,19 @@ export default {
       const e = ne.lng().toFixed(6);
       const bbox = `${s},${w},${n},${e}`;
       
-      // Use our own proxy server
-      // 使用我们自己的代理服务器
-      const isDev = import.meta.env.DEV;
-      const proxyBase = isDev ? 'http://localhost:3003/api' : 'https://your-proxy-server.onrender.com/api';
+      // Use CORS proxy service for map data (GET requests work fine)
+      // 使用CORS代理服务获取地图数据（GET请求工作正常）
+      const proxyBase = import.meta.env.VITE_API_BASE || 'https://api.allorigins.win/raw?url=';
+      const backendUrl = 'http://13.236.162.216:8080';
       
       let targetUrl;
       if (this.allergenicity === 'all') {
-        targetUrl = `/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+        targetUrl = `${backendUrl}/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       } else {
-        targetUrl = `/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+        targetUrl = `${backendUrl}/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       }
       
-      const apiUrl = `${proxyBase}${targetUrl}`;
+      const apiUrl = `${proxyBase}${encodeURIComponent(targetUrl)}`;
       
       console.log('Generated API URL:', apiUrl); // Debug log
       return apiUrl;
@@ -232,10 +232,10 @@ export default {
       } catch (e) {
         console.error('Failed to load map data', e);
         
-        // 自动重试逻辑 - 只针对AbortError重试
-        if (this.retryCount < this.maxRetries && e.name === 'AbortError') {
+        // 自动重试逻辑
+        if (this.retryCount < this.maxRetries) {
           this.retryCount++;
-          console.log(`AbortError detected, retrying data load (attempt ${this.retryCount}/${this.maxRetries})...`);
+          console.log(`Retrying data load (attempt ${this.retryCount}/${this.maxRetries})...`);
           
           // 延迟1秒后重试
           setTimeout(() => {
@@ -629,7 +629,7 @@ export default {
 
 .map-container {
   width: 100%;
-  max-width: 900px; /* Desktop: narrower width */
+  max-width: 1200px; /* Desktop: large screen width */
   aspect-ratio: 16 / 9; /* Default 16:9 widescreen ratio */
   margin: 0 auto; /* Center alignment */
   padding: 0 16px; /* Prevent edge sticking */
@@ -663,7 +663,7 @@ export default {
 /* 🖥️ Desktop (1024px - 1439px) */
 @media (min-width: 1024px) and (max-width: 1439px) {
   .map-container {
-    max-width: 800px;
+    max-width: 960px;
     aspect-ratio: 16 / 9;
     border-radius: 12px;
   }
@@ -672,7 +672,7 @@ export default {
 /* 🖥️ Large desktop (1440px+) */
 @media (min-width: 1440px) {
   .map-container {
-    max-width: 900px;
+    max-width: 1200px;
     aspect-ratio: 16 / 9;
     border-radius: 12px;
   }

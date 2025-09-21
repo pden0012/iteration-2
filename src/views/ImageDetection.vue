@@ -166,13 +166,14 @@ export default {
     },
     
     getApiUrl(path) {
-      // 这个函数现在主要用于开发环境，生产环境的代理逻辑在detectImage中处理
+      // 使用我们自己的代理服务器
       const isDev = import.meta.env.DEV;
       if (isDev) {
-        return `/api${path}`;
+        return `http://localhost:3003/api${path}`;
       } else {
-        // 生产环境将在detectImage函数中处理多个代理服务
-        return `http://13.236.162.216:8080${path}`;
+        // 生产环境使用我们自己的代理服务器
+        const proxyUrl = 'https://your-proxy-server.onrender.com'; // 替换为你的代理服务器URL
+        return `${proxyUrl}/api${path}`;
       }
     },
     
@@ -180,180 +181,34 @@ export default {
       try {
         this.isLoading = true;
         
-        const isDev = import.meta.env.DEV;
-        let json = null;
+        // 使用我们自己的代理服务器
+        const url = this.getApiUrl('/ai/image');
+        const form = new FormData();
+        form.append('image', file);
+        form.append('text', ' ');
         
-        // 开发环境使用本地代理
-        if (isDev) {
-          const url = '/api/ai/image';
-          const form = new FormData();
-          form.append('image', file);
-          form.append('text', ' ');
-          
-          const res = await fetch(url, {
-            method: 'POST',
-            body: form
-          });
-          
-          if (res.ok) {
-            json = await res.json();
-          }
-        } else {
-          // 生产环境使用多个CORS代理服务进行图片检测
-          console.log('🔄 Using CORS proxy services for image detection...');
-          
-          // 准备FormData - 确保正确的Content-Type
-          const form = new FormData();
-          form.append('image', file);
-          form.append('text', ' ');
-          
-          // 确保文件有正确的MIME类型
-          if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
-            // 确保JPEG文件有正确的扩展名
-            const blob = new Blob([file], { type: 'image/jpeg' });
-            form.set('image', blob, 'image.jpg');
-          }
-          
-          // 多个CORS代理服务列表，按优先级排序
-          const proxyServices = [
-            'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?',
-            'https://cors.bridged.cc/',
-            'https://thingproxy.freeboard.io/fetch/',
-            'https://api.codetabs.com/v1/proxy?quest=',
-            'https://cors-anywhere.herokuapp.com/'
-          ];
-          
-          const backendUrl = 'http://13.236.162.216:8080/ai/image';
-          
-          // 尝试每个代理服务
-          for (let i = 0; i < proxyServices.length; i++) {
-            const proxyUrl = proxyServices[i];
-            let fullUrl;
-            
-            // 根据不同的代理服务调整URL格式
-            if (proxyUrl.includes('allorigins.win')) {
-              fullUrl = `${proxyUrl}${encodeURIComponent(backendUrl)}`;
-            } else if (proxyUrl.includes('codetabs.com')) {
-              fullUrl = `${proxyUrl}${encodeURIComponent(backendUrl)}`;
-            } else {
-              fullUrl = `${proxyUrl}${backendUrl}`;
-            }
-            
-            console.log(`Trying proxy ${i + 1}/${proxyServices.length}:`, proxyUrl);
-            
-            try {
-              const res = await fetch(fullUrl, {
-                method: 'POST',
-                body: form,
-                headers: {
-                  'X-Requested-With': 'XMLHttpRequest'
-                },
-                signal: AbortSignal.timeout(10000) // 10 second timeout per proxy
-              });
-              
-              console.log(`Proxy ${i + 1} response status:`, res.status);
-              
-              if (res.ok) {
-                const responseText = await res.text();
-                console.log(`Proxy ${i + 1} raw response:`, responseText.substring(0, 200) + '...');
-                
-                // 检查响应是否包含HTML错误页面
-                if (responseText.includes('<html>') || responseText.includes('Whitelabel Error Page')) {
-                  console.error(`Proxy ${i + 1} returned HTML error page instead of JSON`);
-                  console.error('Response content:', responseText.substring(0, 500));
-                  continue; // 继续尝试下一个代理
-                }
-                
-                try {
-                  json = JSON.parse(responseText);
-                  console.log(`✅ CORS proxy ${i + 1} success!`);
-                  break; // 成功则跳出循环
-                } catch (parseError) {
-                  console.error(`Proxy ${i + 1} JSON parse failed:`, parseError);
-                  console.error('Response content:', responseText.substring(0, 500));
-                  // 继续尝试下一个代理
-                  continue;
-                }
-              } else {
-                const errorText = await res.text();
-                console.error(`Proxy ${i + 1} error:`, res.status, errorText.substring(0, 200));
-                
-                // 特殊处理某些已知错误
-                if (res.status === 403 && errorText.includes('pricing')) {
-                  console.log(`Proxy ${i + 1} requires paid plan, skipping...`);
-                } else if (res.status === 415) {
-                  console.log(`Proxy ${i + 1} returned 415 Unsupported Media Type`);
-                }
-                
-                // 继续尝试下一个代理
-                continue;
-              }
-            } catch (fetchError) {
-              console.error(`Proxy ${i + 1} fetch error:`, fetchError);
-              // 继续尝试下一个代理
-              continue;
-            }
-          }
-          
-          // 如果所有代理都失败了，尝试直接请求（可能会被CORS阻止）
-          if (!json) {
-            console.log('🔄 All proxies failed, trying direct request...');
-            try {
-              const directForm = new FormData();
-              directForm.append('image', file);
-              directForm.append('text', ' ');
-              
-              const directRes = await fetch(backendUrl, {
-                method: 'POST',
-                body: directForm,
-                mode: 'cors'
-              });
-              
-              if (directRes.ok) {
-                const directResponseText = await directRes.text();
-                if (!directResponseText.includes('<html>')) {
-                  json = JSON.parse(directResponseText);
-                  console.log('✅ Direct request succeeded!');
-                }
-              }
-            } catch (directError) {
-              console.log('Direct request also failed:', directError.message);
-            }
-            
-            if (!json) {
-              // 如果所有代理都失败，尝试重试一次
-              if (this.retryCount < this.maxRetries) {
-                this.retryCount++;
-                console.log(`All proxies failed, retrying in 3 seconds (attempt ${this.retryCount}/${this.maxRetries})...`);
-                
-                // 等待3秒后重试
-                await new Promise(resolve => setTimeout(resolve, 3000));
-                
-                // 递归调用自己进行重试
-                return await this.detectImage(file);
-              } else {
-                throw new Error('All CORS proxy services failed. Please try again later.');
-              }
-            }
-          }
+        // 确保文件有正确的MIME类型
+        if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
+          const blob = new Blob([file], { type: 'image/jpeg' });
+          form.set('image', blob, 'image.jpg');
         }
         
-        if (!json) {
-          // 如果所有代理都失败，显示更友好的错误信息
-          this.results = [{
-            title: 'Service Temporarily Unavailable',
-            scientificName: '',
-            risk: 'unknown',
-            description: 'The image analysis service is currently experiencing issues. Please try again in a few minutes. If the problem persists, please contact support.'
-          }];
-          return;
+        console.log('🔄 Using our own proxy server for image detection...');
+        console.log('Request URL:', url);
+        
+        const res = await fetch(url, {
+          method: 'POST',
+          body: form,
+          signal: AbortSignal.timeout(30000) // 30 second timeout
+        });
+        
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         }
+        
+        const json = await res.json();
         
         console.log('Detection result:', json);
-        
-        // 重置重试计数器
-        this.retryCount = 0;
         
         // 处理后端返回的数据
         if (json.data && Array.isArray(json.data)) {
