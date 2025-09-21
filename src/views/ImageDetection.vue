@@ -214,9 +214,10 @@ export default {
           console.log('Response status:', res.status);
           
           if (res.ok) {
+            const responseText = await res.text();
+            console.log('Raw response:', responseText.substring(0, 200) + '...');
+            
             try {
-              const responseText = await res.text();
-              console.log('Raw response:', responseText.substring(0, 200) + '...');
               json = JSON.parse(responseText);
               console.log('✅ 专用代理成功！');
             } catch (parseError) {
