@@ -65,7 +65,13 @@ export default {
       currentZoom: 12, // 当前缩放级别
       isLoading: false, // 加载状态
       retryCount: 0, // 重试计数器
-      maxRetries: 1 // 最大重试次数
+      maxRetries: 1, // 最大重试次数
+      // 代理服务列表：主要代理和备用代理
+      proxyServices: [
+        'https://api.allorigins.win/raw?url=',
+        'https://corsproxy.io/?'
+      ],
+      currentProxyIndex: 0 // 当前使用的代理索引
     };
   },
   methods: {
@@ -171,7 +177,7 @@ export default {
       
       // Use CORS proxy service for map data (GET requests work fine)
       // 使用CORS代理服务获取地图数据（GET请求工作正常）
-      const proxyBase = import.meta.env.VITE_API_BASE || 'https://api.allorigins.win/raw?url=';
+      const proxyBase = this.proxyServices[this.currentProxyIndex];
       const backendUrl = 'http://13.236.162.216:8080';
       
       let targetUrl;
@@ -232,10 +238,12 @@ export default {
       } catch (e) {
         console.error('Failed to load map data', e);
         
-        // 自动重试逻辑
+        // 自动重试逻辑 - 切换到备用代理
         if (this.retryCount < this.maxRetries) {
           this.retryCount++;
-          console.log(`Retrying data load (attempt ${this.retryCount}/${this.maxRetries})...`);
+          // 切换到下一个代理服务
+          this.currentProxyIndex = (this.currentProxyIndex + 1) % this.proxyServices.length;
+          console.log(`Retrying data load (attempt ${this.retryCount}/${this.maxRetries}) with backup proxy: ${this.proxyServices[this.currentProxyIndex]}`);
           
           // 延迟1秒后重试
           setTimeout(() => {
@@ -246,6 +254,7 @@ export default {
         
         // 重试次数用完，显示错误消息
         this.retryCount = 0; // 重置计数器
+        this.currentProxyIndex = 0; // 重置代理索引到主要代理
         
         // Provide specific error message for different scenarios
         if (e.name === 'TimeoutError') {
