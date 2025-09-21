@@ -33,10 +33,10 @@
         Zoom: {{ currentZoom }}
       </div>
 
-      <!-- 加载提示 -->
+      <!-- Loading indicator -->
       <div v-if="isLoading" class="loading-indicator">
         <span class="spinner"></span>
-        正在加载...
+        Loading...
       </div>
     </div>
 
