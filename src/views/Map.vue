@@ -172,7 +172,7 @@ export default {
       // Use our own proxy server
       // 使用我们自己的代理服务器
       const isDev = import.meta.env.DEV;
-      const proxyBase = isDev ? 'http://localhost:3003/api' : 'https://your-proxy-server.onrender.com/api';
+      const proxyBase = isDev ? 'http://localhost:3003/api' : 'https://iteration-2-hayfree.onrender.com/api';
       
       let targetUrl;
       if (this.allergenicity === 'all') {
