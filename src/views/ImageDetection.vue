@@ -197,10 +197,10 @@ export default {
             json = await res.json();
           }
         } else {
-          // 生产环境使用自建代理服务器
-          const url = 'https://hayfever-cors-proxy.onrender.com/api/ai/image';
+          // 生产环境使用相对路径，通过静态网站重写规则处理
+          const url = '/api/ai/image';
           
-          console.log('🔄 使用自建代理服务器进行图片分析...');
+          console.log('🔄 使用静态网站重写规则进行图片分析...');
           
           const form = new FormData();
           form.append('image', file);
@@ -208,15 +208,14 @@ export default {
           
           const res = await fetch(url, {
             method: 'POST',
-            body: form,
-            mode: 'cors'
+            body: form
           });
           
           if (res.ok) {
             json = await res.json();
-            console.log('✅ 自建代理服务器成功！');
+            console.log('✅ 静态网站重写规则成功！');
           } else {
-            throw new Error(`Proxy server responded with status: ${res.status}`);
+            throw new Error(`Static site rewrite responded with status: ${res.status}`);
           }
         }
         
