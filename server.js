@@ -8,6 +8,12 @@ const app = express();
 // Enable CORS for all routes
 app.use(cors());
 
+// Log all requests
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
 // Serve static files from dist directory
 app.use(express.static(path.join(__dirname, 'dist')));
 
@@ -32,8 +38,11 @@ app.use('/api/map', createProxyMiddleware({
     '^/api/map': '/map'
   },
   onError: (err, req, res) => {
-    console.error('Proxy error:', err);
-    res.status(500).json({ error: 'Proxy server error' });
+    console.error('Map proxy error:', err);
+    res.status(500).json({ error: 'Map proxy server error' });
+  },
+  onProxyReq: (proxyReq, req, res) => {
+    console.log('Proxying map request to:', proxyReq.path);
   }
 }));
 
@@ -44,5 +53,8 @@ app.get('*', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Proxy server running on port ${PORT}`);
+  console.log(`🚀 Express proxy server running on port ${PORT}`);
+  console.log(`📁 Serving static files from: ${path.join(__dirname, 'dist')}`);
+  console.log(`🔄 Proxying /api/ai/image to: http://13.236.162.216:8080/ai/image`);
+  console.log(`🔄 Proxying /api/map to: http://13.236.162.216:8080/map`);
 });

@@ -1,0 +1,14 @@
+# Render deployment configuration
+# Render部署配置
+
+# Build command
+# 构建命令
+npm run build
+
+# Start command  
+# 启动命令
+npm start
+
+# Node.js version
+# Node.js版本
+node-version: 18
