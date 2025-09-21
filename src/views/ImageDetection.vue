@@ -197,30 +197,20 @@ export default {
             json = await res.json();
           }
         } else {
-          // 生产环境使用Express代理服务器
-          const url = '/api/ai/image';
+          // 生产环境显示友好提示，因为Mixed Content问题
+          console.log('🔄 生产环境图片检测功能暂时不可用...');
           
-          console.log('🔄 使用Express代理服务器进行图片分析...', url);
+          // 显示友好的错误信息
+          this.results = [{
+            title: 'Image Detection Unavailable',
+            scientificName: 'Mixed Content Error',
+            risk: 'unknown',
+            confidence: 0,
+            description: 'Image detection is temporarily unavailable due to HTTPS/HTTP security restrictions. Please use the local development version for full functionality.',
+            isLoading: false
+          }];
           
-          const form = new FormData();
-          form.append('image', file);
-          form.append('text', ' ');
-          
-          const res = await fetch(url, {
-            method: 'POST',
-            body: form
-          });
-          
-          console.log('Response status:', res.status);
-          
-          if (res.ok) {
-            json = await res.json();
-            console.log('✅ Express代理成功！');
-          } else {
-            const errorText = await res.text();
-            console.error('代理服务器错误:', errorText);
-            throw new Error(`Proxy server error: ${res.status} - ${errorText}`);
-          }
+          return; // 直接返回，不继续处理
         }
         
         if (!json) {
