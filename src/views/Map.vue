@@ -65,13 +65,7 @@ export default {
       currentZoom: 12, // 当前缩放级别
       isLoading: false, // 加载状态
       retryCount: 0, // 重试计数器
-      maxRetries: 1, // 最大重试次数
-      // 代理服务列表：主要代理和备用代理
-      proxyServices: [
-        'https://api.allorigins.win/raw?url=',
-        'https://corsproxy.io/?'
-      ],
-      currentProxyIndex: 0 // 当前使用的代理索引
+      maxRetries: 2 // 最大重试次数（总共试3次）
     };
   },
   methods: {
@@ -177,7 +171,7 @@ export default {
       
       // Use CORS proxy service for map data (GET requests work fine)
       // 使用CORS代理服务获取地图数据（GET请求工作正常）
-      const proxyBase = this.proxyServices[this.currentProxyIndex];
+      const proxyBase = 'https://api.allorigins.win/raw?url=';
       const backendUrl = 'http://13.236.162.216:8080';
       
       let targetUrl;
@@ -238,12 +232,10 @@ export default {
       } catch (e) {
         console.error('Failed to load map data', e);
         
-        // 自动重试逻辑 - 切换到备用代理
-        if (this.retryCount < this.maxRetries) {
+        // 自动重试逻辑 - 只针对AbortError重试
+        if (this.retryCount < this.maxRetries && e.name === 'AbortError') {
           this.retryCount++;
-          // 切换到下一个代理服务
-          this.currentProxyIndex = (this.currentProxyIndex + 1) % this.proxyServices.length;
-          console.log(`Retrying data load (attempt ${this.retryCount}/${this.maxRetries}) with backup proxy: ${this.proxyServices[this.currentProxyIndex]}`);
+          console.log(`AbortError detected, retrying data load (attempt ${this.retryCount}/${this.maxRetries})...`);
           
           // 延迟1秒后重试
           setTimeout(() => {
@@ -254,7 +246,6 @@ export default {
         
         // 重试次数用完，显示错误消息
         this.retryCount = 0; // 重置计数器
-        this.currentProxyIndex = 0; // 重置代理索引到主要代理
         
         // Provide specific error message for different scenarios
         if (e.name === 'TimeoutError') {
@@ -638,7 +629,7 @@ export default {
 
 .map-container {
   width: 100%;
-  max-width: 1200px; /* Desktop: large screen width */
+  max-width: 900px; /* Desktop: narrower width */
   aspect-ratio: 16 / 9; /* Default 16:9 widescreen ratio */
   margin: 0 auto; /* Center alignment */
   padding: 0 16px; /* Prevent edge sticking */
@@ -672,7 +663,7 @@ export default {
 /* 🖥️ Desktop (1024px - 1439px) */
 @media (min-width: 1024px) and (max-width: 1439px) {
   .map-container {
-    max-width: 960px;
+    max-width: 800px;
     aspect-ratio: 16 / 9;
     border-radius: 12px;
   }
@@ -681,7 +672,7 @@ export default {
 /* 🖥️ Large desktop (1440px+) */
 @media (min-width: 1440px) {
   .map-container {
-    max-width: 1200px;
+    max-width: 900px;
     aspect-ratio: 16 / 9;
     border-radius: 12px;
   }
