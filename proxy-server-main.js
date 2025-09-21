@@ -12,6 +12,7 @@ app.use(cors({
     'http://localhost:3000',
     'http://localhost:3001', 
     'https://iteration-2-underdeployment.onrender.com',
+    'https://iteration-2.onrender.com',
     'https://*.onrender.com' // 允许所有Render域名
   ],
   credentials: true,
