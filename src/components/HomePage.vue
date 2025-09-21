@@ -409,24 +409,21 @@ export default {
 /* 功能网格布局 - 专业级3+3布局解决方案 */
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr); /* 6列网格，便于精确控制 */
+  grid-template-columns: repeat(3, 1fr); /* 3列网格，每列等宽 */
   grid-template-rows: auto auto;
   gap: 30px;
   justify-items: center;
   width: 100%;
 }
 
-/* Desktop: 3+3 layout using grid areas */
-/* 桌面端：使用网格区域的3+3布局 */
-.feature-card:nth-child(1) { grid-column: 1 / 3; grid-row: 1; } /* 占据1-2列 */
-.feature-card:nth-child(2) { grid-column: 3 / 5; grid-row: 1; } /* 占据3-4列 */
-.feature-card:nth-child(3) { grid-column: 5 / 7; grid-row: 1; } /* 占据5-6列 */
-
-/* Bottom row: 3 cards perfectly aligned */
-/* 底部行：3个卡片完美对齐 */
-.feature-card:nth-child(4) { grid-column: 1 / 3; grid-row: 2; } /* 占据1-2列 */
-.feature-card:nth-child(5) { grid-column: 3 / 5; grid-row: 2; } /* 占据3-4列 */
-.feature-card:nth-child(6) { grid-column: 5 / 7; grid-row: 2; } /* 占据5-6列 */
+/* Desktop: Simple 3+3 layout - each card takes one column */
+/* 桌面端：简单3+3布局 - 每个卡片占据一列 */
+.feature-card:nth-child(1) { grid-column: 1; grid-row: 1; }
+.feature-card:nth-child(2) { grid-column: 2; grid-row: 1; }
+.feature-card:nth-child(3) { grid-column: 3; grid-row: 1; }
+.feature-card:nth-child(4) { grid-column: 1; grid-row: 2; }
+.feature-card:nth-child(5) { grid-column: 2; grid-row: 2; }
+.feature-card:nth-child(6) { grid-column: 3; grid-row: 2; }
 
 /* Tablet: 2 columns */
 /* 平板：2列布局 */
@@ -522,8 +519,8 @@ export default {
 /* Ensure all icons have consistent sizing */
 /* 确保所有图标有一致的尺寸 */
 .feature-icon {
-  width: 68px;
-  height: 68px;
+  width: 80px;
+  height: 80px;
   margin-bottom: 15px;
   display: flex;
   align-items: center;
