@@ -197,13 +197,11 @@ export default {
             json = await res.json();
           }
         } else {
-          // 生产环境使用CORS代理服务，就像地图功能一样
-          const proxyBase = import.meta.env.VITE_API_BASE || 'https://api.allorigins.win/raw?url=';
+          // 生产环境直接使用后端API，添加错误处理
           const backendUrl = 'http://13.236.162.216:8080';
-          const targetUrl = `${backendUrl}/ai/image`;
-          const url = `${proxyBase}${encodeURIComponent(targetUrl)}`;
+          const url = `${backendUrl}/ai/image`;
           
-          console.log('🔄 使用CORS代理进行图片分析...', url);
+          console.log('🔄 直接使用后端API进行图片分析...', url);
           
           const form = new FormData();
           form.append('image', file);
@@ -211,7 +209,8 @@ export default {
           
           const res = await fetch(url, {
             method: 'POST',
-            body: form
+            body: form,
+            mode: 'cors' // 明确指定CORS模式
           });
           
           console.log('Response status:', res.status);
@@ -227,7 +226,15 @@ export default {
             } catch (parseError) {
               console.error('JSON解析失败:', parseError);
               console.error('响应内容:', responseText);
-              throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}...`);
+              
+              // 检查是否是Mixed Content错误
+              if (responseText.includes('Mixed Content') || responseText.includes('insecure resource')) {
+                throw new Error('Mixed Content Error: HTTPS site cannot load HTTP resources. Please use HTTP version of this site or contact administrator.');
+              } else if (responseText.includes('Whitelabel Error Page')) {
+                throw new Error('Backend API Error: The image detection service is not responding correctly. Please try again later.');
+              } else {
+                throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}...`);
+              }
             }
           } else {
             const errorText = await res.text();
