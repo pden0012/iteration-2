@@ -102,16 +102,26 @@ export default {
       window.location.hash = '#symptoms';
     },
     onHomeFeatureButton(id) {
-      // Hero CTA 或 "View Dashboard/Visit Resources"等按钮点击回调
+      // Hero CTA 或功能按钮点击回调
       if (id === 'tracker') {
         this.currentView = 'dashboard';
         this.activeItem = 'dashboard';
         window.location.hash = '#dashboard';
       } else if (id === 'education') {
-        // 如果未来需要跳转到资源
+        // 跳转到资源页面
         this.currentView = 'resources';
         this.activeItem = 'resources';
         window.location.hash = '#resources';
+      } else if (id === 'plant-identifier') {
+        // 跳转到图片检测页面
+        this.currentView = 'image';
+        this.activeItem = 'image';
+        window.location.hash = '#image';
+      } else if (id === 'map') {
+        // 跳转到地图页面
+        this.currentView = 'map';
+        this.activeItem = 'map';
+        window.location.hash = '#map';
       }
     },
     
