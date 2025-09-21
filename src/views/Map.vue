@@ -183,7 +183,7 @@ export default {
       
       const apiUrl = `${proxyBase}${targetUrl}`;
       
-      console.log('Generated API URL:', apiUrl); // Debug log - Updated proxy URL
+      console.log('Generated API URL:', apiUrl); // Debug log - Force HTTPS cache refresh
       return apiUrl;
     },
 

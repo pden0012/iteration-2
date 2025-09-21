@@ -193,8 +193,8 @@ export default {
           form.set('image', blob, 'image.jpg');
         }
         
-        console.log('🔄 Using our own proxy server for image detection...');
-        console.log('Request URL:', url);
+          console.log('🔄 Using our own HTTPS proxy server for image detection...');
+          console.log('Request URL:', url);
         
         const res = await fetch(url, {
           method: 'POST',
