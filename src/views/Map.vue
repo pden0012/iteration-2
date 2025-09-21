@@ -155,8 +155,8 @@ export default {
       }
     },
     getApiUrl() {
-      // Build API URL - return backend URL for multi-proxy handling
-      // 构建API URL - 返回后端URL用于多代理处理
+      // Build API URL - use direct backend URL
+      // 构建API URL - 直接使用后端URL
       const bounds = this.map?.getBounds();
       const zoom = this.map?.getZoom() || 12;
       if (!bounds) return null;
@@ -169,6 +169,9 @@ export default {
       const e = ne.lng().toFixed(6);
       const bbox = `${s},${w},${n},${e}`;
       
+      // Use CORS proxy service for map data (GET requests work fine)
+      // 使用CORS代理服务获取地图数据（GET请求工作正常）
+      const proxyBase = 'https://api.allorigins.win/raw?url=';
       const backendUrl = 'http://13.236.162.216:8080';
       
       let targetUrl;
@@ -178,8 +181,10 @@ export default {
         targetUrl = `${backendUrl}/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       }
       
-      console.log('Generated backend URL:', targetUrl); // Debug log
-      return targetUrl;
+      const apiUrl = `${proxyBase}${encodeURIComponent(targetUrl)}`;
+      
+      console.log('Generated API URL:', apiUrl); // Debug log
+      return apiUrl;
     },
 
     async refreshMarkers() {
@@ -197,124 +202,25 @@ export default {
       try {
         this.isLoading = true;
         this.clearData();
-        const backendUrl = this.getApiUrl();
-        if (!backendUrl) return;
+        const url = this.getApiUrl();
+        if (!url) return;
         
-        console.log('🔄 Using CORS proxy services for map data...');
+        console.log('Fetching data from:', url); // Debug log
         
-        // 多个CORS代理服务列表，按优先级排序
-        const proxyServices = [
-          'https://api.allorigins.win/raw?url=',
-          'https://corsproxy.io/?',
-          'https://thingproxy.freeboard.io/fetch/',
-          'https://cors-anywhere.herokuapp.com/',
-          'https://api.codetabs.com/v1/proxy?quest=',
-          'https://cors.bridged.cc/'
-        ];
+        const res = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          signal: AbortSignal.timeout(15000) // 15 second timeout
+        });
         
-        let json = null;
-        
-        // 尝试每个代理服务
-        for (let i = 0; i < proxyServices.length; i++) {
-          const proxyUrl = proxyServices[i];
-          let fullUrl;
-          
-          // 根据不同的代理服务调整URL格式
-          if (proxyUrl.includes('allorigins.win')) {
-            fullUrl = `${proxyUrl}${encodeURIComponent(backendUrl)}`;
-          } else if (proxyUrl.includes('codetabs.com')) {
-            fullUrl = `${proxyUrl}${encodeURIComponent(backendUrl)}`;
-          } else {
-            fullUrl = `${proxyUrl}${backendUrl}`;
-          }
-          
-          console.log(`Trying proxy ${i + 1}/${proxyServices.length}:`, proxyUrl);
-          
-          try {
-            const res = await fetch(fullUrl, {
-              method: 'GET',
-              headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-              },
-              signal: AbortSignal.timeout(15000) // 15 second timeout
-            });
-            
-            console.log(`Proxy ${i + 1} response status:`, res.status);
-            
-            if (res.ok) {
-              const responseText = await res.text();
-              console.log(`Proxy ${i + 1} raw response:`, responseText.substring(0, 200) + '...');
-              
-              // 检查响应是否包含HTML错误页面
-              if (responseText.includes('<html>') || responseText.includes('Whitelabel Error Page')) {
-                console.error(`Proxy ${i + 1} returned HTML error page instead of JSON`);
-                console.error('Response content:', responseText.substring(0, 500));
-                continue; // 继续尝试下一个代理
-              }
-              
-              try {
-                json = JSON.parse(responseText);
-                console.log(`✅ CORS proxy ${i + 1} success!`);
-                break; // 成功则跳出循环
-              } catch (parseError) {
-                console.error(`Proxy ${i + 1} JSON parse failed:`, parseError);
-                console.error('Response content:', responseText.substring(0, 500));
-                // 继续尝试下一个代理
-                continue;
-              }
-            } else {
-              const errorText = await res.text();
-              console.error(`Proxy ${i + 1} error:`, res.status, errorText.substring(0, 200));
-              
-              // 特殊处理某些已知错误
-              if (res.status === 403 && errorText.includes('pricing')) {
-                console.log(`Proxy ${i + 1} requires paid plan, skipping...`);
-              } else if (res.status === 415) {
-                console.log(`Proxy ${i + 1} returned 415 Unsupported Media Type`);
-              }
-              
-              // 继续尝试下一个代理
-              continue;
-            }
-          } catch (fetchError) {
-            console.error(`Proxy ${i + 1} fetch error:`, fetchError);
-            // 继续尝试下一个代理
-            continue;
-          }
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}. Please check API server status.`);
         }
         
-        // 如果所有代理都失败了，尝试直接请求（可能会被CORS阻止）
-        if (!json) {
-          console.log('🔄 All proxies failed, trying direct request...');
-          try {
-            const directRes = await fetch(backendUrl, {
-              method: 'GET',
-              headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-              },
-              mode: 'cors',
-              signal: AbortSignal.timeout(15000)
-            });
-            
-            if (directRes.ok) {
-              const directResponseText = await directRes.text();
-              if (!directResponseText.includes('<html>')) {
-                json = JSON.parse(directResponseText);
-                console.log('✅ Direct request succeeded!');
-              }
-            }
-          } catch (directError) {
-            console.log('Direct request also failed:', directError.message);
-          }
-          
-          if (!json) {
-            throw new Error('All CORS proxy services failed. Please try again later.');
-          }
-        }
-        
+        const json = await res.json();
         console.log('Received data:', json); // Debug log
         
         const list = Array.isArray(json?.data) ? json.data : [];
