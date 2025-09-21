@@ -134,8 +134,8 @@ export default {
       this.currentZoom = this.map.getZoom();
     },
     getApiUrl() {
-      // Build API URL using relative path for Render deployment
-      // 构建API URL，使用相对路径适配Render部署的Rewrite功能
+      // Build API URL - use direct backend URL
+      // 构建API URL - 直接使用后端URL
       const bounds = this.map?.getBounds();
       const zoom = this.map?.getZoom() || 12;
       if (!bounds) return null;
@@ -148,27 +148,15 @@ export default {
       const e = ne.lng().toFixed(6);
       const bbox = `${s},${w},${n},${e}`;
       
-      // Use relative path /api for production deployment (Render Rewrite)
-      // For local development, use full URL
-      // 生产环境使用相对路径 /api (通过Render Rewrite代理)，本地开发使用完整URL
-      const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      // Use direct backend API URL for all environments
+      // 所有环境都直接使用后端API URL
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://13.236.162.216:8080';
       
       let apiUrl;
-      if (isDevelopment) {
-        // Local development: use direct API URL
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://13.236.162.216:8080';
-        if (this.allergenicity === 'all') {
-          apiUrl = `${baseUrl}/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
-        } else {
-          apiUrl = `${baseUrl}/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
-        }
+      if (this.allergenicity === 'all') {
+        apiUrl = `${baseUrl}/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       } else {
-        // Production deployment: use relative path (handled by Render Rewrite)
-        if (this.allergenicity === 'all') {
-          apiUrl = `/api/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
-        } else {
-          apiUrl = `/api/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
-        }
+        apiUrl = `${baseUrl}/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       }
       
       console.log('Generated API URL:', apiUrl); // Debug log

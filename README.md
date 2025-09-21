@@ -177,28 +177,26 @@ npm run build
    - Publish Directory: `dist`
    - Node Version: 18 or latest
 
-3. **Environment Variables** (Critical!):
+3. **Environment Variables**:
    - Go to your service's "Environment" tab in Render dashboard
    - Add: `VITE_GOOGLE_MAPS_API_KEY` with your Google Maps API key
-   - Add: `VITE_API_BASE_URL` (optional, defaults to auto-detection)
+   - Add: `VITE_API_BASE_URL` (optional, defaults to `http://13.236.162.216:8080`)
 
 4. **Deploy**: Click "Manual Deploy" or push to your connected branch
 
 #### Common Render Deployment Issues:
 
 **Issue**: "Error loading tree data" on deployed site
-- **Cause**: Mixed content (HTTPS site loading HTTP API) or CORS issues
-- **Solution**: The code includes automatic HTTPS/HTTP fallback handling
+- **Cause**: Backend API server issues or network connectivity
+- **Solution**: Ensure backend API server is running and accessible
 
 **Issue**: Blank map or Google Maps errors  
 - **Cause**: Missing or invalid Google Maps API key
 - **Solution**: Verify `VITE_GOOGLE_MAPS_API_KEY` is set in Render environment variables
 
 **Issue**: Network errors in production
-- **Cause**: Backend API server issues or CORS configuration
-- **Solution**: Ensure backend allows requests from your Render domain
-
-For detailed troubleshooting, see `render-deployment.md` in the project root.
+- **Cause**: Backend API server issues or firewall blocking
+- **Solution**: Ensure backend API server allows external requests
 
 ### API Configuration
 
