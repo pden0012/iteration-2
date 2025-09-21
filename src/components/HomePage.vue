@@ -103,6 +103,13 @@ export default {
           description: 'Get quick access to clinics, pharmacies and urgent care contacts.',
           buttonText: 'Get Support',
           iconText: '/images/prototype images/image copy 10.png'
+        },
+        {
+          id: 'plant-identifier',
+          title: 'Plant Risk Identifier',
+          description: 'Upload a plant photo to instantly identify species and check hay fever risk levels.',
+          buttonText: 'Find Now',
+          iconText: '/images/prototype images/9941758449562_.pic.jpg'
         }
       ],
       infoData: {
@@ -398,8 +405,8 @@ export default {
    - gap: 30px 网格项目间距30像素
    - width: 100% 占满容器宽度
    - justify-items: center 网格项目在各自单元格内水平居中 */
-/* Features grid layout - Professional 3+2 layout solution */
-/* 功能网格布局 - 专业级3+2布局解决方案 */
+/* Features grid layout - Professional 3+3 layout solution */
+/* 功能网格布局 - 专业级3+3布局解决方案 */
 .features-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr); /* 6列网格，便于精确控制 */
@@ -409,16 +416,17 @@ export default {
   width: 100%;
 }
 
-/* Desktop: 3+2 layout using grid areas */
-/* 桌面端：使用网格区域的3+2布局 */
+/* Desktop: 3+3 layout using grid areas */
+/* 桌面端：使用网格区域的3+3布局 */
 .feature-card:nth-child(1) { grid-column: 1 / 3; grid-row: 1; } /* 占据1-2列 */
 .feature-card:nth-child(2) { grid-column: 3 / 5; grid-row: 1; } /* 占据3-4列 */
 .feature-card:nth-child(3) { grid-column: 5 / 7; grid-row: 1; } /* 占据5-6列 */
 
-/* Bottom row: centered in middle 4 columns */
-/* 底部行：在中间4列居中 */
-.feature-card:nth-child(4) { grid-column: 2 / 4; grid-row: 2; } /* 占据2-3列 */
-.feature-card:nth-child(5) { grid-column: 4 / 6; grid-row: 2; } /* 占据4-5列 */
+/* Bottom row: 3 cards centered */
+/* 底部行：3个卡片居中 */
+.feature-card:nth-child(4) { grid-column: 1 / 3; grid-row: 2; } /* 占据1-2列 */
+.feature-card:nth-child(5) { grid-column: 3 / 5; grid-row: 2; } /* 占据3-4列 */
+.feature-card:nth-child(6) { grid-column: 5 / 7; grid-row: 2; } /* 占据5-6列 */
 
 /* Tablet: 2 columns */
 /* 平板：2列布局 */
@@ -432,7 +440,8 @@ export default {
   .feature-card:nth-child(2) { grid-column: 2; grid-row: 1; }
   .feature-card:nth-child(3) { grid-column: 1; grid-row: 2; }
   .feature-card:nth-child(4) { grid-column: 2; grid-row: 2; }
-  .feature-card:nth-child(5) { grid-column: 1 / 3; grid-row: 3; justify-self: center; }
+  .feature-card:nth-child(5) { grid-column: 1; grid-row: 3; }
+  .feature-card:nth-child(6) { grid-column: 2; grid-row: 3; }
 }
 
 /* Mobile: 1 column */
@@ -440,7 +449,7 @@ export default {
 @media (max-width: 600px) {
   .features-grid {
     grid-template-columns: 1fr;
-    grid-template-rows: repeat(5, auto);
+    grid-template-rows: repeat(6, auto);
   }
   
   .feature-card {
@@ -828,4 +837,5 @@ export default {
 .feature-card:nth-child(3) { animation-delay: 0.3s; }
 .feature-card:nth-child(4) { animation-delay: 0.4s; }
 .feature-card:nth-child(5) { animation-delay: 0.5s; }
+.feature-card:nth-child(6) { animation-delay: 0.6s; }
 </style>
