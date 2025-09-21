@@ -130,11 +130,11 @@ export default {
       const e = ne.lng().toFixed(6);
       const bbox = `${s},${w},${n},${e}`;
       
-      // 直接使用后端API URL
+      // 使用相对路径，避免Mixed Content问题
       if (this.allergenicity === 'all') {
-        return `http://13.236.162.216:8080/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+        return `/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       } else {
-        return `http://13.236.162.216:8080/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+        return `/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       }
     },
 
