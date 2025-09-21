@@ -148,9 +148,9 @@ export default {
       const e = ne.lng().toFixed(6);
       const bbox = `${s},${w},${n},${e}`;
       
-      // Use direct backend API URL for all environments
-      // 所有环境都直接使用后端API URL
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://13.236.162.216:8080';
+      // Use direct HTTP API URL with error handling
+      // 直接使用HTTP API URL，带错误处理
+      const baseUrl = 'http://13.236.162.216:8080';
       
       let apiUrl;
       if (this.allergenicity === 'all') {
@@ -160,11 +160,7 @@ export default {
       }
       
       console.log('Generated API URL:', apiUrl); // Debug log
-      return apiUrl;
-    },
-
-    async refreshMarkers() {
-      // Fetch points from backend and render markers (Google Maps)
+      return apiUrl;      // Fetch points from backend and render markers (Google Maps)
       // 拉取后端数据并渲染标记（Google地图）
       if (!this.map) return;
       
@@ -209,13 +205,15 @@ export default {
         console.error('Failed to load map data', e);
         
         // Provide specific error message for different scenarios
+        // Provide specific error message for different scenarios
         if (e.name === 'TimeoutError') {
           this.emptyMessage = 'Request timeout. The server might be slow or unavailable.';
-        } else if (e.message.includes('NetworkError') || e.message.includes('Failed to fetch')) {
+        } else if (e.message.includes('Mixed Content') || e.message.includes('insecure resource')) {
           this.emptyMessage = 'Mixed Content Error: HTTPS site cannot load HTTP resources. Please use HTTP version of this site or contact administrator.';
+        } else if (e.message.includes('NetworkError') || e.message.includes('Failed to fetch')) {
+          this.emptyMessage = 'Network error. Please check your connection and API server status.';
         } else {
-          this.emptyMessage = `Error loading tree data: ${e.message}`;
-        }
+          this.emptyMessage = `Error loading tree data: ${e.message}`;        }
       } finally {
         this.isLoading = false;
       }
