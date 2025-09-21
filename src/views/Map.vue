@@ -42,7 +42,7 @@
 
     <!-- Map container -->
     <!-- 地图容器：Google Maps 会把地图渲染在这里 -->
-    <div id="leafletMap" class="map-container" ref="mapEl"></div>
+    <div id="googleMap" class="map-container" ref="mapEl"></div>
   <div v-if="emptyMessage" class="empty-hint">{{ emptyMessage }}</div>
   </div>
   
@@ -106,32 +106,51 @@ export default {
       });
     },
     async initMap() {
-      // Initialize Google Map centered on Melbourne
-      // 初始化Google地图，默认中心在墨尔本
-      const google = await this.loadGoogleIfNeeded();
-      const el = this.$refs.mapEl;
-      if (!el) return;
-      this.map = new google.maps.Map(el, {
-        center: { lat: -37.8136, lng: 144.9631 },
-        zoom: 12,
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: false
-      });
-      const debounced = this.debounce(this.refreshMarkers, 400); // 平衡的防抖延迟
-      this.map.addListener('idle', debounced);
-      
-      // 更新缩放级别显示
-      this.map.addListener('zoom_changed', () => {
+      try {
+        console.log('Starting map initialization...');
+        // Initialize Google Map centered on Melbourne
+        // 初始化Google地图，默认中心在墨尔本
+        const google = await this.loadGoogleIfNeeded();
+        console.log('Google Maps API loaded successfully');
+        
+        const el = this.$refs.mapEl;
+        if (!el) {
+          console.error('Map element not found');
+          this.emptyMessage = 'Map container not found';
+          return;
+        }
+        console.log('Map element found:', el);
+        
+        this.map = new google.maps.Map(el, {
+          center: { lat: -37.8136, lng: 144.9631 },
+          zoom: 12,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false
+        });
+        console.log('Google Map instance created successfully');
+        
+        const debounced = this.debounce(this.refreshMarkers, 400); // 平衡的防抖延迟
+        this.map.addListener('idle', debounced);
+        
+        // 更新缩放级别显示
+        this.map.addListener('zoom_changed', () => {
+          this.currentZoom = this.map.getZoom();
+        });
+        
+        console.log('Starting initial data load...');
+        await this.refreshMarkers();
+        // 初始化边界
+        await this.loadMunicipalBoundary();
+        // 应用初始样式
+        this.applyDataLayerStyle();
+        // 初始化缩放级别显示
         this.currentZoom = this.map.getZoom();
-      });
-      await this.refreshMarkers();
-      // 初始化边界
-      await this.loadMunicipalBoundary();
-      // 应用初始样式
-      this.applyDataLayerStyle();
-      // 初始化缩放级别显示
-      this.currentZoom = this.map.getZoom();
+        console.log('Map initialization completed successfully');
+      } catch (error) {
+        console.error('Failed to initialize map:', error);
+        this.emptyMessage = `Map initialization failed: ${error.message}`;
+      }
     },
     getApiUrl() {
       // Build API URL - use direct backend URL
