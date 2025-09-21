@@ -56,7 +56,7 @@ export default {
         buttonText: 'Watch'
       },
       symptoms: [
-        { id: 'sneezing', text: 'Frequent sneezing', checked: true },
+        { id: 'sneezing', text: 'Frequent sneezing', checked: false },
         { id: 'nose', text: 'Blocked or runny nose', checked: false },
         { id: 'eyes', text: 'Itchy and watery eyes', checked: false },
         { id: 'throat', text: 'Itchy throat, ears or roof of mouth', checked: false },
@@ -91,9 +91,9 @@ export default {
   },
 
   mounted() {
-    // Initialize advice when page loads
-    // 页面加载时初始化建议
-    this.updateAdvice();
+    // Don't show advice initially - only show when user checks symptoms
+    // 初始不显示建议 - 只有用户勾选症状后才显示
+    this.advice = '';
   }
 }
 </script>
