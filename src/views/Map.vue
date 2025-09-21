@@ -141,12 +141,14 @@ export default {
           return `/api/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
         }
       } else {
-        // 生产环境使用相对路径，通过Vite代理
+        // 生产环境使用CORS代理服务
+        let backendUrl;
         if (this.allergenicity === 'all') {
-          return `/api/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+          backendUrl = `http://13.236.162.216:8080/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
         } else {
-          return `/api/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
+          backendUrl = `http://13.236.162.216:8080/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
         }
+        return `https://api.allorigins.win/raw?url=${encodeURIComponent(backendUrl)}`;
       }
     },
 
