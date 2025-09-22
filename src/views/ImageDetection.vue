@@ -1,5 +1,9 @@
 <template>
   <div class="image-page">
+    <!-- 中文：页面主标题；English: big page title shown at the top -->
+    <div class="page-header">
+      <h1 class="page-title">Plant Hayfever Risk Identifier</h1>
+    </div>
     <div class="image-grid">
       <!-- Left side: upload -->
       <div class="left-panel">
@@ -296,6 +300,22 @@ export default {
   background-position: center top;
   background-size: 100% 620px; /* 刚好覆盖到第三个卡片下面一点点 */
   /* 移除 min-height，让页面高度适应内容，消除下方空隙 */
+}
+
+/* 中文：标题区域；English: header box for the page title */
+.page-header {
+  max-width: 1280px;
+  margin: 0 auto 8px auto;
+  padding: 0 20px;
+}
+
+/* 中文：主标题样式；English: main title style */
+.page-title {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 800;
+  color: #1b3a2a;
 }
 
 .image-grid {
@@ -611,6 +631,9 @@ export default {
     background-size: 100% 480px; /* Mobile: smaller background */
   }
   
+  .page-header { padding: 0 12px; }
+  .page-title { font-size: 22px; }
+  
   .image-grid {
     grid-template-columns: 1fr; /* Mobile: single column layout */
     gap: 16px;
@@ -665,6 +688,8 @@ export default {
   .image-page {
     background-size: 100% 580px;
   }
+  
+  .page-header { padding: 0 20px; }
   
   .image-grid {
     grid-template-columns: 1fr 1.2fr; /* Tablet: adjust ratio */
