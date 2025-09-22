@@ -13,6 +13,7 @@ app.use(cors({
     'https://iteration-2-underdeployment.onrender.com',
     'https://iteration-2.onrender.com',
     'https://www.hayfree.space',
+    'http://www.hayfree.space',
     'https://hayfree.space',
     'https://*.onrender.com'
   ],
