@@ -298,7 +298,7 @@ export default {
   background-image: url('/images/Image Detection Background.png');
   background-repeat: no-repeat;
   background-position: center top;
-  background-size: 100% 620px; /* 刚好覆盖到第三个卡片下面一点点 */
+  background-size: 100% 700px; /* 原 620px -> 略微加长 */
   /* 移除 min-height，让页面高度适应内容，消除下方空隙 */
 }
 
@@ -630,7 +630,7 @@ export default {
 @media (max-width: 767px) {
   .image-page {
     padding: 16px 0 20px 0;
-    background-size: 100% 480px; /* Mobile: smaller background */
+    background-size: 100% 520px; /* 原 480px -> 略微加长 */
   }
   
   .page-header { padding: 0 12px; }
@@ -688,7 +688,7 @@ export default {
 /* 📱 Tablet devices (768px - 1023px) */
 @media (min-width: 768px) and (max-width: 1023px) {
   .image-page {
-    background-size: 100% 580px;
+    background-size: 100% 640px; /* 原 580px -> 略微加长 */
   }
   
   .page-header { padding: 0 20px; }
@@ -719,7 +719,7 @@ export default {
 /* 🖥️ Desktop (1024px - 1439px) */
 @media (min-width: 1024px) and (max-width: 1439px) {
   .image-page {
-    background-size: 100% 620px;
+    background-size: 100% 700px; /* 原 620px -> 略微加长 */
   }
   
   .image-grid {
@@ -737,7 +737,7 @@ export default {
 /* 🖥️ Large desktop (1440px+) */
 @media (min-width: 1440px) {
   .image-page {
-    background-size: 100% 620px;
+    background-size: 100% 700px; /* 原 620px -> 略微加长 */
   }
   
   .image-grid {
