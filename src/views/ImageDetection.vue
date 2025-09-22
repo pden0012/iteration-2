@@ -312,9 +312,11 @@ export default {
 /* 中文：主标题样式；English: main title style */
 .page-title {
   margin: 0 0 8px 0;
-  font-size: 28px;
+  font-family: var(--font-heading, 'Questrial', sans-serif);
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 400;
+  text-align: center;
   line-height: 1.2;
-  font-weight: 800;
   color: #1b3a2a;
 }
 
