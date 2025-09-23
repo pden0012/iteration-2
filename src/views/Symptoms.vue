@@ -411,7 +411,7 @@ export default {
   .page-container {
     padding: 0 48px;
   }
-  
+  /* symptoms page */ 
   .symptoms-page {
     padding: 64px 0;
   }
