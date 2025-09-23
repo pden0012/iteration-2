@@ -10,33 +10,43 @@
     <!-- symptoms checklist section -->
     <section class="checklist-section">
       <div class="page-container">
-        <div class="checklist-grid">
-          <div 
-            v-for="symptom in symptoms" 
-            :key="symptom.id"
-            class="symptom-item"
-          >
-            <div class="checkbox-container">
-              <input 
-                type="checkbox" 
-                :id="symptom.id"
-                v-model="symptom.checked"
-                class="symptom-checkbox"
-                @change="updateAdvice"
-              />
-              <div class="checkmark">
-                <span class="check-icon">✓</span>
+        <!-- 左侧：症状清单 | Left: checklist list -->
+        <div class="left-column">
+          <div class="checklist-panel">
+            <div class="checklist-grid">
+              <div 
+                v-for="symptom in symptoms" 
+                :key="symptom.id"
+                class="symptom-item"
+              >
+                <div class="checkbox-container">
+                  <input 
+                    type="checkbox" 
+                    :id="symptom.id"
+                    v-model="symptom.checked"
+                    class="symptom-checkbox"
+                    @change="updateAdvice"
+                  />
+                  <div class="checkmark">
+                    <span class="check-icon">✓</span>
+                  </div>
+                </div>
+                <label :for="symptom.id" class="symptom-label">
+                  {{ symptom.text }}
+                </label>
               </div>
             </div>
-            <label :for="symptom.id" class="symptom-label">
-              {{ symptom.text }}
-            </label>
           </div>
         </div>
-        
-        <!-- simple advice -->
-        <div class="advice-box" v-if="checkedCount > 0">
-          <p class="advice-text">{{ advice }}</p>
+
+        <!-- 右侧：提示卡片 | Right: tips card -->
+        <div class="right-column">
+          <!-- simple advice -->
+          <div class="advice-panel">
+            <div class="advice-box" v-if="checkedCount > 0">
+              <p class="advice-text">{{ advice }}</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -116,7 +126,7 @@ export default {
   --spacing-lg: 24px;
   --spacing-xl: 40px;
   
-  --item-spacing: 12px;
+  --item-spacing: 4px;
   --title-spacing: 24px;
   
   --font-heading: 'Questrial', sans-serif;
@@ -163,6 +173,35 @@ export default {
   padding: 0;
 }
 
+.checklist-section .page-container {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr; /* left checklist, right tips */
+  gap: 24px;
+  align-items: start;
+  max-width: 1100px; /* wider so two columns have room */
+}
+
+/* two-column wrappers */
+.left-column, .right-column { width: 100%; }
+
+/* left checklist panel card */
+.checklist-panel {
+  background: #FFFFFF;
+  border: none; /* remove outer border for cleaner look */
+  border-radius: 10px;
+  padding: 16px 16px 8px;
+}
+
+/* right tips panel container - vertically center */
+.right-column { display: flex; align-items: center; }
+.advice-panel { position: static; }
+
+/* right tips card fine-tuning inside column */
+.right-column .advice-box {
+  margin: 0; /* align to top, no extra outside margin on desktop */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
 .checklist-grid {
   display: flex;
   flex-direction: column;
@@ -176,7 +215,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 4px 0;
+  padding: 0;
   cursor: pointer;
 }
 
@@ -258,7 +297,7 @@ export default {
   font-family: var(--font-body);
   font-weight: 400;
   font-size: 18px;
-  line-height: 2.2;
+  line-height: 1.5;
   color: #000000;
   text-decoration: none;
   cursor: pointer;
@@ -277,6 +316,9 @@ export default {
 
 
 @media (max-width: 767px) {
+  .checklist-section .page-container {
+    display: block; /* stack on small screens */
+  }
   .page-container {
     padding: 0 16px;
   }
@@ -294,23 +336,15 @@ export default {
     margin-bottom: 24px;
   }
   
-  .checklist-grid {
-    gap: 12px;
-  }
+  .checklist-grid { gap: 4px; }
   
-  .symptom-item {
-    padding: 12px 16px;
-  }
+  .symptom-item { padding: 4px 8px; }
   
-  .symptom-label {
-    font-size: 14px;
-  }
+  .symptom-label { font-size: 14px; line-height: 1.4; }
   
-  .advice-box {
-    padding: 16px;
-    margin-top: 20px;
-    margin-bottom: 32px;
-  }
+  .right-column { display: block; }
+  .advice-panel { position: static; }
+  .advice-box { padding: 16px; margin-top: 20px; margin-bottom: 32px; }
   
   .advice-text {
     font-size: 14px;
@@ -327,21 +361,18 @@ export default {
     font-size: clamp(28px, 5vw, 30px);
   }
   
-  .checklist-grid {
-    gap: 14px;
-  }
+  .checklist-grid { gap: 5px; }
   
-  .symptom-item {
-    padding: 14px 18px;
-  }
+  .symptom-item { padding: 5px 10px; }
   
-  .symptom-label {
-    font-size: 15px;
-  }
+  .symptom-label { font-size: 15px; line-height: 1.4; }
 }
 
 
 @media (min-width: 768px) and (max-width: 1023px) {
+  .checklist-section .page-container {
+    grid-template-columns: 1fr; /* stack on tablets */
+  }
   .page-container {
     padding: 0 32px;
   }
@@ -358,25 +389,20 @@ export default {
     margin-bottom: 32px;
   }
   
-  .checklist-grid {
-    gap: 16px;
-    max-width: 600px;
-    margin: 0 auto;
-  }
+  .checklist-grid { gap: 6px; max-width: 600px; margin: 0 auto; }
   
-  .symptom-item {
-    padding: 16px 20px;
-  }
+  .symptom-item { padding: 6px 8px; }
   
-  .advice-box {
-    max-width: 600px;
-    margin: 32px auto 40px;
-    padding: 20px;
-  }
+  .right-column { display: block; }
+  .advice-panel { position: static; }
+  .advice-box { max-width: 600px; margin: 32px auto 40px; padding: 20px; }
 }
 
 
 @media (min-width: 1024px) and (max-width: 1439px) {
+  .checklist-section .page-container {
+    grid-template-columns: 1.05fr 0.95fr; /* subtle balance */
+  }
   .page-container {
     padding: 0 40px;
   }
@@ -393,25 +419,18 @@ export default {
     margin-bottom: 40px;
   }
   
-  .checklist-grid {
-    gap: 18px;
-    max-width: 700px;
-    margin: 0 auto;
-  }
+  .checklist-grid { gap: 7px; max-width: 700px; margin: 0 auto; }
   
-  .symptom-item {
-    padding: 18px 22px;
-  }
+  .symptom-item { padding: 7px 9px; }
   
-  .advice-box {
-    max-width: 700px;
-    margin: 40px auto 48px;
-    padding: 24px;
-  }
+  .right-column .advice-box { max-width: 700px; margin: 0; padding: 24px; }
 }
 
 
 @media (min-width: 1440px) {
+  .checklist-section .page-container {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
   .page-container {
     padding: 0 48px;
   }
@@ -429,21 +448,11 @@ export default {
     margin-bottom: 48px;
   }
   
-  .checklist-grid {
-    gap: 20px;
-    max-width: 800px;
-    margin: 0 auto;
-  }
+  .checklist-grid { gap: 8px; max-width: 800px; margin: 0 auto; }
   
-  .symptom-item {
-    padding: 20px 24px;
-  }
+  .symptom-item { padding: 8px 10px; }
   
-  .advice-box {
-    max-width: 800px;
-    margin: 48px auto 56px;
-    padding: 28px;
-  }
+  .right-column .advice-box { max-width: 800px; margin: 0; padding: 28px; }
 }
 
 
