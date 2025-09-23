@@ -1,11 +1,11 @@
 <template>
   <div class="homepage">
-    <!-- Hero Section -->
+    <!-- hero section with main title and background -->
     <section class="hero-section">
       <div class="hero-background">
-        <!-- Background Decorative Ellipse -->
+        <!-- decorative ellipse in background -->
         <div class="hero-ellipse"></div>
-        <!-- Hero Image -->
+        <!-- hero image on the right -->
         <div class="hero-image"></div>
       </div>
       
@@ -18,7 +18,7 @@
       </div>
     </section>
 
-    <!-- Info Section - moved to middle -->
+    <!-- info section in the middle -->
     <section class="info-section">
       <div class="page-container">
         <div class="info-container">
@@ -28,7 +28,7 @@
       </div>
     </section>
 
-    <!-- Features Section -->
+    <!-- features section with all the feature cards -->
     <section class="features-section">
       <div class="page-container">
         <div class="features-container">
@@ -62,12 +62,14 @@ export default {
   name: 'HomePage',
   data() {
     return {
+      // hero section data
       heroData: {
         title: 'Beat hay fever before it beats you',
         subtitle: 'Your partner in managing allergies daily',
         buttonText: "Check Today's Pollen"
       },
       featuresTitle: 'All the Tools You Need to Stay Ahead',
+      // all the feature cards data
       features: [
         {
           id: 'tracker',
@@ -112,6 +114,7 @@ export default {
           iconText: '/images/prototype images/9951758450144_.pic.jpg'
         }
       ],
+      // info section data
       infoData: {
         title: 'Take Control of Your Hay Fever',
         description: 'Our resources provide the information and tools you need to effectively manage hay fever and maintain your quality of life.'
@@ -119,17 +122,34 @@ export default {
     }
   },
   methods: {
+    // this method handles the "Get Started" button click (not currently used)
+    // it logs the click and emits an event to parent component
+    // returns: nothing, but emits get-started-clicked event
     handleGetStarted() {
       console.log('Get Started button clicked');
       this.$emit('get-started-clicked');
     },
+    
+    // this method handles the hero section "Check Today's Pollen" button click
+    // it navigates to the dashboard/tracker feature
+    // returns: nothing, but emits feature-button-clicked event with 'tracker'
     goDashboard() {
       this.$emit('feature-button-clicked', 'tracker');
     },
+    
+    // this method handles when user clicks on a feature card (not the button)
+    // it logs the click and emits an event to parent component
+    // parameters: featureId - the ID of the clicked feature card
+    // returns: nothing, but emits feature-clicked event
     handleFeatureClick(featureId) {
       console.log('Feature card clicked:', featureId);
       this.$emit('feature-clicked', featureId);
     },
+    
+    // this method handles when user clicks on a feature card's button
+    // it logs the click and emits an event to parent component for navigation
+    // parameters: featureId - the ID of the clicked feature button
+    // returns: nothing, but emits feature-button-clicked event
     handleButtonClick(featureId) {
       console.log('Feature button clicked:', featureId);
       this.$emit('feature-button-clicked', featureId);
@@ -139,35 +159,35 @@ export default {
 </script>
 
 <style scoped>
-/* 主页容器 - 控制整个页面的宽度和溢出
-   - width: 100% 设置容器占满父元素宽度
-   - max-width: 100vw 限制最大宽度为视口宽度，防止横向滚动
-   - overflow-x: hidden 隐藏水平方向的溢出内容 */
+/* homepage container - controls page width and overflow
+   - width: 100% sets container to fill parent element width
+   - max-width: 100vw limits maximum width to viewport width, prevents horizontal scrolling
+   - overflow-x: hidden hides horizontal overflow content */
 .homepage {
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
 }
 
-/* 页面容器 - 中心栏 + 两侧 gutter 版式
-   - max-width: 1200px 最大宽度1200像素，限制内容宽度
-   - margin: 0 auto 水平居中对齐
-   - padding: 0 24px 左右内边距24像素，提供基础gutter空间 */
+/* page container - center column + side gutters layout
+   - max-width: 1200px maximum width 1200 pixels, limits content width
+   - margin: 0 auto horizontally centered alignment
+   - padding: 0 24px left and right padding 24 pixels, provides basic gutter space */
 .page-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
-/* Hero区域样式 - 页面顶部的背景图区域，包含主标题和按钮
-   - position: relative 相对定位，作为子元素的定位参考点
-   - width: 100% 占满容器宽度
-   - height: 824px 固定高度824像素
-   - background: url('/images/prototype images/background home page.png') 使用背景图片
-   - background-size: cover 背景图片覆盖整个区域
-   - background-position: center 背景图片居中显示
-   - background-repeat: no-repeat 背景图片不重复
-   - overflow: hidden 隐藏超出区域的内容，防止装饰元素溢出 */
+/* Hero area styles - top page background image area containing main title and button
+   - position: relative relative positioning, serves as positioning reference for child elements
+   - width: 100% fills container width
+   - height: 824px fixed height 824 pixels
+   - background: url('/images/prototype images/background home page.png') uses background image
+   - background-size: cover background image covers entire area
+   - background-position: center background image centered display
+   - background-repeat: no-repeat background image does not repeat
+   - overflow: hidden hides content exceeding area, prevents decorative elements overflow */
 .hero-section {
   position: relative;
   width: 100%;

@@ -1,14 +1,14 @@
 <template>
   <div id="app">
-    <!-- Navigation Bar -->
+    <!-- navigation bar at the top -->
     <nav class="navbar">
       <div class="nav-container">
-        <!-- Website Logo -->
+        <!-- website logo -->
         <div class="logo">
           <img src="/images/prototype images/logo.png" alt="HayFree Logo" class="logo-image">
         </div>
         
-        <!-- Navigation Menu -->
+        <!-- navigation menu with all the pages -->
         <ul class="nav-menu">
           <li 
             v-for="item in navItems" 
@@ -23,7 +23,7 @@
       </div>
     </nav>
     
-    <!-- Main Content Area -->
+    <!-- main content area where different pages show up -->
     <main class="main-content">
               <HomePage v-if="currentView === 'home'"
                 @feature-button-clicked="onHomeFeatureButton"
@@ -39,7 +39,7 @@
       </div>
     </main>
     
-    <!-- Footer -->
+    <!-- footer at the bottom -->
     <footer class="footer">
       <div class="footer-container">
         <p>&copy; {{ currentYear }} HayFree. All rights reserved.</p>
@@ -49,6 +49,7 @@
 </template>
 
 <script>
+// import all the components we need
 import HomePage from './components/HomePage.vue'
 import Dashboard from './views/Dashboard.vue'
 import Resources from './views/Resources.vue'
@@ -68,8 +69,8 @@ export default {
   },
   data() {
     return {
-      activeItem: 'home',
-      currentView: 'home', // Current active view
+      activeItem: 'home',  // which nav item is currently active
+      currentView: 'home', // which page/view is currently showing
       navItems: [
         { id: 'home', text: 'Home', href: '#home' },
         { id: 'dashboard', text: 'Pollen Dashboard', href: '#dashboard' },
@@ -82,50 +83,49 @@ export default {
     }
   },
   computed: {
+    // get current year for footer
     currentYear() {
       return new Date().getFullYear();
     }
   },
   methods: {
+    // when user clicks on nav item, switch to that page
     setActiveItem(itemId) {
       this.activeItem = itemId;
-      this.currentView = itemId; // Switch to the corresponding view
-      // Update URL hash
+      this.currentView = itemId;
+      // update url hash so browser back/forward works
       window.location.hash = `#${itemId}`;
     },
     
-    // Navigate to symptoms page from resources
-    // 从资源页面导航到症状页面
+    // navigate to symptoms page from resources
     navigateToSymptoms() {
       this.currentView = 'symptoms';
-      this.activeItem = 'resources'; // Keep resources highlighted in nav
+      this.activeItem = 'resources'; // keep resources highlighted in nav
       window.location.hash = '#symptoms';
     },
+    
+    // handle clicks from homepage feature buttons
     onHomeFeatureButton(id) {
-      // Hero CTA 或功能按钮点击回调
       if (id === 'tracker') {
         this.currentView = 'dashboard';
         this.activeItem = 'dashboard';
         window.location.hash = '#dashboard';
       } else if (id === 'education') {
-        // 跳转到资源页面
         this.currentView = 'resources';
         this.activeItem = 'resources';
         window.location.hash = '#resources';
       } else if (id === 'plant-identifier') {
-        // 跳转到图片检测页面
         this.currentView = 'image';
         this.activeItem = 'image';
         window.location.hash = '#image';
       } else if (id === 'map') {
-        // 跳转到地图页面
         this.currentView = 'map';
         this.activeItem = 'map';
         window.location.hash = '#map';
       }
     },
     
-    // Handle browser back/forward and direct URL access
+    // handle browser back/forward and direct url access
     handleHashChange() {
       const hash = window.location.hash.substring(1) || 'home';
       const validViews = ['home', 'dashboard', 'map', 'image', 'trends', 'resources', 'support', 'symptoms'];
@@ -134,7 +134,7 @@ export default {
         this.currentView = hash;
         this.activeItem = hash === 'symptoms' ? 'resources' : hash;
       } else {
-        // Default to home for invalid hashes
+        // default to home for invalid hashes
         this.currentView = 'home';
         this.activeItem = 'home';
         window.location.hash = '#home';
@@ -143,14 +143,14 @@ export default {
   },
   
   mounted() {
-    // Listen for hash changes (browser back/forward)
+    // listen for hash changes when user uses browser back/forward buttons
     window.addEventListener('hashchange', this.handleHashChange);
-    // Handle initial page load
+    // handle initial page load
     this.handleHashChange();
   },
   
   beforeUnmount() {
-    // Clean up event listener
+    // clean up event listener when component is destroyed
     window.removeEventListener('hashchange', this.handleHashChange);
   }
 }

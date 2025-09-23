@@ -1,15 +1,13 @@
 <template>
   <div class="symptoms-page">
-    <!-- Page Title -->
-    <!-- 页面标题 -->
+    <!-- page title -->
     <section class="title-section">
       <div class="page-container">
         <h1 class="page-title">{{ pageData.title }}</h1>
       </div>
     </section>
 
-    <!-- Symptoms Checklist Section -->
-    <!-- 症状清单区域 -->
+    <!-- symptoms checklist section -->
     <section class="checklist-section">
       <div class="page-container">
         <div class="checklist-grid">
@@ -36,8 +34,7 @@
           </div>
         </div>
         
-        <!-- Simple advice -->
-        <!-- 简单建议 -->
+        <!-- simple advice -->
         <div class="advice-box" v-if="checkedCount > 0">
           <p class="advice-text">{{ advice }}</p>
         </div>
@@ -91,16 +88,15 @@ export default {
   },
 
   mounted() {
-    // Don't show advice initially - only show when user checks symptoms
-    // 初始不显示建议 - 只有用户勾选症状后才显示
+    
     this.advice = '';
   }
 }
 </script>
 
 <style scoped>
-/* CSS Variables - Simple clean design */
-/* CSS变量 - 简洁清爽设计 */
+
+
 :root {
   --color-primary: #239BA7;
   --color-success: #4CAF50;
@@ -123,24 +119,24 @@ export default {
   --font-body: 'AR One Sans', sans-serif;
 }
 
-/* Page Container - Centered with generous spacing */
-/* 页面容器 - 居中且留白充足 */
+
+/* page container - centered with comfortable gutters */
 .page-container {
   max-width: 600px;
   margin: 0 auto;
   padding: 0 32px;
 }
 
-/* Symptoms Page - White background */
-/* 症状页面 - 白色背景 */
+
+/* symptoms page - white background */
 .symptoms-page {
   background: #FFFFFF;
   min-height: calc(100vh - 105px - 60px);
   padding: 64px 0 var(--spacing-xl);
 }
 
-/* Title Section - Compact line height */
-/* 标题区域 - 紧凑行高 */
+
+/* title section - compact line height */
 .title-section {
   font-size: 42px;
   margin-top: 44px;
@@ -157,8 +153,8 @@ export default {
   text-align: left;
 }
 
-/* Checklist Section - Single column layout */
-/* 清单区域 - 单列布局 */
+
+/* checklist area - single column layout */
 .checklist-section {
   padding: 0;
 }
@@ -170,8 +166,8 @@ export default {
   max-width: 100%;
 }
 
-/* Individual Symptom Item - Clean rhythm */
-/* 单个症状项目 - 清洁节奏 */
+
+/* single symptom item - clean rhythm */
 .symptom-item {
   display: flex;
   align-items: center;
@@ -184,8 +180,8 @@ export default {
   cursor: pointer;
 }
 
-/* Checkbox Container - Square design */
-/* 复选框容器 - 方形设计 */
+
+/* checkbox container - square design */
 .checkbox-container {
   position: relative;
   flex-shrink: 0;
@@ -205,8 +201,8 @@ export default {
   z-index: 2;
 }
 
-/* Square Checkmark - Brand color when checked */
-/* 方形复选标记 - 选中时使用品牌色 */
+
+/* square check mark - use brand color when checked */
 .checkmark {
   display: flex;
   align-items: center;
@@ -233,8 +229,8 @@ export default {
   line-height: 1;
 }
 
-/* Checked state - Green background with white checkmark */
-/* 选中状态 - 绿色背景配白色对勾 */
+
+/* checked state - green background with white tick */
 .symptom-checkbox:checked + .checkmark {
   background: var(--color-checkbox-checked);
 }
@@ -243,16 +239,16 @@ export default {
   color: var(--color-checkmark);
 }
 
-/* Focus accessibility - Keyboard navigation */
-/* 焦点无障碍 - 键盘导航 */
+
+/* focus accessibility - keyboard navigation */
 .symptom-checkbox:focus-visible + .checkmark {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
   box-shadow: 0 0 0 4px rgba(35, 155, 167, 0.2);
 }
 
-/* Symptom Label - Simple black text */
-/* 症状标签 - 简洁黑色文本 */
+
+/* symptom label - simple black text */
 .symptom-label {
   flex: 1;
   font-family: var(--font-body);
@@ -271,11 +267,11 @@ export default {
   color: #555555;
 }
 
-/* Responsive Design - Progressive enhancement */
-/* 响应式设计 - 渐进式增强 */
 
-/* 📱 Complete Responsive Design System for Symptoms */
-/* 📱 Mobile devices (320px - 767px) */
+/* responsive design - progressive enhancement */
+
+
+
 @media (max-width: 767px) {
   .page-container {
     padding: 0 16px;
@@ -317,7 +313,7 @@ export default {
   }
 }
 
-/* 📱 Large mobile (480px - 767px) */
+
 @media (min-width: 480px) and (max-width: 767px) {
   .page-container {
     padding: 0 20px;
@@ -340,7 +336,7 @@ export default {
   }
 }
 
-/* 📱 Tablet devices (768px - 1023px) */
+
 @media (min-width: 768px) and (max-width: 1023px) {
   .page-container {
     padding: 0 32px;
@@ -375,7 +371,7 @@ export default {
   }
 }
 
-/* 🖥️ Desktop (1024px - 1439px) */
+
 @media (min-width: 1024px) and (max-width: 1439px) {
   .page-container {
     padding: 0 40px;
@@ -410,7 +406,7 @@ export default {
   }
 }
 
-/* 🖥️ Large desktop (1440px+) */
+
 @media (min-width: 1440px) {
   .page-container {
     padding: 0 48px;
@@ -420,6 +416,7 @@ export default {
     padding: 64px 0;
   }
   
+  /* page title */
   .page-title {
     font-size: 40px;
   }
@@ -445,7 +442,7 @@ export default {
   }
 }
 
-/* 📱 Very small screens (<320px) */
+
 @media (max-width: 319px) {
   .page-container {
     padding: 0 12px;
@@ -482,17 +479,17 @@ export default {
   }
 }
 
-/* Enhanced interactions for better UX */
-/* 增强交互以改善用户体验 */
+
+/* enhance interaction to improve UX */
 .symptom-item:hover .checkmark {
   box-shadow: 0 2px 4px rgba(35, 155, 167, 0.15);
 }
 
-/* Ensure first item is checked by default (if needed) */
-/* 确保第一项默认选中（如需要） */
 
-/* Simple advice box */
-/* 简单建议框 */
+/* make sure first item default checked (if needed) */
+
+
+/* simple advice box */
 .advice-box {
   background: #F0F8FF;
   border: 1px solid #239BA7;
@@ -509,5 +506,31 @@ export default {
   margin: 0;
   line-height: 1.6;
   white-space: pre-line;
+}
+
+/* extra visual polish for the page header
+   - add subtle divider and spacing to separate title from list
+   - this is small UI sugar, to make the section look clearer */
+.title-section {
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  padding-bottom: 8px;
+}
+
+/* card-like hover for symptom item (feels clickable)
+   - only a tiny background hint, don't distract too much */
+.symptom-item:hover {
+  background: rgba(35, 155, 167, 0.04);
+  border-radius: 8px;
+}
+
+/* when checkbox checked, softly highlight the label color
+   - using :has selector for parent awareness */
+.symptom-item:has(.symptom-checkbox:checked) .symptom-label {
+  color: #239BA7;
+}
+
+/* make the check mark pop a little more when active */
+.symptom-item:has(.symptom-checkbox:checked) .checkmark {
+  box-shadow: 0 2px 6px rgba(35, 155, 167, 0.25);
 }
 </style>

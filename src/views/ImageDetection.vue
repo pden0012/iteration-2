@@ -1,16 +1,16 @@
 <template>
   <div class="image-page">
-    <!-- 中文：页面主标题；English: big page title shown at the top -->
+    <!-- big page title shown at the top -->
     <div class="page-header">
       <h1 class="page-title">Plant Hayfever Risk Identifier</h1>
     </div>
     <div class="image-grid">
-      <!-- Left side: upload -->
+      <!-- left side: upload -->
       <div class="left-panel">
         <div class="upload-section">
-          <!-- 上传区域现在会被图片覆盖 -->
+          <!-- upload area gets covered by image -->
           <div class="upload-box" @click="triggerFileInput" :class="{ 'has-image': imagePreview }">
-            <!-- 显示图片预览或上传提示 -->
+            <!-- show image preview or upload hint -->
             <div v-if="imagePreview" class="preview-overlay">
               <img :src="imagePreview" alt="Preview" class="preview-img" />
               <button class="close-preview" @click.stop="clearPreview">×</button>
@@ -37,7 +37,7 @@
             Image uploaded successfully.
           </div>
           
-          <!-- Loading indicator -->
+          <!-- loading indicator -->
           <div v-if="isLoading" class="loading-indicator">
             <div class="spinner"></div>
             <p class="loading-text">Analyzing image...</p>
@@ -45,7 +45,7 @@
         </div>
       </div>
       
-      <!-- Right side: results -->
+      <!-- right side: results -->
       <div class="right-panel">
         <div v-for="(result, idx) in topResults" :key="`result-${idx}`" 
              class="result-card" 
@@ -63,7 +63,7 @@
               {{ result.risk === 'safe' ? 'Safe' : result.risk === 'risk' ? 'Risk' : 'Unknown' }}
             </span>
           </div>
-          <!-- 删除了 scientific name 这一行 -->
+          <!-- removed scientific name line -->
           <p class="card-confidence" v-if="!result.isLoading">Confidence Level: {{ idx + 1 }}</p>
           <p class="card-confidence" v-else>
             <span class="loading-dots">Analyzing</span>
@@ -83,16 +83,16 @@ export default {
       selectedFile: null,
       imagePreview: null,
       uploadSuccess: false,
-      results: [], // 后端返回的结果
+      results: [], 
       isLoading: false,
       retryCount: 0,
       maxRetries: 1
     };
   },
   computed: {
-    // 显示前3个结果，按后端返回顺序
+    
     topResults() {
-      // 如果正在加载，显示加载状态
+      
       if (this.isLoading) {
         return [
           { title: 'Analyzing...', scientificName: '', risk: 'unknown', description: 'AI is analyzing your image...', isLoading: true },
@@ -111,7 +111,7 @@ export default {
         return placeholders;
       }
       
-      // 使用后端返回的前3个结果，如果不足3个就用占位符补充
+      
       const actualResults = this.results.slice(0, 3);
       while (actualResults.length < 3) {
         actualResults.push({ 
@@ -126,96 +126,131 @@ export default {
     }
   },
   methods: {
+    // this method is for clicking the file input button programmatically
+    // it basically simulate a click on the hidden file input element
+    // returns: nothing, just triggers the file picker dialog
     triggerFileInput() {
+      // click the hidden file input to open file picker
       this.$refs.fileInput.click();
     },
     
+    // this method handles when user selects a file from file picker
+    // it validates the file type and size, then shows preview and starts analysis
+    // parameters: event - the file input change event
+    // returns: nothing, but updates component state and calls detectImage
     async onFileChange(event) {
+      // get the first file from the input
       const file = event.target.files && event.target.files[0];
-      if (!file) return;
+      if (!file) return; // exit if no file selected
       
-      // 验证文件类型：jpg, png, webp, heic, heif
+      // check if file type is supported image format
       if (!/^image\/(jpeg|jpg|png|webp|heic|heif)$/.test(file.type)) {
         alert('Only JPG, PNG, WEBP, HEIC, and HEIF image files are allowed.');
         return;
       }
       
-      // 验证文件大小：< 2MB
-      const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+      // check file size limit (2MB)
+      const maxSize = 2 * 1024 * 1024; 
       if (file.size > maxSize) {
         alert('Image size must be less than 2MB.');
         return;
       }
       
+      // store the file and mark upload as successful
       this.selectedFile = file;
       this.uploadSuccess = true;
       
-      // 创建预览
+      // create file reader to show image preview
       const reader = new FileReader();
       reader.onload = (e) => {
+        // set the preview image data
         this.imagePreview = e.target.result;
       };
       reader.readAsDataURL(file);
       
-      // 发送到后端进行检测
+      // send to backend for detection - analyze the uploaded image
       await this.detectImage(file);
     },
     
+    // this method clears the image preview and resets all related state
+    // it's called when user clicks the X button on preview
+    // returns: nothing, but resets component state to initial values
     clearPreview() {
+      // remove the image preview
       this.imagePreview = null;
+      // reset upload success flag
       this.uploadSuccess = false;
+      // clear selected file
       this.selectedFile = null;
+      // clear previous results
       this.results = [];
+      // reset the file input value
       this.$refs.fileInput.value = '';
     },
     
+    // this method builds the correct API URL based on environment
+    // it checks if we're in development or production mode
+    // parameters: path - the API endpoint path to append
+    // returns: string - the complete API URL
     getApiUrl(path) {
-      // 使用我们自己的代理服务器
+      // check if we're in development mode
       const isDev = import.meta.env.DEV;
       if (isDev) {
+        // use local development server
         return `http://localhost:3003/api${path}`;
       } else {
-        // 生产环境使用我们自己的代理服务器
+        // use production proxy server
         const proxyUrl = 'https://iteration-2-hayfree.onrender.com';
         return `${proxyUrl}/api${path}`;
       }
     },
     
+    // this method sends the uploaded image to AI service for plant identification
+    // it handles the API request, response processing, and error handling
+    // parameters: file - the image file to analyze
+    // returns: nothing, but updates this.results with plant identification data
     async detectImage(file) {
       try {
+        // show loading state to user
         this.isLoading = true;
         
-        // 使用我们自己的代理服务器
+        // build the API URL for image detection
         const url = this.getApiUrl('/ai/image');
+        // create form data for file upload
         const form = new FormData();
         form.append('image', file);
-        form.append('text', ' ');
+        form.append('text', ' '); // empty text field required by API
         
-        // 确保文件有正确的MIME类型
+        // special handling for JPEG files to ensure proper format
         if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
           const blob = new Blob([file], { type: 'image/jpeg' });
           form.set('image', blob, 'image.jpg');
         }
         
-          console.log('🔄 Using our own HTTPS proxy server for image detection...');
-          console.log('Request URL:', url);
+        // log the request for debugging
+        console.log('🔄 Using our own HTTPS proxy server for image detection...');
+        console.log('Request URL:', url);
         
+        // send the request with timeout
         const res = await fetch(url, {
           method: 'POST',
           body: form,
           signal: AbortSignal.timeout(30000) // 30 second timeout
         });
         
+        // check if request was successful
         if (!res.ok) {
           throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         }
         
+        // parse the JSON response
         const json = await res.json();
         
         console.log('Detection result:', json);
         
-        // 处理后端返回的数据
+        // process the response data
         if (json.data && Array.isArray(json.data)) {
+          // map each result to our component format
           this.results = json.data.map(item => ({
             title: item.commonName || item.name || 'Unknown Species',
             scientificName: item.scientificName || item.scientific_name || '',
@@ -223,6 +258,7 @@ export default {
             risk: this.mapRiskLevel(item.isHarmful)
           }));
         } else {
+          // handle unexpected response format
           console.warn('Unexpected API response format:', json);
           this.results = [{
             title: 'Analysis Complete',
@@ -233,9 +269,10 @@ export default {
         }
         
       } catch (error) {
+        // handle any errors that occur during detection
         console.error('Image detection failed:', error);
         
-        // 根据错误类型显示不同的用户提示
+        // create user-friendly error message based on error type
         let errorMessage = 'Failed to analyze image. ';
         if (error.message.includes('CORS proxy')) {
           errorMessage += 'Network service is temporarily unavailable. Please try again later.';
@@ -245,7 +282,7 @@ export default {
           errorMessage += 'Please check your internet connection and try again.';
         }
         
-        // 显示错误结果而不是弹窗
+        // show error result to user
         this.results = [{
           title: 'Analysis Failed',
           scientificName: '',
@@ -253,26 +290,38 @@ export default {
           description: errorMessage + ' Click "Change Image" to try again.'
         }];
         
-        // 重置重试计数器
+        // reset retry count
         this.retryCount = 0;
       } finally {
+        // always hide loading state
         this.isLoading = false;
       }
     },
     
+    // this method converts the API's harmful flag to our risk level string
+    // it handles different data types that the API might return
+    // parameters: isHarmful - boolean, string, or number indicating if plant is harmful
+    // returns: string - 'risk', 'safe', or 'unknown'
     mapRiskLevel(isHarmful) {
-      // 将后端的 isHarmful 映射到前端的 risk 级别
+      // check if plant is harmful (various formats)
       if (isHarmful === '1' || isHarmful === true || isHarmful === 1) {
         return 'risk';
       } else if (isHarmful === '0' || isHarmful === false || isHarmful === 0) {
         return 'safe';
       } else {
+        // if value is unclear, mark as unknown
         return 'unknown';
       }
     },
     
+    // this method creates a user-friendly description based on plant risk level
+    // it converts the risk level to a readable message for the user
+    // parameters: isHarmful - the harmful flag from API
+    // returns: string - human-readable risk description
     getRiskDescription(isHarmful) {
+      // first convert to our risk level format
       const risk = this.mapRiskLevel(isHarmful);
+      // return appropriate description based on risk level
       switch (risk) {
         case 'safe':
           return 'This plant is generally safe for most people.';
@@ -287,10 +336,9 @@ export default {
 </script>
 
 <style scoped>
-/* 中文：页面整体采用浅色背景；右侧卡片白底。
-   English: page background is light; cards use plain white. */
+/* English: page background is light; cards use plain white. */
 .image-page {
-  /* 背景图片高度控制，完全覆盖到第三个卡片下面 */
+  /* background image height control, covers completely to below third card */
   width: 100%;
   margin: 0;
   padding: 24px 0 40px 0;
@@ -298,18 +346,18 @@ export default {
   background-image: url('/images/Image Detection Background.png');
   background-repeat: no-repeat;
   background-position: center top;
-  background-size: 100% 700px; /* 原 620px -> 略微加长 */
-  /* 移除 min-height，让页面高度适应内容，消除下方空隙 */
+  background-size: 100% 700px; 
+  
 }
 
-/* 中文：标题区域；English: header box for the page title */
+
 .page-header {
   max-width: 1280px;
   margin: 0 auto 8px auto;
   padding: 0 20px;
 }
 
-/* 中文：主标题样式；English: main title style */
+
 .page-title {
   margin: 0 0 8px 0;
   font-family: var(--font-heading, 'Questrial', sans-serif);
@@ -322,22 +370,22 @@ export default {
 
 .image-grid {
   display: grid;
-  grid-template-columns: 1fr 1.4fr; /* 增加右侧结果区域宽度 */
-  gap: 32px; /* 增加间距 */
-  max-width: 1280px; /* 扩大整体宽度 */
+  grid-template-columns: 1fr 1.4fr; /* increase right panel width */
+  gap: 32px; /* increase spacing */
+  max-width: 1280px; /* expand overall width */
   margin: 0 auto;
   padding: 0 20px;
 }
 
-/* Left panel: upload area */
+
 .left-panel {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* 垂直居中对齐 */
+  justify-content: center; /* vertical center alignment */
   gap: 16px;
-  min-height: 600px; /* 确保有足够的高度进行居中 */
-  margin-top: -40px; /* 稍微向上移动一点点 */
+  min-height: 600px; /* ensure sufficient height for centering */
+  margin-top: -40px; /* move up slightly */
 }
 
 .upload-section {
@@ -382,7 +430,7 @@ export default {
   height: 100%;
 }
 
-/* 图片预览覆盖层 */
+/* image preview overlay */
 .preview-overlay {
   position: absolute;
   top: 0;
@@ -440,7 +488,7 @@ export default {
 
 .upload-btn {
   height: 44px;
-  width: 320px; /* 与上传框同宽对齐 */
+  width: 320px; /* align with upload box width */
   padding: 0 16px;
   border-radius: 10px;
   border: none;
@@ -462,7 +510,7 @@ export default {
   font-size: 14px;
 }
 
-/* Loading indicator styles */
+
 .loading-indicator {
   display: flex;
   flex-direction: column;
@@ -496,7 +544,7 @@ export default {
   text-align: center;
 }
 
-/* Loading dots animation for result cards */
+
 .loading-dots::after {
   content: '';
   animation: dots 1.5s steps(4, end) infinite;
@@ -510,9 +558,9 @@ export default {
   100% { content: ''; }
 }
 
-/* 旧的预览样式已移除，现在使用覆盖层预览 */
+/* old preview styles removed, now using overlay preview */
 
-/* Right panel: results */
+
 .right-panel {
   display: flex;
   flex-direction: column;
@@ -532,32 +580,32 @@ export default {
   transition: all 0.3s ease;
 }
 
-/* 第一个结果卡片(最高置信度)更大更显眼 */
+/* first result card (highest confidence) is larger and more prominent */
 .result-card.primary-result {
   background: rgba(255, 255, 255, 0.95);
-  padding: 24px 20px; /* 更大的内边距 */
-  min-height: 140px; /* 更高 */
-  border: 2px solid #24b36b; /* 绿色边框突出显示 */
+  padding: 24px 20px; /* larger padding */
+  min-height: 140px; /* taller */
+  border: 2px solid #24b36b; /* green border for emphasis */
   box-shadow: 0 4px 16px rgba(36, 179, 107, 0.15);
-  transform: scale(1.02); /* 稍微放大 */
+  transform: scale(1.02); /* slightly larger */
 }
 
 .result-card.primary-result .card-title {
-  font-size: 18px; /* 更大的标题 */
-  font-weight: 700; /* 更粗的字体 */
+  font-size: 18px; /* larger title */
+  font-weight: 700; /* bolder font */
 }
 
 .result-card.primary-result .card-confidence {
-  font-size: 14px; /* 更大的置信度文字 */
+  font-size: 14px; /* larger confidence text */
   font-weight: 600;
-  color: #24b36b; /* 绿色高亮 */
+  color: #24b36b; /* green highlight */
 }
 
 .result-card.primary-result .card-description {
-  font-size: 14px; /* 更大的描述文字 */
+  font-size: 14px; /* larger description text */
 }
 
-/* 其他结果卡片稍小一些 */
+/* other result cards are slightly smaller */
 .result-card.secondary-result {
   opacity: 0.9;
   transform: scale(0.98);
@@ -585,7 +633,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 8px; /* 增加间距：从6px改为8px */
+  margin-bottom: 8px; 
 }
 
 .card-title {
@@ -595,7 +643,7 @@ export default {
   margin: 0;
   flex: 1;
   margin-right: 8px;
-  line-height: 1.3; /* 增加行高 */
+  line-height: 1.3; /* increase line height */
 }
 
 .badge {
@@ -614,37 +662,37 @@ export default {
   font-size: 12px;
   color: #495057;
   font-weight: 500;
-  margin: 0 0 8px 0; /* 增加间距：从6px改为8px */
+  margin: 0 0 8px 0; 
 }
 
 .card-description {
   color: #6c757d;
   font-size: 13px;
-  line-height: 1.5; /* 增加行高 */
+  line-height: 1.5; /* increase line height */
   margin: 0;
-  flex-grow: 1; /* 让描述占用剩余空间 */
+  flex-grow: 1; /* let description take remaining space */
 }
 
-/* 📱 Complete Responsive Design System */
-/* 📱 Mobile devices (320px - 767px) */
+
+
 @media (max-width: 767px) {
   .image-page {
     padding: 16px 0 20px 0;
-    background-size: 100% 520px; /* 原 480px -> 略微加长 */
+    background-size: 100% 520px; 
   }
   
   .page-header { padding: 0 12px; }
   .page-title { font-size: 22px; }
   
   .image-grid {
-    grid-template-columns: 1fr; /* Mobile: single column layout */
+    grid-template-columns: 1fr; 
     gap: 16px;
     padding: 0 12px;
     max-width: 100%;
   }
   
   .left-panel {
-    min-height: 400px; /* Mobile: reduce height */
+    min-height: 400px; 
     justify-content: center;
     margin-top: -20px;
   }
@@ -658,7 +706,7 @@ export default {
   }
   
   .upload-box {
-    height: 200px; /* Mobile: smaller upload area */
+    height: 200px; 
   }
   
   .result-card {
@@ -668,7 +716,7 @@ export default {
   }
   
   .result-card.primary-result {
-    transform: scale(1); /* Mobile: no scaling for primary */
+    transform: scale(1); 
   }
 }
 
@@ -685,16 +733,16 @@ export default {
   }
 }
 
-/* 📱 Tablet devices (768px - 1023px) */
+
 @media (min-width: 768px) and (max-width: 1023px) {
   .image-page {
-    background-size: 100% 640px; /* 原 580px -> 略微加长 */
+    background-size: 100% 640px; 
   }
   
   .page-header { padding: 0 20px; }
   
   .image-grid {
-    grid-template-columns: 1fr 1.2fr; /* Tablet: adjust ratio */
+    grid-template-columns: 1fr 1.2fr; 
     gap: 24px;
     padding: 0 20px;
     max-width: 900px;
@@ -716,10 +764,10 @@ export default {
   }
 }
 
-/* 🖥️ Desktop (1024px - 1439px) */
+
 @media (min-width: 1024px) and (max-width: 1439px) {
   .image-page {
-    background-size: 100% 700px; /* 原 620px -> 略微加长 */
+    background-size: 100% 700px; 
   }
   
   .image-grid {
@@ -734,10 +782,10 @@ export default {
   }
 }
 
-/* 🖥️ Large desktop (1440px+) */
+
 @media (min-width: 1440px) {
   .image-page {
-    background-size: 100% 700px; /* 原 620px -> 略微加长 */
+    background-size: 100% 700px; 
   }
   
   .image-grid {
@@ -752,7 +800,7 @@ export default {
   }
 }
 
-/* 📱 Very small screens (<320px) */
+
 @media (max-width: 319px) {
   .image-grid {
     padding: 0 8px;

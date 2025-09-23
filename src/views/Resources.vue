@@ -1,34 +1,28 @@
 <template>
   <div class="resources">
-    <!-- Article Detail View - Shows when viewing a specific article -->
-    <!-- 文章详情视图 - 查看特定文章时显示 -->
+    <!-- article detail view - shows when viewing specific article -->
     <div v-if="showArticleDetail" class="article-detail-page">
       <div class="page-container">
-        <!-- Back button -->
-        <!-- 返回按钮 -->
+        <!-- back button -->
         <button class="back-button" @click="goBackToResources">
           ← Back to Resources
         </button>
         
-        <!-- Article header -->
-        <!-- 文章头部 -->
+        <!-- article header -->
         <div class="article-header">
           <div class="article-category">{{ currentArticle.type }}</div>
           <h1 class="article-title">{{ currentArticle.title }}</h1>
           <p class="article-meta">By {{ currentArticle.author }} | {{ currentArticle.date }}</p>
         </div>
         
-        <!-- Article content container -->
-        <!-- 文章内容容器 -->
+        <!-- article content container -->
         <div class="article-content-container">
-          <!-- Article image -->
-          <!-- 文章图片 -->
+          <!-- article image -->
           <div class="article-image">
             <img src="/images/prototype images/article page image.png" alt="Hay fever illustration" />
           </div>
           
-          <!-- Article content -->
-          <!-- 文章正文内容 -->
+          <!-- article content -->
           <div class="article-content">
             <div class="article-tip">
               <strong>1. Avoid outdoor exposure during high-pollen periods</strong>, especially mornings and windy weather.
@@ -63,30 +57,25 @@
           </div>
         </div>
         
-        <!-- Article footer -->
-        <!-- 文章底部 -->
+        <!-- article footer -->
         <div class="article-footer">
           <p class="article-source">Source: <a :href="currentArticle.sourceUrl" target="_blank">The Guardian</a></p>
         </div>
       </div>
     </div>
 
-    <!-- Video Detail View - Shows when viewing a specific video -->
-    <!-- 视频详情视图 - 查看特定视频时显示 -->
+    <!-- video detail view - shows when viewing specific video -->
     <div v-else-if="showVideoDetail" class="video-detail-page">
       <div class="page-container">
-        <!-- Back button -->
-        <!-- 返回按钮 -->
+        <!-- back button -->
         <button class="back-button" @click="goBackToResources">
           ← Back to Resources
         </button>
         
-        <!-- Video title -->
-        <!-- 视频标题 -->
+        <!-- video title -->
         <h1 class="video-title">{{ currentVideo.title }}</h1>
         
-        <!-- Video player container -->
-        <!-- 视频播放器容器 -->
+        <!-- video player container -->
         <div class="video-container">
           <iframe 
             :src="currentVideo.embedUrl"
@@ -98,8 +87,7 @@
           ></iframe>
         </div>
         
-        <!-- Video description -->
-        <!-- 视频描述 -->
+        <!-- video description -->
         <div class="video-info">
           <p class="video-author">By {{ currentVideo.author }}</p>
           <p class="video-description">{{ currentVideo.description }}</p>
@@ -107,11 +95,9 @@
       </div>
     </div>
 
-    <!-- Main Resources View - Shows resource listing -->
-    <!-- 主资源视图 - 显示资源列表 -->
+    <!-- main resources view - shows resource listing -->
     <div v-else>
-      <!-- Hero Section - Main banner with title and background -->
-      <!-- Hero区域 - 主横幅，包含标题和背景 -->
+      <!-- hero section - main banner with title and background -->
       <section class="hero-section">
         <div class="page-container">
           <div class="hero-content">
@@ -121,8 +107,7 @@
         </div>
       </section>
 
-    <!-- Resources Cards Section - Grid layout for resource cards -->
-    <!-- 资源卡片区域 - 资源卡片的网格布局 -->
+    <!-- resources cards section - grid layout for resource cards -->
     <section class="cards-section">
       <div class="page-container">
         <div class="cards-grid">
@@ -132,14 +117,12 @@
             class="resource-card"
             @click="openResource(resource.id)"
           >
-            <!-- Card image -->
-            <!-- 卡片图片 -->
+            <!-- card image -->
             <div class="card-image">
               <img :src="resource.image" :alt="resource.title" />
             </div>
             
-            <!-- Card content -->
-            <!-- 卡片内容 -->
+            <!-- card content -->
             <div class="card-content">
               <div class="card-type">{{ resource.type }}</div>
               <h3 class="card-title">{{ resource.title }}</h3>
@@ -152,11 +135,9 @@
       </div>
     </section>
 
-    <!-- Did You Know Section - Educational content -->
-    <!-- 知识普及区域 - 教育内容 -->
+    <!-- did you know section - educational content -->
     <section class="knowledge-section">
-      <!-- Top separator bar -->
-      <!-- 顶部分隔条 -->
+      <!-- top separator bar -->
       <div class="separator-bar"></div>
       <div class="page-container">
         <div class="knowledge-content">
@@ -177,104 +158,101 @@
 <script>
 export default {
   name: 'Resources',
-  data() {
-    return {
-      // Article detail view state
-      // 文章详情视图状态
-      showArticleDetail: false,
-      currentArticle: null,
+    data() {
+      return {
+        
+        showArticleDetail: false,
+        currentArticle: null,
 
-      // Video detail view state
-      // 视频详情视图状态
-      showVideoDetail: false,
-      currentVideo: null,
+        
+        showVideoDetail: false,
+        currentVideo: null,
 
-      // Hero section data
-      // Hero区域数据
-      heroData: {
-        title: 'Learn. Manage. Prevent.',
-        subtitle: 'Trusted guides, tips and seasonal hacks to help you stay ahead of hay fever.'
-      },
-
-      // Resources data - placeholder for future API integration
-      // 资源数据 - 为将来API集成预留的占位符
-      resources: [
-        {
-          id: 1,
-          title: 'Five Ways to Treat Allergies at Home Without Medication',
-          image: '/images/prototype images/video image.png', // 使用实际的视频图片 - Using actual video image
-          category: 'treatments',
-          type: 'Video',
-          buttonText: 'Watch',
-          isVideo: true,
-          videoUrl: 'https://www.youtube.com/watch?v=H2DIcKgpKoE',
-          embedUrl: 'https://www.youtube.com/embed/H2DIcKgpKoE',
-          author: 'Norton Healthcare',
-          description: 'Learn five effective ways to manage allergies at home without relying on medication. This video provides practical tips and natural remedies to help you breathe easier during allergy season.'
+        
+        heroData: {
+          title: 'Learn. Manage. Prevent.',
+          subtitle: 'Trusted guides, tips and seasonal hacks to help you stay ahead of hay fever.'
         },
-        {
-          id: 2,
-          title: 'Recognize & Manage Hay Fever Symptoms',
-          image: '/images/prototype images/checklist image.png', // 使用实际的检查清单图片 - Using actual checklist image
-          category: 'symptoms',
-          type: 'Checklist',
-          buttonText: 'Check',
-          isVideo: false
-        },
-        {
-          id: 3,
-          title: 'Expert-backed Tips to Reduce Hay Fever Misery',
-          image: '/images/prototype images/article image.png', // 使用实际的文章图片 - Using actual article image
-          category: 'lifestyle',
-          type: 'Article',
-          buttonText: 'Read',
-          isVideo: false,
-          isArticle: true,
-          author: 'Sarah Phillips',
-          date: 'Apr 10, 2025',
-          sourceUrl: 'https://www.theguardian.com/lifeandstyle/2025/apr/10/hay-fever-misery-20-tips-doctors-allergy-experts',
-          content: [] // Will be populated by API call
+
+        
+        resources: [
+          {
+            id: 1,
+            title: 'Five Ways to Treat Allergies at Home Without Medication',
+            image: '/images/prototype images/video image.png', 
+            category: 'treatments',
+            type: 'Video',
+            buttonText: 'Watch',
+            isVideo: true,
+            videoUrl: 'https://www.youtube.com/watch?v=H2DIcKgpKoE',
+            embedUrl: 'https://www.youtube.com/embed/H2DIcKgpKoE',
+            author: 'Norton Healthcare',
+            description: 'Learn five effective ways to manage allergies at home without relying on medication. This video provides practical tips and natural remedies to help you breathe easier during allergy season.'
+          },
+          {
+            id: 2,
+            title: 'Recognize & Manage Hay Fever Symptoms',
+            image: '/images/prototype images/checklist image.png', 
+            category: 'symptoms',
+            type: 'Checklist',
+            buttonText: 'Check',
+            isVideo: false
+          },
+          {
+            id: 3,
+            title: 'Expert-backed Tips to Reduce Hay Fever Misery',
+            image: '/images/prototype images/article image.png', 
+            category: 'lifestyle',
+            type: 'Article',
+            buttonText: 'Read',
+            isVideo: false,
+            isArticle: true,
+            author: 'Sarah Phillips',
+            date: 'Apr 10, 2025',
+            sourceUrl: 'https://www.theguardian.com/lifeandstyle/2025/apr/10/hay-fever-misery-20-tips-doctors-allergy-experts',
+            content: [] 
+          }
+        ],
+
+        
+        knowledgeData: {
+          title: 'Did You Know?',
+          content: 'Despite its name, hay fever does not mean you have a fever. It is not the cause of a virus but rather an allergic reaction to allergens.',
+          buttonText: 'Back to Dashboard'
         }
-      ],
-
-      // Knowledge section data
-      // 知识普及区域数据
-      knowledgeData: {
-        title: 'Did You Know?',
-        content: 'Despite its name, hay fever does not mean you have a fever. It is not the cause of a virus but rather an allergic reaction to allergens.',
-        buttonText: 'Back to Dashboard'
       }
-    }
-  },
+    },
 
   methods: {
-    // Open resource handler - navigate to specific pages or external content
-    // 打开资源处理器 - 导航到特定页面或外部内容
+    // this method handles when user clicks on a resource card
+    // it determines what type of resource it is and opens the appropriate view
+    // parameters: resourceId - the ID of the clicked resource
+    // returns: nothing, but updates component state to show detail view
     openResource(resourceId) {
       console.log('Opening resource:', resourceId);
       
+      // find the resource object by ID
       const resource = this.resources.find(r => r.id === resourceId);
       
       if (resource) {
-        // If it's a video, show video detail page
-        // 如果是视频，显示视频详情页面
+        // check if it's a video resource
         if (resource.isVideo) {
           this.currentVideo = resource;
           this.showVideoDetail = true;
         }
-        // If it's an article, show article detail page
-        // 如果是文章，显示文章详情页面
+        
+        // check if it's an article resource
         else if (resource.isArticle) {
           this.currentArticle = resource;
           this.showArticleDetail = true;
         }
-        // Navigate to symptoms page for the symptoms checklist
-        // 为症状清单导航到症状页面
+        
+        // special case for checklist (resource ID 2)
         else if (resourceId === 2) {
+          // emit event to navigate to symptoms page
           this.$emit('navigate-to-symptoms');
         } else {
-          // For other resources, could open in modal or external link
-          // 对于其他资源，可以在模态框或外部链接中打开
+          // handle other resource types
           console.log('Opening other resource:', resourceId);
         }
       }
@@ -283,20 +261,23 @@ export default {
 
 
 
-    // Go back to resources list from detail views
-    // 从详情视图返回到资源列表
+    // this method handles the back button click from detail views
+    // it resets all detail view states and returns to main resources list
+    // returns: nothing, but updates component state to show main view
     goBackToResources() {
+      // hide video detail view
       this.showVideoDetail = false;
       this.currentVideo = null;
+      // hide article detail view  
       this.showArticleDetail = false;
       this.currentArticle = null;
     },
 
-    // Back to dashboard handler - navigate back to dashboard
-    // 返回仪表板处理器 - 导航回仪表板
+    // this method handles the "Back to Dashboard" button click
+    // it navigates back to the main dashboard page
+    // returns: nothing, but emits navigation event to parent component
     learnMore() {
-      // Navigate back to dashboard
-      // 导航回仪表板
+      // tell parent component to switch to dashboard tab
       this.$parent.setActiveItem('dashboard');
     }
   }
@@ -304,8 +285,7 @@ export default {
 </script>
 
 <style scoped>
-/* CSS Variables - consistent with Dashboard.vue */
-/* CSS变量 - 与Dashboard.vue保持一致 */
+
 :root {
   --primary-color: #239BA7;
   --secondary-color: #F9D65C;
@@ -323,16 +303,15 @@ export default {
   --font-content: 'AR One Sans', sans-serif;
 }
 
-/* Page container - center column with side gutters */
-/* 页面容器 - 中心栏加两侧留白 */
+
 .page-container {
   max-width: 1160px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
-/* Article Detail Page - full screen article reading */
-/* 文章详情页面 - 全屏文章阅读 */
+
+/* article detail page - full screen article reading */
 .article-detail-page {
   background: var(--background-white);
   min-height: calc(100vh - 105px);
@@ -349,16 +328,16 @@ export default {
   width: 100%;
 }
 
-/* Article header section */
-/* 文章头部区域 */
+
+/* article header area */
 .article-header {
   width: 100%;
   margin-bottom: 32px;
   text-align: center;
 }
 
-/* Article category label */
-/* 文章分类标签 */
+
+/* article category tag */
 .article-category {
   font-family: var(--font-body);
   font-size: 12px;
@@ -369,8 +348,8 @@ export default {
   margin-bottom: 16px;
 }
 
-/* Article title */
-/* 文章标题 */
+
+/* article title */
 .article-title {
   font-family: var(--font-heading);
   font-size: clamp(28px, 4vw, 42px);
@@ -380,8 +359,8 @@ export default {
   margin: 0 0 16px;
 }
 
-/* Article meta information */
-/* 文章元信息 */
+
+/* article meta information */
 .article-meta {
   font-family: var(--font-body);
   font-size: 14px;
@@ -390,8 +369,8 @@ export default {
   margin: 0;
 }
 
-/* Article content container - two column layout */
-/* 文章内容容器 - 两列布局 */
+
+/* article content container - two column layout */
 .article-content-container {
   width: 100%;
   display: grid;
@@ -401,8 +380,8 @@ export default {
   align-items: start;
 }
 
-/* Article image section */
-/* 文章图片区域 */
+
+/* article image area */
 .article-image {
   display: flex;
   justify-content: center;
@@ -416,16 +395,16 @@ export default {
   border-radius: 12px;
 }
 
-/* Article content section */
-/* 文章内容区域 */
+
+/* article content area */
 .article-content {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-/* Individual article tip */
-/* 单个文章提示 */
+
+/* individual article tip */
 .article-tip {
   font-family: var(--font-body);
   font-size: 16px;
@@ -439,7 +418,7 @@ export default {
   color: var(--text-primary);
 }
 
-/* Responsive design for article content */
+
 /* 文章内容响应式设计 */
 @media (max-width: 768px) {
   .article-content-container {
@@ -452,7 +431,7 @@ export default {
   }
 }
 
-/* Article footer */
+
 /* 文章底部 */
 .article-footer {
   width: 100%;
@@ -460,7 +439,7 @@ export default {
   padding: 16px 0;
 }
 
-/* Article source link */
+
 /* 文章来源链接 */
 .article-source {
   font-family: var(--font-body);
@@ -480,7 +459,7 @@ export default {
 
 
 
-/* Video Detail Page - full screen video viewing */
+
 /* 视频详情页面 - 全屏视频观看 */
 .video-detail-page {
   background: var(--background-white);
@@ -497,7 +476,7 @@ export default {
   text-align: center;
 }
 
-/* Back button - navigation to return to resources */
+
 /* 返回按钮 - 导航返回资源页面 */
 .back-button {
   background: transparent;
@@ -518,7 +497,7 @@ export default {
   text-decoration: underline;
 }
 
-/* Video title - main heading for video */
+
 /* 视频标题 - 视频的主标题 */
 .video-title {
   font-family: var(--font-heading);
@@ -530,8 +509,8 @@ export default {
   max-width: 800px;
 }
 
-/* Video container - responsive iframe wrapper */
-/* 视频容器 - 响应式iframe包装器 */
+
+
 .video-container {
   position: relative;
   width: 100%;
@@ -543,16 +522,16 @@ export default {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
-/* Maintain 16:9 aspect ratio for video */
-/* 保持16:9宽高比 */
+
+
 .video-container::before {
   content: '';
   display: block;
-  padding-top: 56.25%; /* 16:9 aspect ratio */
+  padding-top: 56.25%; 
 }
 
-/* Video iframe - embedded YouTube player */
-/* 视频iframe - 嵌入的YouTube播放器 */
+
+
 .video-iframe {
   position: absolute;
   top: 0;
@@ -562,13 +541,13 @@ export default {
   border: none;
 }
 
-/* Video information section */
+
 /* 视频信息区域 */
 .video-info {
   max-width: 800px;
 }
 
-/* Video author information */
+
 /* 视频作者信息 */
 .video-author {
   font-family: var(--font-body);
@@ -580,7 +559,7 @@ export default {
   letter-spacing: 0.5px;
 }
 
-/* Video description text */
+
 /* 视频描述文本 */
 .video-description {
   font-family: var(--font-content);
@@ -593,8 +572,8 @@ export default {
   max-width: 800px;
 }
 
-/* Hero Section - main banner area */
-/* Hero区域 - 主横幅区域 */
+
+
 .hero-section {
   background: linear-gradient(#239BA7CC, #239BA7CC), url('/images/prototype images/resources background.png');
   background-size: cover;
@@ -608,15 +587,15 @@ export default {
   border-radius: 2px;
 }
 
-/* Hero content wrapper */
-/* Hero内容包装器 */
+
+
 .hero-content {
   text-align: center;
   color: var(--background-white);
 }
 
-/* Hero main title */
-/* Hero主标题 */
+
+
 .hero-title {
   font-family: var(--font-heading);
   font-size: clamp(42px, 6vw, 64px);
@@ -626,8 +605,8 @@ export default {
   color: #FFFFFF !important;
 }
 
-/* Hero subtitle */
-/* Hero副标题 */
+
+
 .hero-subtitle {
   font-family: var(--font-heading);
   font-size: clamp(20px, 2.2vw, 22px);
@@ -638,7 +617,7 @@ export default {
   color: #FFFFFF !important;
 }
 
-/* Cards Section - resource cards grid */
+
 /* 卡片区域 - 资源卡片网格 */
 .cards-section {
   background: var(--background-white);
@@ -647,7 +626,7 @@ export default {
   border-radius: 2px;
 }
 
-/* Cards grid layout */
+
 /* 卡片网格布局 */
 .cards-grid {
   display: grid;
@@ -655,7 +634,7 @@ export default {
   gap: 28px;
 }
 
-/* Individual resource card */
+
 /* 单个资源卡片 */
 .resource-card {
   background: var(--background-white);
@@ -666,14 +645,14 @@ export default {
   cursor: pointer;
 }
 
-/* Card hover effect */
+
 /* 卡片悬停效果 */
 .resource-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
 }
 
-/* Card image container */
+
 /* 卡片图片容器 */
 .card-image {
   width: 100%;
@@ -685,7 +664,7 @@ export default {
   justify-content: center;
 }
 
-/* Card image styling */
+
 /* 卡片图片样式 */
 .card-image img {
   width: 100%;
@@ -693,7 +672,7 @@ export default {
   object-fit: cover;
 }
 
-/* Card content area */
+
 /* 卡片内容区域 */
 .card-content {
   padding: 16px 18px 24px;
@@ -702,7 +681,7 @@ export default {
   gap: 12px;
 }
 
-/* Card type label */
+
 /* 卡片类型标签 */
 .card-type {
   font-family: var(--font-body);
@@ -714,7 +693,7 @@ export default {
   margin: 0;
 }
 
-/* Card title */
+
 /* 卡片标题 */
 .card-title {
   font-family: var(--font-body);
@@ -723,18 +702,18 @@ export default {
   line-height: 1.2;
   color: var(--text-primary);
   margin: 0;
-  min-height: 44px; /* Consistent height for two-line alignment */
+  min-height: 44px; 
   display: flex;
   align-items: flex-start;
 }
 
-/* Card action button */
+
 /* 卡片操作按钮 */
 .card-button {
   background: transparent;
   border: none;
   padding: 0;
-  cursor: inherit; /* Inherit cursor from parent card */
+  cursor: inherit; 
   transition: all 0.3s ease;
   align-self: flex-start;
   font-family: var(--font-body);
@@ -743,17 +722,17 @@ export default {
   line-height: 120%;
   color: var(--primary-color);
   text-decoration: none;
-  pointer-events: none; /* Prevent button from intercepting clicks */
+  pointer-events: none; 
 }
 
-/* Card button hover effect - now handled by parent card */
+
 /* 卡片按钮悬停效果 - 现在由父卡片处理 */
 .resource-card:hover .card-button {
   text-decoration: underline;
   color: #1a7a84;
 }
 
-/* Separator bar between sections */
+
 /* 区域间分隔条 */
 .separator-bar {
   width: 100%;
@@ -762,14 +741,14 @@ export default {
   border-radius: 1px;
 }
 
-/* Knowledge Section - educational content */
+
 /* 知识区域 - 教育内容 */
 .knowledge-section {
   background: var(--background-off-white);
   padding: 0 0 48px;
 }
 
-/* Knowledge content wrapper */
+
 /* 知识内容包装器 */
 .knowledge-content {
   max-width: 1160px;
@@ -781,7 +760,7 @@ export default {
   padding: 48px 24px 0;
 }
 
-/* Knowledge section title */
+
 /* 知识区域标题 */
 .knowledge-title {
   font-family: var(--font-heading);
@@ -792,7 +771,7 @@ export default {
   margin: 0;
 }
 
-/* Knowledge section text */
+
 /* 知识区域文本 */
 .knowledge-text {
   font-family: var(--font-content);
@@ -804,7 +783,7 @@ export default {
   text-align: left;
 }
 
-/* Knowledge section button */
+
 /* 知识区域按钮 */
 .knowledge-button {
   background: #F9D65C !important;
@@ -820,22 +799,22 @@ export default {
   color: #303030;
 }
 
-/* Knowledge button hover effect */
+
 /* 知识按钮悬停效果 */
 .knowledge-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* 📱 Complete Responsive Design System for Resources */
-/* 📱 Mobile devices (320px - 767px) */
+
+
 @media (max-width: 767px) {
   .page-container {
     padding: 0 12px;
   }
   
   .cards-grid {
-    grid-template-columns: 1fr; /* Mobile: single column */
+    grid-template-columns: 1fr; 
     gap: 16px;
   }
   
@@ -862,7 +841,7 @@ export default {
   }
 }
 
-/* 📱 Large mobile (480px - 767px) */
+
 @media (min-width: 480px) and (max-width: 767px) {
   .page-container {
     padding: 0 16px;
@@ -877,14 +856,14 @@ export default {
   }
 }
 
-/* 📱 Tablet devices (768px - 1023px) */
+
 @media (min-width: 768px) and (max-width: 1023px) {
   .page-container {
     padding: 0 24px;
   }
   
   .cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)); /* Tablet: 2 columns */
+    grid-template-columns: repeat(2, minmax(0, 1fr)); 
     gap: 20px;
   }
   
@@ -897,14 +876,14 @@ export default {
   }
 }
 
-/* 🖥️ Desktop (1024px - 1439px) */
+
 @media (min-width: 1024px) and (max-width: 1439px) {
   .page-container {
     padding: 0 32px;
   }
   
   .cards-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr)); /* Desktop: 3 columns */
+    grid-template-columns: repeat(3, minmax(0, 1fr)); 
     gap: 24px;
     max-width: 1100px;
     margin: 0 auto;
@@ -919,14 +898,14 @@ export default {
   }
 }
 
-/* 🖥️ Large desktop (1440px+) */
+
 @media (min-width: 1440px) {
   .page-container {
     padding: 0 40px;
   }
   
   .cards-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr)); /* Large desktop: 3 columns */
+    grid-template-columns: repeat(3, minmax(0, 1fr)); 
     gap: 28px;
     max-width: 1200px;
     margin: 0 auto;
@@ -941,7 +920,7 @@ export default {
   }
 }
 
-/* 📱 Very small screens (<320px) */
+
 @media (max-width: 319px) {
   .page-container {
     padding: 0 8px;
@@ -973,7 +952,7 @@ export default {
   }
 }
 
-/* Video detail responsive design */
+
 /* 视频详情响应式设计 */
 @media (max-width: 767px) {
   .video-detail-page {
@@ -995,7 +974,7 @@ export default {
   }
 }
 
-/* Placeholder styling for missing images */
+
 /* 缺失图片的占位符样式 */
 .card-image::before {
   content: '📖';
@@ -1007,7 +986,7 @@ export default {
   display: block;
 }
 
-/* Hide placeholder when image loads */
+
 /* 图片加载后隐藏占位符 */
 .card-image:has(img) {
   background: transparent;

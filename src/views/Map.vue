@@ -1,12 +1,10 @@
 <template>
   <div class="map-page">
-    <!-- Page title -->
-    <!-- 页面标题：简洁说明这个页面干嘛的 -->
+    <!-- page title -->
     <h1 class="map-title">Allergy Exposure Map</h1>
     <p class="map-subtitle">Explore Safe (green) and Risk (red) trees across Melbourne.</p>
 
-    <!-- Controls row: filter select + legend -->
-    <!-- 控件区：筛选下拉 + 图例，简单好用 -->
+    <!-- controls row: filter select + legend -->
     <div class="controls">
       <label class="filter-label" for="filterSelect">Filter Trees</label>
       <select id="filterSelect" class="filter-select" v-model="allergenicity" @change="onFilterChange">
@@ -21,27 +19,26 @@
         <span class="legend-item"><span class="dot risk"></span>Risk</span>
       </div>
 
-      <!-- 边界开关：是否显示市政边界 -->
+      <!-- boundary toggle: whether to show municipal boundary -->
       <label class="boundary-toggle">
         <input type="checkbox" v-model="showBoundary" @change="toggleBoundary" />
         <span>Show Municipal Boundary</span>
       </label>
       
       
-      <!-- 缩放级别显示 -->
+      <!-- zoom level display -->
       <div class="zoom-display">
         Zoom: {{ currentZoom }}
       </div>
 
-      <!-- Loading indicator -->
+      <!-- loading indicator -->
       <div v-if="isLoading" class="loading-indicator">
         <span class="spinner"></span>
         Loading...
       </div>
     </div>
 
-    <!-- Map container -->
-    <!-- 地图容器：Google Maps 会把地图渲染在这里 -->
+    <!-- map container -->
     <div id="googleMap" class="map-container" ref="mapEl"></div>
   <div v-if="emptyMessage" class="empty-hint">{{ emptyMessage }}</div>
   </div>
@@ -53,34 +50,38 @@ export default {
   name: 'AllergenMap',
   data() {
     return {
-      // current filter: 0 Safe, 1 Risk, 2 None, all Show All
-      // 当前筛选：0安全 1风险 2无 all全部
-      allergenicity: 'all',  // 默认显示全部
-      map: null,        // Google Map instance
-      currentDataLayer: null, // 当前数据层ID，用于清理
-      infoWindow: null, // Reuse one info window
-      showBoundary: true, // 中文：是否显示市政边界  English: toggle municipal boundary
-      boundaryAdded: false, // 防止重复添加
-      emptyMessage: '', // 当当前筛选结果为空时提示
-      currentZoom: 12, // 当前缩放级别
-      isLoading: false, // 加载状态
-      retryCount: 0, // 重试计数器
-      maxRetries: 2 // 最大重试次数（总共试3次）
+      
+      allergenicity: 'all',  
+      map: null,        
+      currentDataLayer: null, 
+      infoWindow: null, 
+      showBoundary: true, 
+      boundaryAdded: false, 
+      emptyMessage: '', 
+      currentZoom: 12, 
+      isLoading: false, 
+      retryCount: 0, 
+      maxRetries: 2 
     };
   },
   methods: {
+    // this method loads Google Maps API if it's not already loaded
+    // it checks if the API is available and loads it dynamically if needed
+    // returns: Promise<google> - resolves with the Google Maps API object
     loadGoogleIfNeeded() {
-      // Dynamically load Google Maps JS API using env key
-      // 动态加载 Google Maps JS，使用环境变量中的密钥
+      // check if Google Maps is already loaded
       if (window.google && window.google.maps) return Promise.resolve(window.google);
       
+      // create a promise to load the API
       return new Promise((resolve, reject) => {
+        // check if script is already being loaded
         const existing = document.getElementById('google-maps-sdk');
         if (existing) { 
           existing.onload = () => resolve(window.google); 
           return; 
         }
         
+        // get the API key from environment variables
         const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
         if (!key || key === 'your_google_maps_api_key_here') {
           console.error('Google Maps API key is not configured. Please set VITE_GOOGLE_MAPS_API_KEY in your environment.');
@@ -88,33 +89,41 @@ export default {
           return;
         }
         
+        // create script element to load Google Maps
         const script = document.createElement('script');
         script.id = 'google-maps-sdk';
         script.async = true; 
         script.defer = true;
         script.src = `https://maps.googleapis.com/maps/api/js?key=${key}`;
         
+        // handle successful loading
         script.onload = () => {
           console.log('Google Maps API loaded successfully');
           resolve(window.google);
         };
         
+        // handle loading errors
         script.onerror = (error) => {
           console.error('Failed to load Google Maps API:', error);
           reject(new Error('Failed to load Google Maps API. Please check your API key and network connection.'));
         };
         
+        // add script to document
         document.body.appendChild(script);
       });
     },
+    // this method initializes the Google Map and sets up all the event listeners
+    // it creates the map instance, loads initial data, and sets up zoom tracking
+    // returns: nothing, but updates component state with map instance
     async initMap() {
       try {
         console.log('Starting map initialization...');
-        // Initialize Google Map centered on Melbourne
-        // 初始化Google地图，默认中心在墨尔本
+        
+        // wait for Google Maps API to be loaded
         const google = await this.loadGoogleIfNeeded();
         console.log('Google Maps API loaded successfully');
         
+        // get the map container element
         const el = this.$refs.mapEl;
         if (!el) {
           console.error('Map element not found');
@@ -123,30 +132,36 @@ export default {
         }
         console.log('Map element found:', el);
         
+        // create the Google Map instance centered on Melbourne
         this.map = new google.maps.Map(el, {
-          center: { lat: -37.8136, lng: 144.9631 },
-          zoom: 12,
-          mapTypeControl: false,
-          streetViewControl: false,
-          fullscreenControl: false
+          center: { lat: -37.8136, lng: 144.9631 }, // Melbourne coordinates
+          zoom: 12, // initial zoom level
+          mapTypeControl: false, // hide map type controls
+          streetViewControl: false, // hide street view controls
+          fullscreenControl: false // hide fullscreen control
         });
         console.log('Google Map instance created successfully');
         
-        const debounced = this.debounce(this.refreshMarkers, 400); // 平衡的防抖延迟
+        // set up debounced refresh function to avoid too many API calls
+        const debounced = this.debounce(this.refreshMarkers, 400); 
         this.map.addListener('idle', debounced);
         
-        // 更新缩放级别显示
+        // track zoom level changes
         this.map.addListener('zoom_changed', () => {
           this.currentZoom = this.map.getZoom();
         });
         
         console.log('Starting initial data load...');
+        // load initial tree data
         await this.refreshMarkers();
-        // 初始化边界
+        
+        // load municipal boundary data
         await this.loadMunicipalBoundary();
-        // 应用初始样式
+        
+        // apply styling to all map layers
         this.applyDataLayerStyle();
-        // 初始化缩放级别显示
+        
+        // set initial zoom level
         this.currentZoom = this.map.getZoom();
         console.log('Map initialization completed successfully');
       } catch (error) {
@@ -154,45 +169,53 @@ export default {
         this.emptyMessage = `Map initialization failed: ${error.message}`;
       }
     },
+    // this method builds the API URL for fetching tree data based on current map view
+    // it gets the map bounds and zoom level to request only visible trees
+    // returns: string|null - the complete API URL or null if map not ready
     getApiUrl() {
-      // Build API URL - use our own proxy server
-      // 构建API URL - 使用我们自己的代理服务器
+      // get current map bounds and zoom level
       const bounds = this.map?.getBounds();
       const zoom = this.map?.getZoom() || 12;
-      if (!bounds) return null;
+      if (!bounds) return null; // map not ready yet
       
+      // extract corner coordinates from bounds
       const sw = bounds.getSouthWest();
       const ne = bounds.getNorthEast();
-      const s = sw.lat().toFixed(6);
-      const w = sw.lng().toFixed(6);
-      const n = ne.lat().toFixed(6);
-      const e = ne.lng().toFixed(6);
-      const bbox = `${s},${w},${n},${e}`;
+      const s = sw.lat().toFixed(6); // south latitude
+      const w = sw.lng().toFixed(6); // west longitude  
+      const n = ne.lat().toFixed(6); // north latitude
+      const e = ne.lng().toFixed(6); // east longitude
+      const bbox = `${s},${w},${n},${e}`; // bounding box string
       
-      // Use our own proxy server
-      // 使用我们自己的代理服务器
+      // determine API base URL based on environment
       const isDev = import.meta.env.DEV;
       const proxyBase = isDev ? 'http://localhost:3003/api' : 'https://iteration-2-hayfree.onrender.com/api';
       
+      // build the target URL based on filter selection
       let targetUrl;
       if (this.allergenicity === 'all') {
+        // get all trees in current view
         targetUrl = `/map/tree?zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       } else {
+        // get filtered trees based on allergenicity
         targetUrl = `/map/tree?allergenicity=${this.allergenicity}&zoom=${zoom}&bbox=${encodeURIComponent(bbox)}`;
       }
       
+      // combine base URL with target path
       const apiUrl = `${proxyBase}${targetUrl}`;
       
-      console.log('Generated API URL:', apiUrl); // Debug log - Force HTTPS cache refresh
+      console.log('Generated API URL:', apiUrl); 
       return apiUrl;
     },
 
+    // this method fetches tree data from API and displays it on the map
+    // it handles loading states, error handling, and retry logic
+    // returns: nothing, but updates map with new tree markers
     async refreshMarkers() {
-      // Fetch points from backend and render markers (Google Maps)
-      // 拉取后端数据并渲染标记（Google地图）
+      // exit if map is not initialized
       if (!this.map) return;
       
-      // 如果选择 None，直接清空不发请求
+      // handle "None" filter - clear all data
       if (this.allergenicity === '2') {
         this.clearData();
         this.emptyMessage = 'No trees displayed (None selected)';
@@ -200,13 +223,18 @@ export default {
       }
       
       try {
+        // show loading indicator
         this.isLoading = true;
+        // clear existing tree data
         this.clearData();
+        
+        // get the API URL for current map view
         const url = this.getApiUrl();
-        if (!url) return;
+        if (!url) return; // map not ready
         
-        console.log('Fetching data from:', url); // Debug log
+        console.log('Fetching data from:', url); 
         
+        // make API request with timeout
         const res = await fetch(url, {
           method: 'GET',
           headers: {
@@ -216,38 +244,44 @@ export default {
           signal: AbortSignal.timeout(15000) // 15 second timeout
         });
         
+        // check if request was successful
         if (!res.ok) {
           throw new Error(`HTTP ${res.status}: ${res.statusText}. Please check API server status.`);
         }
         
+        // parse response data
         const json = await res.json();
-        console.log('Received data:', json); // Debug log
+        console.log('Received data:', json); 
         
+        // extract tree data from response
         const list = Array.isArray(json?.data) ? json.data : [];
         
+        // render trees on map as GeoJSON
         this.renderAsGeoJSON(list, String(this.allergenicity));
+        // apply visual styling to all map layers
         this.applyDataLayerStyle();
         
+        // show message if no trees found
         this.emptyMessage = list.length === 0 ? 'No trees in current view.' : '';
       } catch (e) {
         console.error('Failed to load map data', e);
         
-        // 自动重试逻辑 - 只针对AbortError重试
+        // handle timeout errors with retry logic
         if (this.retryCount < this.maxRetries && e.name === 'AbortError') {
           this.retryCount++;
           console.log(`AbortError detected, retrying data load (attempt ${this.retryCount}/${this.maxRetries})...`);
           
-          // 延迟1秒后重试
+          // retry after 1 second delay
           setTimeout(() => {
             this.refreshMarkers();
           }, 1000);
-          return; // 不显示错误消息，等待重试
+          return; 
         }
         
-        // 重试次数用完，显示错误消息
-        this.retryCount = 0; // 重置计数器
+        // reset retry count for other errors
+        this.retryCount = 0; 
         
-        // Provide specific error message for different scenarios
+        // show appropriate error message based on error type
         if (e.name === 'TimeoutError') {
           this.emptyMessage = 'Request timeout. The server might be slow or unavailable.';
         } else if (e.message.includes('NetworkError') || e.message.includes('Failed to fetch')) {
@@ -256,59 +290,71 @@ export default {
           this.emptyMessage = `Error loading tree data: ${e.message}`;
         }
       } finally {
+        // always hide loading indicator
         this.isLoading = false;
       }
     },
 
-    // 手动清理所有圆点
+    
+    // this method clears all tree data from the map and closes info windows
+    // it removes only tree features, keeping boundary data intact
+    // returns: nothing, but updates map display
     clearData() {
-      // Clear only tree data from Google Maps data layer, keep boundary
-      // 只清空树木数据，保留边界数据
+      // remove tree features from map data layer
       if (this.map && this.map.data) {
         this.map.data.forEach((feature) => {
           const featureType = feature.getProperty('type');
-          // 只删除树木数据，保留边界数据和覆盖层
+          
+          // only remove tree features, keep boundary features
           if (!featureType || featureType === 'tree') {
             this.map.data.remove(feature);
           }
         });
       }
-      // Close info window if open
-      // 关闭信息窗口（如果打开）
+      
+      // close any open info windows
       if (this.infoWindow) this.infoWindow.close();
-      // 强制清空提示，避免误导
+      
+      // clear empty message
       this.emptyMessage = '';
-      // 重置当前数据层ID
+      
+      // reset current data layer reference
       this.currentDataLayer = null;
     },
 
+    // this method converts tree data to GeoJSON format and adds it to the map
+    // it creates markers for each tree with color coding based on allergenicity
+    // parameters: list - array of tree data from API, filterSel - current filter selection
+    // returns: nothing, but updates map with tree markers and click handlers
     renderAsGeoJSON(list, filterSel) {
-      // Convert tree data to GeoJSON and render using Google Maps data layer
-      // 将树木数据转换为GeoJSON格式并使用Google Maps数据层渲染
+      // exit if map not ready or no data
       if (!this.map || !list.length) return;
       
-      // 生成唯一的数据层ID
+      // create unique layer ID for this data set
       const layerId = `trees_${Date.now()}_${Math.random().toString(36).substring(7)}`;
       this.currentDataLayer = layerId;
       
-      // 创建GeoJSON FeatureCollection
+      // convert tree data to GeoJSON format
       const geojson = {
         type: 'FeatureCollection',
         features: list.map(item => {
+          // extract coordinates and validate them
           const lat = Number(item.latitude);
           const lng = Number(item.longitude);
           if (!isFinite(lat) || !isFinite(lng)) return null;
           
+          // determine if tree is safe or risky based on allergenicity
           const val = String(item.allergenicity).toLowerCase();
-          // 修正：0 对应 safe（绿色），1 对应 risk（红色）
           const isSafe = (val === '0' || val === 'safe' || val === 'true');
-          // 简化：直接根据数据本身决定颜色，不依赖筛选参数
+          
+          // set color based on safety level
           const color = isSafe ? '#2EAF62' : '#E64A3B';
           
+          // create GeoJSON feature for this tree
           return {
             type: 'Feature',
             properties: {
-              type: 'tree', // 标识为树木数据
+              type: 'tree', 
               layerId: layerId,
               commonName: item.commonName || 'Tree',
               scientificName: item.scientificName || '',
@@ -318,21 +364,22 @@ export default {
             },
             geometry: {
               type: 'Point',
-              coordinates: [lng, lat]
+              coordinates: [lng, lat] // GeoJSON uses [longitude, latitude] order
             }
           };
-        }).filter(f => f !== null)
+        }).filter(f => f !== null) // remove any invalid features
       };
       
-      // 添加GeoJSON到数据层
+      // add the GeoJSON data to the map
       this.map.data.addGeoJson(geojson);
       
-      // 应用统一的数据层样式
+      // apply visual styling to all map layers
       this.applyDataLayerStyle();
       
-      // 添加点击事件
+      // set up click handlers for tree markers
       if (!this.infoWindow) this.infoWindow = new window.google.maps.InfoWindow();
       this.map.data.addListener('click', (event) => {
+        // get tree information from clicked feature
         const feature = event.feature;
         const commonName = feature.getProperty('commonName');
         const scientificName = feature.getProperty('scientificName');
@@ -340,12 +387,14 @@ export default {
         const color = feature.getProperty('color');
         const riskLabel = isSafe ? 'Safe' : 'Risk';
         
+        // create HTML content for info window
         const content = `<div style="font-family: Inter, sans-serif; font-size:12px;">
             <strong>${commonName}</strong><br/>
             <em>${scientificName}</em><br/>
             Risk Level: <span style="color:${color}; font-weight:600;">${riskLabel}</span>
           </div>`;
         
+        // show info window at clicked location
         this.infoWindow.setContent(content);
         this.infoWindow.setPosition(event.latLng);
         this.infoWindow.open(this.map);
@@ -353,8 +402,11 @@ export default {
     },
 
 
+    // this method handles when user changes the filter dropdown
+    // it refreshes the map data based on the new filter selection
+    // returns: nothing, but updates map display with filtered data
     onFilterChange() {
-      // 如果选择 None，立即清空
+      // handle "None" filter - clear all data and show message
       if (this.allergenicity === '2') {
         this.clearData();
         this.emptyMessage = 'No trees displayed (None selected)';
@@ -362,32 +414,42 @@ export default {
         return;
       }
       
-    // 切换筛选时重新请求数据
-    this.refreshMarkers();
-  },
+      // refresh markers with new filter
+      this.refreshMarkers();
+    },
 
-  // debounce helper to reduce refresh frequency
+    // this method creates a debounced version of a function to prevent too many calls
+    // it delays execution until the function hasn't been called for the specified time
+    // parameters: fn - function to debounce, wait - delay time in milliseconds
+    // returns: function - debounced version of the input function
     debounce(fn, wait) {
-      let t = null;
+      let t = null; // timeout reference
       return (...args) => {
-        clearTimeout(t);
-        t = setTimeout(() => fn.apply(this, args), wait);
+        clearTimeout(t); // clear previous timeout
+        t = setTimeout(() => fn.apply(this, args), wait); // set new timeout
       };
     },
 
-    // 中文：从 CSV 读取 MultiPolygon 并渲染到 Google Map Data 图层
-    // English: load boundary multipolygon from CSV and render via map.data
+    
+    
+    // this method loads municipal boundary data from CSV file and adds it to the map
+    // it parses the CSV, extracts GeoJSON data, and creates boundary overlays
+    // returns: nothing, but updates map with boundary visualization
     async loadMunicipalBoundary() {
+      // exit if map not ready or boundary already loaded
       if (!this.map || this.boundaryAdded) return;
       try {
         console.log('Loading municipal boundary...');
-        // 使用 public 目录中的 CSV 资源
+        
+        // fetch the CSV file containing boundary data
         const response = await fetch('/municipal-boundary.csv');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const text = await response.text();
         console.log('CSV loaded, length:', text.length);
+        
+        // split into lines and filter out empty ones
         const lines = text.split(/\r?\n/).filter(Boolean);
         if (lines.length < 2) {
           console.error('CSV file does not have enough lines');
@@ -397,6 +459,7 @@ export default {
         console.log('CSV lines count:', lines.length);
         console.log('Header:', lines[0]);
         
+        // find the column containing GeoJSON shape data
         const header = lines[0].split(',');
         const geoShapeIdx = header.findIndex(h => h.trim().toLowerCase().includes('geo shape'));
         console.log('Geo Shape column index:', geoShapeIdx);
@@ -406,8 +469,8 @@ export default {
           return;
         }
         
+        // parse the first data row, handling quoted CSV values
         const firstRow = lines[1];
-        // 简单 CSV 解析：按双引号包裹字段拆分
         const cols = [];
         let inQuotes = false; 
         let cur = '';
@@ -424,19 +487,19 @@ export default {
           }
           cur += ch;
         }
-        cols.push(cur);
+        cols.push(cur); // add the last column
         
         console.log('Parsed columns count:', cols.length);
         const shapeRaw = cols[geoShapeIdx] || '';
         console.log('Raw shape data length:', shapeRaw.length);
         
-        // 去掉最外层引号并反转义 CSV 的双引号
+        
         const jsonLike = shapeRaw.replace(/^"|"$/g, '').replace(/""/g, '"');
         console.log('Cleaned JSON length:', jsonLike.length);
         
         const shapeObj = JSON.parse(jsonLike);
         console.log('Parsed shape object:', shapeObj.type, shapeObj.coordinates?.length);
-        // 创建边界线
+        
         const boundaryFeature = {
           type: 'Feature',
           properties: { 
@@ -449,16 +512,16 @@ export default {
           }
         };
         
-        // 创建大的外边界矩形，覆盖整个墨尔本地区
+        
         const outerBounds = [
-          [144.5, -37.5],  // 西北
-          [145.5, -37.5],  // 东北  
-          [145.5, -38.5],  // 东南
-          [144.5, -38.5],  // 西南
-          [144.5, -37.5]   // 闭合
+          [144.5, -37.5],  
+          [145.5, -37.5],  
+          [145.5, -38.5],  
+          [144.5, -38.5],  
+          [144.5, -37.5]   
         ];
         
-        // 创建带洞的多边形：外边界减去市政边界（形成边界外的灰色覆盖）
+        
         const boundaryWithHole = {
           type: 'Feature',
           properties: { 
@@ -468,14 +531,14 @@ export default {
           geometry: {
             type: 'Polygon',
             coordinates: [
-              outerBounds, // 外边界
-              ...shapeObj.coordinates[0] // 内部洞（市政边界）
+              outerBounds, 
+              ...shapeObj.coordinates[0] 
             ]
           }
         };
         
         console.log('Adding boundary features to map...');
-        // 添加到数据层：先添加覆盖层，再添加边界线
+        
         this.map.data.addGeoJson({ 
           type: 'FeatureCollection', 
           features: [boundaryWithHole, boundaryFeature] 
@@ -488,59 +551,59 @@ export default {
       }
     },
 
-    // 显隐边界
+    // toggle boundary visibility
     toggleBoundary() {
       if (!this.map) return;
       if (this.showBoundary) {
         if (!this.boundaryAdded) this.loadMunicipalBoundary();
       }
-      // 重新应用样式（会根据showBoundary状态显示/隐藏边界）
+      // reapply styles (will show/hide boundary based on showBoundary state)
       this.applyDataLayerStyle();
     },
 
 
 
     applyDataLayerStyle() {
-      // 统一的数据层样式应用函数
+      // unified data layer style application function
       if (!this.map) return;
       this.map.data.setStyle((feature) => {
         const featureType = feature.getProperty('type');
         
         if (featureType === 'boundary_overlay') {
-          // 边界外的灰色蒙版
+          // gray overlay outside boundary
           return {
             fillColor: '#808080',
-            fillOpacity: this.showBoundary ? 0.3 : 0, // 降低透明度
+            fillOpacity: this.showBoundary ? 0.3 : 0, // reduce opacity
             strokeColor: 'transparent',
             strokeWeight: 0,
-            zIndex: 1 // 在底层
+            zIndex: 1 // bottom layer
           };
         } else if (featureType === 'boundary_line') {
-          // 边界线
+          // boundary line
           return {
             fillColor: this.showBoundary ? '#E0F7FA' : 'transparent',
             fillOpacity: this.showBoundary ? 0.1 : 0,
             strokeColor: this.showBoundary ? '#00BCD4' : 'transparent',
             strokeOpacity: this.showBoundary ? 0.8 : 0,
             strokeWeight: this.showBoundary ? 3 : 0,
-            zIndex: 2 // 在灰色覆盖之上
+            zIndex: 2 // above gray overlay
           };
         } else if (featureType === 'tree' || !featureType) {
-          // 树木数据点 - 平衡性能和视觉效果
+          // tree data points - balance performance and visual effects
           const color = feature.getProperty('color');
           const zoom = this.map.getZoom() || 12;
-          // 动态半径计算，高zoom级别增大圆圈
+          // dynamic radius calculation, increase circles at high zoom levels
           let scale;
           if (zoom <= 12) {
-            scale = Math.max(2, Math.min(3, zoom - 9)); // 低缩放：2-3px
+            scale = Math.max(2, Math.min(3, zoom - 9)); 
           } else if (zoom <= 16) {
-            scale = Math.max(1.5, Math.min(3, (zoom - 12) * 0.3 + 3)); // 中缩放：1.5-3px
+            scale = Math.max(1.5, Math.min(3, (zoom - 12) * 0.3 + 3)); 
           } else if (zoom <= 18) {
-            scale = Math.max(4, Math.min(5, zoom - 14)); // 高缩放：4-5px
+            scale = Math.max(4, Math.min(5, zoom - 14)); 
           } else if (zoom <= 19) {
-            scale = Math.max(6, Math.min(8, zoom - 17)); // 超高缩放19：6-8px
+            scale = Math.max(6, Math.min(8, zoom - 17)); 
           } else {
-            scale = Math.max(8, Math.min(10, zoom - 18)); // 极高缩放20+：8-10px
+            scale = Math.max(8, Math.min(10, zoom - 18)); 
           }
           return {
             fillColor: color || '#2EAF62',
@@ -548,10 +611,10 @@ export default {
             strokeColor: color || '#2EAF62',
             strokeOpacity: 1,
             strokeWeight: 1,
-            zIndex: 3, // 在最上层
+            zIndex: 3, // top layer
             icon: {
               path: window.google.maps.SymbolPath.CIRCLE,
-              scale: scale, // 根据缩放级别调整大小
+              scale: scale, // adjust size based on zoom level
               fillColor: color || '#2EAF62',
               fillOpacity: 0.7,
               strokeColor: color || '#2EAF62',
@@ -559,7 +622,7 @@ export default {
             }
           };
         } else {
-          // 其他类型的要素，使用默认样式
+          // other feature types use default styles
           return {
             fillColor: 'transparent',
             fillOpacity: 0,
@@ -572,8 +635,8 @@ export default {
     }
   },
   mounted() {
-    // Kick off the map when component is mounted
-    // 组件挂载后初始化地图
+    
+    // initialize map after component is mounted
     this.initMap();
   }
 }
@@ -583,7 +646,7 @@ export default {
 .map-page {
   box-sizing: border-box;
   width: 100%;
-  max-width: 1200px; /* 与其它页面一致的中心宽度 */
+  max-width: 1200px; /* consistent center width with other pages */
   margin: 0 auto;
   padding: 20px 24px 40px;
 }
@@ -629,38 +692,38 @@ export default {
 
 .map-container {
   width: 100%;
-  max-width: 900px; /* Desktop: narrower width */
-  aspect-ratio: 16 / 9; /* Default 16:9 widescreen ratio */
-  margin: 0 auto; /* Center alignment */
-  padding: 0 16px; /* Prevent edge sticking */
+  max-width: 900px; 
+  aspect-ratio: 16 / 9; 
+  margin: 0 auto; 
+  padding: 0 16px; 
   border: 1px solid rgba(0,0,0,0.1);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08); /* Shadow effect */
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08); 
 }
 
-/* 📱 Mobile devices (320px - 767px) */
+
 @media (max-width: 767px) {
   .map-container {
     max-width: 100%;
-    margin: 0 12px; /* Mobile: small side margins */
-    aspect-ratio: 4 / 3; /* Mobile: 4:3 ratio better for phones */
-    border-radius: 8px; /* Mobile: smaller border radius */
+    margin: 0 12px; 
+    aspect-ratio: 4 / 3; 
+    border-radius: 8px; 
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
 }
 
-/* 📱 Tablet devices (768px - 1023px) */
+
 @media (min-width: 768px) and (max-width: 1023px) {
   .map-container {
     max-width: 720px;
-    margin: 0 24px; /* Tablet: moderate margins */
-    aspect-ratio: 16 / 9; /* Tablet: keep 16:9 ratio */
+    margin: 0 24px; 
+    aspect-ratio: 16 / 9; 
     border-radius: 10px;
   }
 }
 
-/* 🖥️ Desktop (1024px - 1439px) */
+
 @media (min-width: 1024px) and (max-width: 1439px) {
   .map-container {
     max-width: 800px;
@@ -669,7 +732,7 @@ export default {
   }
 }
 
-/* 🖥️ Large desktop (1440px+) */
+
 @media (min-width: 1440px) {
   .map-container {
     max-width: 900px;
@@ -678,11 +741,11 @@ export default {
   }
 }
 
-/* 📱 Very small screens (<320px) */
+
 @media (max-width: 319px) {
   .map-container {
     margin: 0 8px;
-    aspect-ratio: 1 / 1; /* Very small: square ratio */
+    aspect-ratio: 1 / 1; 
     border-radius: 6px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.05);
   }
