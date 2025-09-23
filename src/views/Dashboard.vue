@@ -796,10 +796,10 @@ export default {
 }
 
 
-/* 页面容器 - 中心栏加两侧留白
-   - max-width: 1200px 最大宽度1200像素
-   - margin: 0 auto 水平居中
-   - padding: 0 24px 左右内边距24像素 */
+/* page container - center column with side gutters
+   - max-width: 1200px
+   - margin: 0 auto center horizontally
+   - padding: 0 24px left/right gutters */
 .page-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -807,12 +807,12 @@ export default {
 }
 
 
-/* Dashboard头部 - 标题、时间戳和控制组件
-   - display: grid 网格布局
-   - grid-template-columns: 1fr auto 左栏占剩余空间，右栏自适应内容
-   - align-items: start 顶部对齐
-   - gap: 12px 24px 行间距12px，列间距24px
-   - padding: 32px 0 24px 上下内边距：顶部32px，底部24px */
+/* dashboard header - title, timestamp and controls
+   - display: grid layout
+   - grid-template-columns: 1fr auto
+   - align-items: start
+   - gap: 12px 24px
+   - padding: 32px 0 24px */
 .dashboard-header {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -822,10 +822,8 @@ export default {
 }
 
 
-/* 头部左侧区域 - 标题和时间戳
-   - display: flex 弹性布局
-   - flex-direction: column 垂直排列
-   - gap: 20px 项目间距20像素，增加标题与时间戳间距 */
+/* header left - title and timestamp
+   - flex column with 20px gap */
 .header-left {
   display: flex;
   flex-direction: column;
@@ -833,11 +831,8 @@ export default {
 }
 
 
-/* 头部右侧区域 - 控制组件
-   - display: flex 弹性布局
-   - align-items: center 垂直居中
-   - justify-content: flex-end 右对齐
-   - gap: 12px 项目间距12像素 */
+/* header right - control widgets
+   - flex, center vertically, right aligned, 12px gap */
 .header-right {
   display: flex;
   align-items: center;
@@ -846,13 +841,7 @@ export default {
 }
 
 
-/* 主Dashboard标题
-   - font-family: var(--font-heading) 使用标题字体变量Questrial
-   - font-size: clamp(40px, 4vw, 64px) 响应式字体：最小40px，最大64px
-   - font-weight: 400 字体粗细400(正常)
-   - line-height: 1 行高为1倍字体大小
-   - color: var(--text-primary) 使用主要文本颜色变量(黑色)
-   - margin: 0 0 8px 底部外边距8像素 */
+/* main dashboard title - responsive large heading */
 .dashboard-title {
   font-family: var(--font-heading);
   font-size: clamp(40px, 4vw, 64px);
@@ -864,11 +853,7 @@ export default {
 }
 
 
-/* 最后更新时间戳
-   - font-family: var(--font-heading) 使用标题字体变量Questrial
-   - font-size: clamp(16px, 2vw, 32px) 响应式字体大小
-   - color: var(--text-primary) 使用主要文本颜色(黑色)
-   - margin: 0 无外边距 */
+/* last updated timestamp - responsive size */
 .last-updated {
   font-family: var(--font-heading);
   font-size: 22px;
@@ -877,10 +862,7 @@ export default {
 }
 
 
-/* 地点选择下拉框
-   - margin: 0 移除所有外边距
-   - display: flex 弹性布局
-   - align-items: center 垂直居中 */
+/* location select - inline controls */
 .location-select {
   margin: 0;
   display: flex;
@@ -949,10 +931,10 @@ export default {
   background: #F6F6F6;
 }
 
-/* 输入框样式 */
+/* location input style */
 .location-input {
-  width: 220px;                     /* 稍微宽一点，内容不会挤 */
-  height: 36px;                     /* 更矮一些 */
+  width: 220px;                     /* a bit wider, content not squeezed */
+  height: 36px;                     /* slightly shorter */
   padding: 6px 10px;
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 15px;
@@ -963,21 +945,14 @@ export default {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* 聚焦状态：更明显的边框和阴影 */
+/* focus state: clearer border and shadow */
 .location-input:focus {
-  border-color: #239BA7;            /* 青绿色边框 */
+  border-color: #239BA7;            /* teal border */
   box-shadow: 0 0 0 2px rgba(35, 155, 167, 0.2);
 }
 
 
-/* 警报横幅 - 警告消息
-   - display: inline-flex 内联弹性布局
-   - align-items: center 垂直居中
-   - gap: 8px 项目间距8像素
-   - padding: 8px 12px 内边距：上下8px，左右12px
-   - background: var(--secondary-color) 使用次要颜色背景(黄色#F9D65C)
-   - border-radius: 12px 圆角12像素
-   - align-self: flex-start 在父容器中左对齐 */
+/* alert banner - warning message chip */
 .alert-banner {
   display: inline-flex;
   align-items: center;
@@ -994,11 +969,7 @@ export default {
 }
 
 
-/* 警报文本样式
-   - font-family: var(--font-body) 使用正文字体变量Inter
-   - font-size: 14px 字体大小14像素
-   - font-weight: 400 字体粗细400(正常)
-   - color: #2C2C2C 深灰色文本 */
+/* alert text style */
 .alert-text {
   margin: 0;
   padding: 0;
@@ -1011,18 +982,13 @@ export default {
 }
 
 
-/* 主内容区域
-   - padding: 40px 0 上下内边距40像素 */
+/* main content area - vertical padding */
 .main-content {
   padding: 40px 0;
 }
 
 
-/* 内容网格 - 双列布局
-   - display: grid 网格布局
-   - grid-template-columns: 1fr 1fr 两列等宽布局
-   - gap: 60px 网格间距60像素
-   - align-items: flex-start 顶部对齐 */
+/* content grid - 2 equal columns, 60px gap */
 .content-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1031,13 +997,7 @@ export default {
 }
 
 
-/* 区域标题 - 图表和过敏原标题的共享样式
-   - font-family: var(--font-body) 使用正文字体变量Inter
-   - font-size: clamp(20px, 2.5vw, 32px) 响应式字体大小
-   - font-weight: 400 字体粗细400(正常)
-   - color: var(--text-primary) 主要文本颜色(黑色)
-   - margin: 0 0 30px 底部外边距30像素
-   - text-align: center 文本居中 */
+/* section title - shared style */
 .section-title {
   font-family: var(--font-body);
   font-size: clamp(20px, 2.5vw, 32px);
@@ -1050,20 +1010,15 @@ export default {
 
 /* 区域标题 - 不同区域的对齐方式 */
 .chart-section .section-title {
-  text-align: center; /* 图表标题居中对齐，与按钮保持一致 */
+  text-align: center; /* chart title center aligned */
 }
 
 .allergen-section .section-title {
-  text-align: left; /* 过敏原标题左对齐 */
+  text-align: left; /* allergen title left aligned */
 }
 
 
-/* 图表区域 - 左栏
-   - width: 100% 占满网格单元格宽度
-   - display: flex 弹性布局
-   - flex-direction: column 垂直排列
-   - align-items: flex-start 左对齐，与右栏保持一致
-   - padding-top: 56px 顶部内边距，与右栏警报横幅高度匹配 */
+/* chart section - left column, padded to align with right banner */
 .chart-section {
   width: 100%;
   display: flex;
@@ -1073,20 +1028,14 @@ export default {
 }
 
 
-/* 图表容器 - 圆形图表包装器
-   - position: relative 相对定位
-   - margin-bottom: 30px 底部外边距30像素 */
+/* chart container - wrapper for donut */
 .chart-container {
   position: relative;
   margin-bottom: 30px;
 }
 
 
-/* 花粉图表 - 圆形进度图表
-   - position: relative 相对定位
-   - width: 342px 宽度342像素(与设计图一致)
-   - height: 342px 高度342像素(与设计图一致)
-   - margin: 0 auto 水平居中 */
+/* pollen chart - circular progress donut */
 .pollen-chart {
   position: relative;
   width: 342px;
@@ -1095,16 +1044,7 @@ export default {
 }
 
 
-/* 图表圆圈 - 带蓝色边框的外圆
-   - position: relative 相对定位
-   - width: 100% 占满容器宽度
-   - height: 100% 占满容器高度
-   - border: 3px solid var(--chart-blue) 3像素蓝色边框
-   - border-radius: 50% 圆形
-   - display: flex 弹性布局
-   - align-items: center 垂直居中
-   - justify-content: center 水平居中
-   - background: #f8f9fa 浅灰色背景 */
+/* chart circle - outer ring mask */
 
 .chart-circle {
   position: relative;
@@ -1132,19 +1072,7 @@ export default {
 
 
 
-/* 图表中心 - 带等级文本的内圆
-   - position: absolute 绝对定位
-   - top: 50% 垂直居中
-   - left: 50% 水平居中
-   - transform: translate(-50%, -50%) 居中对齐
-   - width: 250px 宽度250像素
-   - height: 250px 高度250像素
-   - background: var(--background-white) 白色背景
-   - border-radius: 50% 圆形
-   - display: flex 弹性布局
-   - align-items: center 垂直居中
-   - justify-content: center 水平居中
-   - z-index: 10 层级10，确保在进度弧之上 */
+/* chart center - inner white circle with level text */
 .chart-center {
   position: absolute;
   top: 50%;
@@ -1161,12 +1089,7 @@ export default {
 }
 
 
-/* 花粉等级文本 - "Low"指示器
-   - font-family: var(--font-body) 使用正文字体变量Inter
-   - font-size: clamp(32px, 4vw, 48px) 响应式字体大小
-   - font-weight: 600 字体粗细600(粗体)
-   - color: var(--primary-color) 使用主要颜色(青蓝色)
-   - text-align: center 文本居中 */
+/* pollen level label - big text */
 .pollen-level {
   font-family: var(--font-body);
   font-size: clamp(24px, 3.2vw, 40px);
@@ -1176,12 +1099,7 @@ export default {
 }
 
 
-/* 图表角落控制点 - 蓝色方形指示器
-   - position: absolute 绝对定位
-   - width: 8px 宽度8像素
-   - height: 8px 高度8像素
-   - background: var(--chart-blue) 图表蓝色背景
-   - border-radius: 1px 圆角1像素 */
+/* chart handle - blue square indicators */
 .chart-handle {
   position: absolute;
   width: 8px;
@@ -1212,18 +1130,7 @@ export default {
 }
 
 
-/* 图表尺寸指示器 - 尺寸显示
-   - position: absolute 绝对定位
-   - bottom: -40px 距离图表底部40像素
-   - left: 50% 水平居中
-   - transform: translateX(-50%) 居中对齐
-   - font-family: var(--font-body) 使用正文字体变量Inter
-   - font-size: 14px 字体大小14像素
-   - font-weight: 600 字体粗细600(粗体)
-   - background: var(--chart-blue) 图表蓝色背景
-   - color: white 白色文本
-   - padding: 6px 12px 内边距：上下6px，左右12px
-   - border-radius: 4px 圆角4像素 */
+/* chart size badge - decorative size label */
 .chart-size {
   position: absolute;
   bottom: -40px;
@@ -1240,22 +1147,22 @@ export default {
 
 
 
-/* 气候可视化区域容器：竖向堆叠两个图表卡片 */
+/* climate viz section - stacked cards */
 .climate-section {
   margin-top: 60px; 
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center; /* 区块整体居中 */
-  gap: 16px; /* 两图更集中，减少垂直间距 */
+  align-items: center; /* center the section */
+  gap: 16px; /* tighter vertical spacing */
 }
 
 
-/* 可视化卡片外框：白底、轻边框与圆角 */
+/* viz card wrapper - white background, light border and radius */
 .viz-card {
   width: 100%;
-  max-width: 640px;  /* 稍微更窄，让两图更集中 */
-  margin: 0 auto;    /* 卡片居中 */
+  max-width: 640px;  /* slightly narrower, focus charts */
+  margin: 0 auto;    /* center the card */
   background: var(--background-white);
   border: 1px solid var(--border-light);
   border-radius: 12px;
@@ -1263,7 +1170,7 @@ export default {
 }
 
 
-/* 图表下方的简短说明：居中、窄行宽、弱化色 */
+/* short note under charts: centered, narrow width, soft color */
 .viz-note {
   max-width: 640px;
   margin: 0 auto;
@@ -1297,11 +1204,7 @@ export default {
 .legend-label { font-family: var(--font-body); font-size: 12px; fill: #333; }
 
 
-/* 过敏原区域 - 右栏
-   - width: 100% 占满网格单元格宽度
-   - display: flex 弹性布局
-   - flex-direction: column 垂直排列
-   - gap: 16px 项目间距16像素 */
+/* allergen section - right column, vertical stack */
 .allergen-section {
   width: 100%;
   display: flex;
@@ -1310,11 +1213,7 @@ export default {
 }
 
 
-/* 过敏原列表 - 过敏原项目容器
-   - display: flex 弹性布局
-   - flex-direction: column 垂直排列
-   - gap: 16px 项目间距16像素
-   - margin-bottom: 40px 底部外边距40像素 */
+/* allergen list - vertical list with spacing */
 .allergen-list {
   display: flex;
   flex-direction: column;
@@ -1323,15 +1222,7 @@ export default {
 }
 
 
-/* 单个过敏原项目
-   - display: flex 弹性布局
-   - justify-content: space-between 两端对齐
-   - align-items: center 垂直居中
-   - padding: 16px 20px 内边距：上下16px，左右20px
-   - background: var(--background-white) 白色背景
-   - border: 1px solid var(--border-light) 浅色边框
-   - border-radius: 12px 圆角12像素
-   - box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) 轻微阴影效果 */
+/* allergen item - balanced spacing and light card */
 .allergen-item {
   display: flex;
   justify-content: space-between;
@@ -1344,10 +1235,7 @@ export default {
 }
 
 
-/* 过敏原信息 - 图标和名称容器
-   - display: flex 弹性布局
-   - align-items: center 垂直居中
-   - gap: 12px 项目间距12像素 */
+/* allergen info - icon and name container */
 .allergen-info {
   display: flex;
   align-items: center;
@@ -1355,13 +1243,7 @@ export default {
 }
 
 
-/* 过敏原图标样式
-   - font-size: 24px 图标大小24像素
-   - width: 32px 宽度32像素
-   - height: 32px 高度32像素
-   - display: flex 弹性布局
-   - align-items: center 垂直居中
-   - justify-content: center 水平居中 */
+/* allergen icon - square image box */
 .allergen-icon {
   width: 40px;
   height: 40px;
@@ -1372,7 +1254,7 @@ export default {
 }
 
 
-/* 过敏原图标图片样式 */
+/* allergen icon image */
 .allergen-icon img {
   width: 100%;
   height: 100%;
@@ -1380,11 +1262,7 @@ export default {
 }
 
 
-/* 过敏原名称文本
-   - font-family: var(--font-body) 使用正文字体变量Inter
-   - font-size: 18px 字体大小18像素
-   - font-weight: 500 字体粗细500(中等粗体)
-   - color: var(--text-secondary) 次要文本颜色(深灰色) */
+/* allergen name text */
 .allergen-name {
   font-family: var(--font-body);
   font-size: 18px;
@@ -1393,12 +1271,7 @@ export default {
 }
 
 
-/* 过敏原等级指示器
-   - font-family: var(--font-body) 使用正文字体变量Inter
-   - font-size: 16px 字体大小16像素
-   - font-weight: 600 字体粗细600(粗体)
-   - padding: 6px 12px 内边距：上下6px，左右12px
-   - border-radius: 20px 圆角20像素 */
+/* allergen level badge */
 .allergen-level {
   font-family: var(--font-body);
   font-size: 16px;
@@ -1408,90 +1281,84 @@ export default {
 }
 
 
-/* 中等等级样式 - 橙色背景
-   - background: #FFF3E0 浅橙色背景
-   - color: #F57C00 橙色文本 */
+/* level: moderate - orange scheme */
 .allergen-level.moderate {
   background: #FFF3E0;
   color: #F57C00;
 }
 
 
-/* 低等级样式 - 绿色背景
-   - background: #E8F5E8 浅绿色背景
-   - color: #4CAF50 绿色文本 */
+/* level: low - green scheme */
 .allergen-level.low {
   background: #E8F5E8; 
   color: #43A047;
 }
 
 
-/* 很低等级样式 - 更柔和的绿色 */
+/* level: very low - soft green */
 .allergen-level.very-low {
   background: #C8E6C9; 
   color: #2E7D32;     
 }
 
 
-/* 很高等级样式 - 深红色 */
+/* level: very high - deep red */
 .allergen-level.very-high {
   background: #FFCDD2;
   color: #C62828;
 }
 
 
-/* 高等级样式 - 红色背景
-   - background: #FFEBEE 浅红色背景
-   - color: #F44336 红色文本 */
+/* level: high - red scheme */
 .allergen-level.high {
   background: #FFEBEE;
   color: #F44336;
 }
 
 
-/* 良好等级样式 - 蓝色色调 */
+/* level: good - blueish */
 .allergen-level.good {
   background: #C8E6C9; 
   color: #2E7D32;
 }
 
 
-/* 较差等级样式 - 橙红色调 */
+/* level: poor - orange/red */
 .allergen-level.poor {
   background: #FBE9E7;
   color: #E64A19;
 }
 
 
-/* 一般等级样式 - 黄色 */
+/* level: fair - yellow */
 .allergen-level.fair {
   background: #FFF3E0; 
   color: #F57C00;
 }
 
 
-/* 很差等级样式 - 强红色 */
+/* level: very poor - strong red */
 .allergen-level.very-poor {
   background: #FFCDD2; 
   color: #C62828;
 }
 
 
-/* 极差等级样式 - 最深红 */
+/* level: extremely poor - deepest red */
 .allergen-level.extremely-poor {
   background: #FFCDD2;
   color: #B71C1C;
 }
 
 /* None/No data level styling - gray */
-/* 无数据/无花粉 等级样式 - 灰色 */
+/* level: none/no data - gray */
 .allergen-level.none {
   background: #EEEEEE;
   color: #616161;
 }
 
 
-/* 未知等级样式 - 中性灰 */
+/* level: unknown - neutral gray */
 .allergen-level.unknown {
   background: #EEEEEE;
   color: #616161;
@@ -1499,12 +1366,7 @@ export default {
 
 
 
-/* 蓝色分隔条 - 区域间分隔线
-   - width: 100% 占满容器宽度
-   - height: 12px 高度12像素
-   - background: var(--primary-color) 主要颜色背景(青蓝色)
-   - border-radius: 1px 圆角1像素
-   - margin: 40px 0 顶部和底部外边距40像素 */
+/* blue separator bar - section divider */
 .separator-bar {
   width: 100%;
   height: 12px;
@@ -1514,19 +1376,14 @@ export default {
 }
 
 
-/* 提示区域 - 建议和指导
-   - padding: 60px 0 上下内边距60像素
-   - background: var(--background-off-white) 使用浅白色背景 */
+/* tips section - guidance and advice block */
 .tips-section {
   padding: 60px 0;
   background: var(--background-off-white);
 }
 
 
-/* 提示容器 - 内容包装器
-   - max-width: 1200px 最大宽度1200像素
-   - margin: 0 auto 水平居中
-   - padding: 0 24px 左右内边距24像素 */
+/* tips container - centered content wrapper */
 .tips-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -1534,10 +1391,7 @@ export default {
 }
 
 
-/* 提示内容 - 图标和文本布局
-   - display: flex 弹性布局
-   - align-items: flex-start 顶部对齐
-   - gap: 30px 项目间距30像素 */
+/* tips content - icon and text layout */
 .tips-content {
   display: flex;
   align-items: center;
@@ -1545,7 +1399,7 @@ export default {
 }
 
 
-/* 提示左侧区域 - 图标和标题 */
+/* tips left side - icon and title */
 .tips-left {
   display: flex;
   flex-direction: column;
@@ -1555,11 +1409,7 @@ export default {
 }
 
 
-/* 提示图标 - 图片图标
-   - width: 80px 图标宽度80像素
-   - height: 80px 图标高度80像素
-   - flex-shrink: 0 不缩小
-   - display: flex 弹性布局用于居中图片 */
+/* tips icon - image box */
 .tips-icon {
   width: 100px;
   height: 100px;
@@ -1570,7 +1420,7 @@ export default {
 }
 
 
-/* 提示图标图片样式 */
+/* tips icon image */
 .tips-icon img {
   width: 100%;
   height: 100%;
@@ -1578,21 +1428,14 @@ export default {
 }
 
 
-/* 提示文本容器
-   - flex: 1 占据剩余空间
-   - text-align: left 文本左对齐 */
+/* tips text container - flex:1 left aligned */
 .tips-text {
   flex: 1;
   text-align: left;
 }
 
 
-/* 提示区域标题
-   - font-family: var(--font-heading) 使用标题字体变量Questrial
-   - font-size: clamp(32px, 3vw, 48px) 响应式字体大小
-   - font-weight: 400 字体粗细400(正常)
-   - color: var(--text-primary) 主要文本颜色(黑色)
-   - margin: 0 0 20px 底部外边距20像素 */
+/* tips title - responsive heading */
 .tips-title {
   font-family: var(--font-heading);
   font-size: clamp(32px, 3vw, 48px);
@@ -1603,13 +1446,7 @@ export default {
 }
 
 
-/* 主要提示文本 - 主要建议
-   - font-family: var(--font-content) 使用内容字体变量AR One Sans
-   - font-size: clamp(24px, 2.5vw, 36px) 响应式字体大小
-   - font-weight: 400 字体粗细400(正常)
-   - line-height: 1.2 行高1.2倍
-   - color: var(--text-primary) 主要文本颜色(黑色)
-   - margin: 0 0 16px 底部外边距16像素 */
+/* tip main text - primary advice */
 .tip-main {
   font-family: var(--font-content);
   font-size: clamp(22px, 2.2vw, 32px);
@@ -1620,13 +1457,7 @@ export default {
 }
 
 
-/* 提示描述 - 解释性文本
-   - font-family: var(--font-content) 使用内容字体变量AR One Sans
-   - font-size: clamp(18px, 1.5vw, 24px) 响应式字体大小
-   - font-weight: 400 字体粗细400(正常)
-   - line-height: 1.2 行高1.2倍
-   - color: var(--text-primary) 主要文本颜色(黑色)
-   - margin: 0 无外边距 */
+/* tip description - explanatory paragraph */
 .tip-description {
   font-family: var(--font-content);
   font-size: clamp(14px, 1.2vw, 18px);
@@ -1637,19 +1468,19 @@ export default {
 }
 
 
-/* 响应式断点 */
+/* responsive breakpoints */
 
 
 
 @media (min-width: 1440px) {
   
-  /* 增加页面容器内边距 */
+  /* increase page container padding */
   .page-container {
     padding: 0 40px;
   }
   
   
-  /* 增加提示容器内边距 */
+  /* increase tips container padding */
   .tips-container {
     padding: 0 40px;
   }
@@ -1659,7 +1490,7 @@ export default {
 
 @media (min-width: 1200px) {
   
-  /* 两列网格 - 等宽以获得更好的平衡 */
+  /* two-column grid - equal width */
   .content-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -1669,14 +1500,14 @@ export default {
 
 @media (min-width: 768px) and (max-width: 1199px) {
   
-  /* 减少内容网格间距 */
+  /* reduce grid gap */
   .content-grid {
     gap: 40px;
     grid-template-columns: 1fr 1fr;
   }
   
   
-  /* 中等屏幕调整图表大小 */
+  /* medium screens - chart size adjustments */
   .pollen-chart {
     width: 280px;
     height: 280px;
@@ -1692,14 +1523,14 @@ export default {
 
 @media (max-width: 767px) {
   
-  /* 单列网格 */
+  /* single column grid */
   .content-grid {
     grid-template-columns: 1fr;
     gap: 30px;
   }
   
   
-  /* 头部项目垂直堆叠 */
+  /* header items stack vertically */
   .dashboard-header {
     flex-direction: column;
     align-items: flex-start;
@@ -1712,13 +1543,13 @@ export default {
   }
   
   
-  /* 地点选择占满宽度 */
+  /* location input full width */
   .location-input {
     width: 100%;
   }
   
   
-  /* 移动端调整图表大小 */
+  /* mobile - chart sizes */
   .pollen-chart {
     width: 250px;
     height: 250px;
@@ -1730,7 +1561,7 @@ export default {
   }
   
   
-  /* 移动端调整提示布局 */
+  /* mobile - tips layout */
   .tips-content {
     flex-direction: column;
     text-align: center;
@@ -1738,7 +1569,7 @@ export default {
   }
   
   
-  /* 移动端居中提示图标 */
+  /* mobile - center tips icon */
   .tips-icon {
     align-self: center;
   }
