@@ -298,6 +298,8 @@ export default {
     // this method updates the "Last updated" timestamp to current time
     // it formats the date and time in DD-MM-YYYY HH:MM AM/PM format
     // returns: nothing, but updates dashboardData.lastUpdated
+    // this method recalculates and sets the "Last updated" string to now
+    // returns: nothing; formats time as DD-MM-YYYY HH:MM AM/PM
     updateLastUpdated() {
       // helper function to pad numbers with leading zeros
       const pad = (n) => String(n).padStart(2, '0');
@@ -315,6 +317,8 @@ export default {
     // this method loads the address list from CSV file for location autocomplete
     // it fetches the CSV, parses it, and filters addresses based on current query
     // returns: nothing, but updates addressList and filteredAddresses
+    // this method loads suburb list from csv for autocomplete
+    // returns: nothing; fills addressList and filteredAddresses
     async loadAddresses() {
       try {
         // fetch the CSV file containing all addresses
@@ -337,6 +341,7 @@ export default {
     // this method initializes the climate visualization charts
     // it loads scatter plot and stacked bar chart data from JSON files
     // returns: nothing, but updates scatterViz and stackedViz data
+    // this method initializes local climate charts (scatter + stacked)
     initClimateViz() {
       try {
         // build scatter plot visualization from JSON data
@@ -358,6 +363,9 @@ export default {
     // it calculates scales, positions points, and sets up median lines
     // parameters: json - the scatter plot data from JSON file
     // returns: object - visualization configuration with points and scales
+    // this method builds the data model for the scatter visualization
+    // params: json - data file with points & medians
+    // returns: object used by template <svg>
     buildScatterViz(json) {
       // set chart dimensions
       const width = 560;    
@@ -410,6 +418,9 @@ export default {
     // it creates bars for each season with stacked segments for different factors
     // parameters: json - the seasonal data from JSON file
     // returns: object - visualization configuration with bars and legend
+    // this method builds the model for seasonal stacked bar chart
+    // params: json - seasonal contribution dataset
+    // returns: object with bars and legend arrays
     buildStackedViz(json) {
       // set chart dimensions
       const width = 560;
@@ -478,6 +489,7 @@ export default {
     // this method handles when user types in the location search input
     // it filters the address list and shows suggestions dropdown
     // returns: nothing, but updates filteredAddresses and showSuggestions
+    // this method updates filtered list on each keystroke and shows popup
     onQueryChange() {
       this.filteredAddresses = this.filterByQuery(this.locationQuery);
       this.showSuggestions = true;
@@ -486,6 +498,7 @@ export default {
     // this method handles when user focuses on the location input
     // it shows the suggestions dropdown with filtered addresses
     // returns: nothing, but updates filteredAddresses and showSuggestions
+    // this method opens the suggestion list (and refreshes filter)
     openSuggestions() {
       this.filteredAddresses = this.filterByQuery(this.locationQuery);
       this.showSuggestions = true;
@@ -494,6 +507,7 @@ export default {
     // this method handles when user presses Enter in the location input
     // it selects the first suggestion from the filtered list
     // returns: nothing, but calls selectAddress with first suggestion
+    // this method picks the first suggestion when user presses Enter
     confirmFirstSuggestion() {
       if (this.filteredAddresses.length) this.selectAddress(this.filteredAddresses[0]);
     },
@@ -502,6 +516,9 @@ export default {
     // it performs case-insensitive search and limits results to 20 items
     // parameters: q - the search query string
     // returns: array - filtered list of addresses matching the query
+    // this method filters addresses by substring (case-insensitive)
+    // params: q - query string
+    // returns: string[] top 20 matches
     filterByQuery(q) {
       const query = (q || '').toLowerCase();
       if (!query) return this.addressList.slice(0, 20); // show first 20 if no query
@@ -512,6 +529,8 @@ export default {
     // it updates the input value and hides the suggestions dropdown
     // parameters: addr - the selected address string
     // returns: nothing, but updates locationQuery and showSuggestions
+    // this method sets the input to selected address and hides suggestions
+    // params: addr - selected address
     selectAddress(addr) {
       this.locationQuery = addr;
       this.showSuggestions = false;
@@ -520,6 +539,8 @@ export default {
     // this method handles when user clicks the Confirm button for location
     // it validates the location and loads data for the selected location
     // returns: nothing, but updates selectedLocation and loads dashboard data
+    // this method validates location and loads dashboard data
+    // returns: nothing; prefers exact match, falls back to first suggestion
     confirmLocation() {
       // try to find exact match in address list
       const match = this.addressList.find(a => a.toLowerCase() === this.locationQuery.toLowerCase());
@@ -541,6 +562,9 @@ export default {
     
     
     // load data for specific location
+    // this method fetches backend data for a given suburb
+    // params: location - suburb string
+    // returns: nothing; updates pollen and allergens, recomputes index
     async loadDataForLocation(location) {
       try {
         
@@ -593,6 +617,7 @@ export default {
       }
     },
 
+    // this method normalizes various backend labels into UI labels
     mapBackendLevelToUi(v) {
       
       // keep backend original terms, only standardize case style
@@ -613,6 +638,7 @@ export default {
 
     
     // normalize pollen levels
+    // this method standardizes pollen level labels
     mapPollenLevel(v) {
       const l = (v || '').toLowerCase();
       if (!l || l === 'unknown' || l === 'none' || l === 'no data') return 'None';
@@ -626,6 +652,7 @@ export default {
 
     
     // normalize dust levels
+    // this method standardizes dust level labels
     mapDustLevel(v) {
       const l = (v || '').toLowerCase();
       if (!l || l === 'unknown' || l === 'none' || l === 'no data') return 'None';
@@ -636,6 +663,7 @@ export default {
       if (l === 'extremely poor') return 'Extremely Poor';
       return 'None';
     },
+    // this method maps a level string to a css class name
     levelToClass(level, key) {
       const l = (level || '').toLowerCase();
       
@@ -647,6 +675,7 @@ export default {
       if (l === 'very high') return 'very-high';
       return 'none';
     },
+    // this method converts a level label to donut progress percent
     levelToProgress(level) {
       const l = (level || '').toLowerCase();
       if (l.includes('very low')) return 10;
@@ -659,6 +688,7 @@ export default {
 
     
     
+    // this method converts categorical level to numeric score (1-5)
     levelToScore(key, level) {
       const l = (level || '').toLowerCase();
       
@@ -673,6 +703,7 @@ export default {
 
     
     // calculate average score and update left circular chart
+    // this method averages scores and updates left donut + banner
     recalculateOverallIndex() {
       const scores = this.allergenData.levels
         .map(row => this.levelToScore(row.id, row.level))
@@ -703,6 +734,7 @@ export default {
 
     
     // return ring color based on overall level
+    // this method returns ring color by overall level
     colorForOverall(level) {
       const l = (level || '').toLowerCase();
       
@@ -718,6 +750,7 @@ export default {
 
     
     // text color: give slightly darker color based on level
+    // this method returns text color by overall level (slightly darker)
     textColorForOverall(level) {
       const l = (level || '').toLowerCase();
       if (l === 'none') return '#6B7280';
@@ -730,6 +763,7 @@ export default {
     },
 
     
+    // this method returns advisory message and variant for banner
     advisoryForLevel(level) {
       const l = (level || '').toLowerCase();
       if (l.includes('very low')) return { message: 'Great day to enjoy the outdoors!', variant: 'normal' };

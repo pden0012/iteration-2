@@ -69,12 +69,16 @@ export default {
   },
 
   computed: {
+    // this computed returns how many symptoms are checked
+    // returns: number - count of selected checklist items
     checkedCount() {
       return this.symptoms.filter(symptom => symptom.checked).length;
     }
   },
 
   methods: {
+    // this method updates the advice text based on number of checks
+    // returns: nothing, but fills the advice box with tailored help
     updateAdvice() {
       const count = this.checkedCount;
       if (count <= 3) {
@@ -88,7 +92,7 @@ export default {
   },
 
   mounted() {
-    
+    // reset advice on first load so box is hidden
     this.advice = '';
   }
 }

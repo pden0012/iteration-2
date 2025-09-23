@@ -224,10 +224,9 @@ export default {
     },
 
   methods: {
-    // this method handles when user clicks on a resource card
-    // it determines what type of resource it is and opens the appropriate view
-    // parameters: resourceId - the ID of the clicked resource
-    // returns: nothing, but updates component state to show detail view
+    // this method opens a resource by id and routes to proper detail view
+    // parameters: resourceId - the ID from resources list
+    // returns: nothing, but toggles either video/article detail or emits navigation
     openResource(resourceId) {
       console.log('Opening resource:', resourceId);
       
@@ -273,7 +272,7 @@ export default {
       this.currentArticle = null;
     },
 
-    // this method handles the "Back to Dashboard" button click
+    // this method handles the "Back to Dashboard" button click in knowledge section
     // it navigates back to the main dashboard page
     // returns: nothing, but emits navigation event to parent component
     learnMore() {

@@ -126,9 +126,8 @@ export default {
     }
   },
   methods: {
-    // this method is for clicking the file input button programmatically
-    // it basically simulate a click on the hidden file input element
-    // returns: nothing, just triggers the file picker dialog
+    // this method programmatically opens the hidden file input
+    // returns: nothing, just triggers the OS file picker dialog
     triggerFileInput() {
       // click the hidden file input to open file picker
       this.$refs.fileInput.click();
@@ -138,6 +137,9 @@ export default {
     // it validates the file type and size, then shows preview and starts analysis
     // parameters: event - the file input change event
     // returns: nothing, but updates component state and calls detectImage
+    // this method handles the change event of file input
+    // params: event - input change event with files list
+    // returns: nothing, validates file, shows preview, calls detectImage
     async onFileChange(event) {
       // get the first file from the input
       const file = event.target.files && event.target.files[0];
@@ -175,6 +177,8 @@ export default {
     // this method clears the image preview and resets all related state
     // it's called when user clicks the X button on preview
     // returns: nothing, but resets component state to initial values
+    // this method resets selected file and preview state
+    // returns: nothing, brings component to initial visual state
     clearPreview() {
       // remove the image preview
       this.imagePreview = null;
@@ -192,6 +196,9 @@ export default {
     // it checks if we're in development or production mode
     // parameters: path - the API endpoint path to append
     // returns: string - the complete API URL
+    // this method builds base API url depending on dev/prod environment
+    // params: path - api path suffix like '/ai/image'
+    // returns: string complete url
     getApiUrl(path) {
       // check if we're in development mode
       const isDev = import.meta.env.DEV;
@@ -209,6 +216,9 @@ export default {
     // it handles the API request, response processing, and error handling
     // parameters: file - the image file to analyze
     // returns: nothing, but updates this.results with plant identification data
+    // this method sends image to backend AI and maps response to results
+    // params: file - a File object from input
+    // returns: nothing, but updates results/loading/error states
     async detectImage(file) {
       try {
         // show loading state to user

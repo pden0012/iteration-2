@@ -89,7 +89,9 @@ export default {
     }
   },
   methods: {
-    // when user clicks on nav item, switch to that page
+    // this method changes current active nav and view
+    // params: itemId - which nav id to activate
+    // returns: nothing, just update state and url hash
     setActiveItem(itemId) {
       this.activeItem = itemId;
       this.currentView = itemId;
@@ -97,14 +99,17 @@ export default {
       window.location.hash = `#${itemId}`;
     },
     
-    // navigate to symptoms page from resources
+    // this method is used by child (resources) to open symptoms view
+    // returns: nothing, but switches view and keeps nav highlight on Resources
     navigateToSymptoms() {
       this.currentView = 'symptoms';
       this.activeItem = 'resources'; // keep resources highlighted in nav
       window.location.hash = '#symptoms';
     },
     
-    // handle clicks from homepage feature buttons
+    // this method handles clicks from homepage feature cards/buttons
+    // params: id - feature id from HomePage ('tracker'|'education'|'plant-identifier'|'map')
+    // returns: nothing, but navigates to the mapped view and updates hash
     onHomeFeatureButton(id) {
       if (id === 'tracker') {
         this.currentView = 'dashboard';
@@ -125,7 +130,9 @@ export default {
       }
     },
     
-    // handle browser back/forward and direct url access
+    // this method syncs current view with location.hash
+    // used on initial load and when browser back/forward happens
+    // returns: nothing, just updates state safely with a default fallback
     handleHashChange() {
       const hash = window.location.hash.substring(1) || 'home';
       const validViews = ['home', 'dashboard', 'map', 'image', 'trends', 'resources', 'support', 'symptoms'];
@@ -235,6 +242,14 @@ export default {
 
 .nav-item:hover {
   background: rgba(35, 139, 167, 0.1);
+}
+
+/* keyboard focus styles for accessibility */
+.nav-item:focus-visible,
+.nav-link:focus-visible {
+  outline: 2px solid #239BA7;
+  outline-offset: 2px;
+  border-radius: 10px;
 }
 
 .nav-link {

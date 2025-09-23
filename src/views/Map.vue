@@ -65,9 +65,8 @@ export default {
     };
   },
   methods: {
-    // this method loads Google Maps API if it's not already loaded
-    // it checks if the API is available and loads it dynamically if needed
-    // returns: Promise<google> - resolves with the Google Maps API object
+    // this method ensures Google Maps JS API is available
+    // returns: Promise<google> resolves with window.google on success
     loadGoogleIfNeeded() {
       // check if Google Maps is already loaded
       if (window.google && window.google.maps) return Promise.resolve(window.google);
@@ -112,9 +111,8 @@ export default {
         document.body.appendChild(script);
       });
     },
-    // this method initializes the Google Map and sets up all the event listeners
-    // it creates the map instance, loads initial data, and sets up zoom tracking
-    // returns: nothing, but updates component state with map instance
+    // this method initializes the Google Map instance and events
+    // returns: nothing, sets up idle/zoom listeners and loads data
     async initMap() {
       try {
         console.log('Starting map initialization...');
@@ -169,9 +167,8 @@ export default {
         this.emptyMessage = `Map initialization failed: ${error.message}`;
       }
     },
-    // this method builds the API URL for fetching tree data based on current map view
-    // it gets the map bounds and zoom level to request only visible trees
-    // returns: string|null - the complete API URL or null if map not ready
+    // this method builds API URL using current bounds and zoom
+    // returns: string|null complete url or null if map not ready
     getApiUrl() {
       // get current map bounds and zoom level
       const bounds = this.map?.getBounds();
@@ -208,9 +205,8 @@ export default {
       return apiUrl;
     },
 
-    // this method fetches tree data from API and displays it on the map
-    // it handles loading states, error handling, and retry logic
-    // returns: nothing, but updates map with new tree markers
+    // this method fetches tree data and renders them on the data layer
+    // returns: nothing; manages loading/retry and user messages
     async refreshMarkers() {
       // exit if map is not initialized
       if (!this.map) return;
@@ -296,9 +292,8 @@ export default {
     },
 
     
-    // this method clears all tree data from the map and closes info windows
-    // it removes only tree features, keeping boundary data intact
-    // returns: nothing, but updates map display
+    // this method clears current tree features and closes infoWindow
+    // returns: nothing; keeps boundary features intact
     clearData() {
       // remove tree features from map data layer
       if (this.map && this.map.data) {
