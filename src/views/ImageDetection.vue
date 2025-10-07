@@ -203,8 +203,8 @@ export default {
       // check if we're in development mode
       const isDev = import.meta.env.DEV;
       if (isDev) {
-        // use local development server
-        return `http://localhost:3003/api${path}`;
+        // use local development server (port 3000 with vite proxy)
+        return `/api${path}`;
       } else {
         // use production proxy server (relative path)
         return `/api${path}`;
