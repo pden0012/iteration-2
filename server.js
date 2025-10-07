@@ -29,9 +29,12 @@ app.use((req, res, next) => {
   next();
 });
 
+// Serve static files from dist directory (frontend build)
+app.use(express.static(path.join(__dirname, 'dist')));
+
 // Proxy API requests to backend
 app.use('/api', createProxyMiddleware({
-  target: 'http://13.236.162.216:8080',
+  target: 'http://3.106.197.188:8080',
   changeOrigin: true,
   pathRewrite: {
     '^/api': '', // remove /api prefix
@@ -73,26 +76,19 @@ app.get('/test', (req, res) => {
   res.json({
     message: 'Proxy server is running!',
     timestamp: new Date().toISOString(),
-    backend: 'http://13.236.162.216:8080'
+    backend: 'http://3.106.197.188:8080'
   });
 });
 
-// Catch all handler
+// Catch all handler - serve index.html for Vue Router
 app.get('*', (req, res) => {
-  res.json({
-    message: 'Hay Fever Management Proxy Server',
-    endpoints: {
-      health: '/health',
-      test: '/test',
-      api: '/api/* (proxies to backend)'
-    },
-    timestamp: new Date().toISOString()
-  });
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Proxy server running on port ${PORT}`);
-  console.log(`📡 Proxying API requests to: http://13.236.162.216:8080`);
+  console.log(`🚀 Frontend + Proxy server running on port ${PORT}`);
+  console.log(`📡 Proxying API requests to: http://3.106.197.188:8080`);
   console.log(`🌐 CORS enabled for frontend domains`);
+  console.log(`📁 Serving static files from: ${path.join(__dirname, 'dist')}`);
   console.log(`🔗 Health check: http://localhost:${PORT}/health`);
 });
