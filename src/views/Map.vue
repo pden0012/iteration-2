@@ -187,7 +187,7 @@ export default {
       
       // determine API base URL based on environment
       const isDev = import.meta.env.DEV;
-      const proxyBase = isDev ? 'http://localhost:3003/api' : '/api';
+      const proxyBase = '/api'; // use relative path for both dev and prod
       
       // build the target URL based on filter selection
       let targetUrl;
