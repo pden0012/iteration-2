@@ -1,5 +1,14 @@
 <template>
   <div class="symptoms-page">
+    <!-- back button -->
+    <div class="back-button-container">
+      <div class="page-container">
+        <button class="back-button" @click="goBackToResources">
+          ← Back to Resources
+        </button>
+      </div>
+    </div>
+
     <!-- page title -->
     <section class="title-section">
       <div class="page-container">
@@ -87,6 +96,13 @@ export default {
   },
 
   methods: {
+    // this method handles the back button click to return to resources page
+    // returns: nothing, but navigates back to resources view
+    goBackToResources() {
+      // tell parent component to switch back to resources tab
+      this.$parent.setActiveItem('resources');
+    },
+
     // this method updates the advice text based on number of checks
     // returns: nothing, but fills the advice box with tailored help
     updateAdvice() {
@@ -147,6 +163,32 @@ export default {
   background: #FFFFFF;
   min-height: calc(100vh - 105px - 60px);
   padding: 64px 0 var(--spacing-xl);
+}
+
+/* back button container */
+.back-button-container {
+  background: #FFFFFF;
+  padding: 20px 0 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* back button - navigation return to resources page */
+.back-button {
+  background: transparent;
+  border: none;
+  color: var(--color-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 0;
+  transition: color 0.3s ease;
+  margin-bottom: 16px;
+}
+
+.back-button:hover {
+  color: #1a7a84;
+  text-decoration: underline;
 }
 
 
@@ -321,6 +363,15 @@ export default {
   }
   .page-container {
     padding: 0 16px;
+  }
+  
+  .back-button-container {
+    padding: 16px 0 0;
+  }
+  
+  .back-button {
+    font-size: 14px;
+    margin-bottom: 12px;
   }
   
   .symptoms-page {
