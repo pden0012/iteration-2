@@ -206,9 +206,8 @@ export default {
         // use local development server
         return `http://localhost:3003/api${path}`;
       } else {
-        // use production proxy server
-        const proxyUrl = 'https://iteration-2-hayfree.onrender.com';
-        return `${proxyUrl}/api${path}`;
+        // use production proxy server (relative path)
+        return `/api${path}`;
       }
     },
     

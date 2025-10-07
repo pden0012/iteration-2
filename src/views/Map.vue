@@ -186,7 +186,7 @@ export default {
       
       // determine API base URL based on environment
       const isDev = import.meta.env.DEV;
-      const proxyBase = isDev ? 'http://localhost:3003/api' : 'https://iteration-2-hayfree.onrender.com/api';
+      const proxyBase = isDev ? 'http://localhost:3003/api' : '/api';
       
       // build the target URL based on filter selection
       let targetUrl;
