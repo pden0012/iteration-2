@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 
 // Proxy API requests to backend
 app.use('/api', createProxyMiddleware({
-  target: 'http://13.236.162.216:8080',
+  target: 'http://3.106.197.188:8080',
   changeOrigin: true,
   pathRewrite: {
     '^/api': '',
@@ -62,12 +62,12 @@ app.get('/test', (req, res) => {
   res.json({
     message: 'Proxy server is running!',
     timestamp: new Date().toISOString(),
-    backend: 'http://13.236.162.216:8080'
+    backend: 'http://3.106.197.188:8080'
   });
 });
 
 app.listen(PORT, () => {
   console.log(`🚀 Proxy server running on port ${PORT}`);
-  console.log(`📡 Proxying API requests to: http://13.236.162.216:8080`);
+  console.log(`📡 Proxying API requests to: http://3.106.197.188:8080`);
   console.log(`🌐 CORS enabled for frontend domains`);
 });

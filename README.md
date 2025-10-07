@@ -175,6 +175,15 @@ npm run build
 - If all proxies fail, users will see a friendly error message instead of technical errors
 - The system automatically tries each proxy service in sequence until one succeeds
 
+#### Issue 5: Map Data Loading Timeout Errors
+**Problem**: "Failed to load map data TimeoutError: signal timed out" when loading tree data
+**Solution**: 
+- Extended timeout from 15 seconds to 30 seconds for large tree datasets
+- Improved retry mechanism with user-friendly progress messages
+- Added intelligent error messages based on error type (timeout, network, server errors)
+- Added performance hints for users when loading large datasets (>1000 trees)
+- Enhanced loading indicators with retry attempt information
+
 ### Render.com Deployment Notes
 
 #### Step-by-step Render Deployment:
@@ -228,6 +237,29 @@ VITE_APP_PASSWORD=123456
 - `VITE_API_BASE_URL` (optional): Backend API URL with protocol
 
 **Important**: Replace `your_google_maps_api_key` with your actual Google Maps API key from [Google Cloud Console](https://console.cloud.google.com/google/maps-apis)
+
+## Map Performance Optimization
+
+### Tree Data Loading
+The map component loads tree data from the backend API server. Due to the large dataset size, several optimizations have been implemented:
+
+1. **Extended Timeout**: Increased from 15 to 30 seconds to accommodate large datasets
+2. **Smart Retry Logic**: Automatically retries failed requests up to 2 times with user feedback
+3. **Progressive Loading**: Shows loading progress and retry attempts to users
+4. **Performance Hints**: Suggests zooming in for faster loading when >1000 trees are loaded
+5. **Error Classification**: Provides specific error messages for different failure types
+
+### User Experience Improvements
+- **Loading Indicators**: Clear visual feedback during data loading
+- **Retry Messages**: Shows retry attempt progress (e.g., "Retrying... (Attempt 1/2)")
+- **Success Feedback**: Displays tree count and performance tips for large datasets
+- **Error Recovery**: Graceful handling of network issues and server errors
+
+### Backend API Configuration
+- **Base URL**: `http://3.106.197.188:8080` (production server)
+- **Endpoint**: `/map/tree` with zoom level and bounding box parameters
+- **Data Format**: JSON with tree coordinates, names, and allergenicity levels
+- **Response Size**: Can be 30KB+ for large areas, requiring extended timeouts
 
 ## Component Description
 

@@ -34,7 +34,7 @@
       <!-- loading indicator -->
       <div v-if="isLoading" class="loading-indicator">
         <span class="spinner"></span>
-        Loading...
+        {{ loadingMessage }}
       </div>
     </div>
 
@@ -60,6 +60,7 @@ export default {
       emptyMessage: '', 
       currentZoom: 12, 
       isLoading: false, 
+      loadingMessage: 'Loading tree data...',
       retryCount: 0, 
       maxRetries: 2 
     };
@@ -219,8 +220,11 @@ export default {
       }
       
       try {
-        // show loading indicator
+        // show loading indicator with appropriate message
         this.isLoading = true;
+        this.loadingMessage = this.retryCount > 0 ? 
+          `Retrying... (Attempt ${this.retryCount}/${this.maxRetries})` : 
+          'Loading tree data...';
         // clear existing tree data
         this.clearData();
         
@@ -230,14 +234,14 @@ export default {
         
         console.log('Fetching data from:', url); 
         
-        // make API request with timeout
+        // make API request with extended timeout for large datasets
         const res = await fetch(url, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
-          signal: AbortSignal.timeout(15000) // 15 second timeout
+          signal: AbortSignal.timeout(30000) // 30 second timeout for large tree datasets
         });
         
         // check if request was successful
@@ -257,20 +261,29 @@ export default {
         // apply visual styling to all map layers
         this.applyDataLayerStyle();
         
-        // show message if no trees found
-        this.emptyMessage = list.length === 0 ? 'No trees in current view.' : '';
+        // show message if no trees found or success message for large datasets
+        if (list.length === 0) {
+          this.emptyMessage = 'No trees in current view.';
+        } else if (list.length > 1000) {
+          this.emptyMessage = `Loaded ${list.length} trees. For faster loading, try zooming in to a smaller area.`;
+        } else {
+          this.emptyMessage = '';
+        }
       } catch (e) {
         console.error('Failed to load map data', e);
         
         // handle timeout errors with retry logic
-        if (this.retryCount < this.maxRetries && e.name === 'AbortError') {
+        if (this.retryCount < this.maxRetries && (e.name === 'AbortError' || e.name === 'TimeoutError')) {
           this.retryCount++;
-          console.log(`AbortError detected, retrying data load (attempt ${this.retryCount}/${this.maxRetries})...`);
+          console.log(`Timeout detected, retrying data load (attempt ${this.retryCount}/${this.maxRetries})...`);
           
-          // retry after 1 second delay
+          // show retry message to user
+          this.emptyMessage = `Loading tree data... (Retry ${this.retryCount}/${this.maxRetries})`;
+          
+          // retry after 2 second delay
           setTimeout(() => {
             this.refreshMarkers();
-          }, 1000);
+          }, 2000);
           return; 
         }
         
@@ -278,10 +291,12 @@ export default {
         this.retryCount = 0; 
         
         // show appropriate error message based on error type
-        if (e.name === 'TimeoutError') {
-          this.emptyMessage = 'Request timeout. The server might be slow or unavailable.';
+        if (e.name === 'TimeoutError' || e.name === 'AbortError') {
+          this.emptyMessage = 'Data loading timeout. The tree database is large and may take time to load. Please try again or zoom in to a smaller area.';
         } else if (e.message.includes('NetworkError') || e.message.includes('Failed to fetch')) {
-          this.emptyMessage = 'Mixed Content Error: HTTPS site cannot load HTTP resources. Please use HTTP version of this site or contact administrator.';
+          this.emptyMessage = 'Network connection error. Please check your internet connection and try again.';
+        } else if (e.message.includes('HTTP 500')) {
+          this.emptyMessage = 'Server error occurred while loading tree data. Please try again later.';
         } else {
           this.emptyMessage = `Error loading tree data: ${e.message}`;
         }

@@ -51,6 +51,6 @@ This server is ready to be deployed on Render.com:
 
 ## Backend Configuration
 
-The server proxies requests to: `http://13.236.162.216:8080`
+The server proxies requests to: `http://3.106.197.188:8080`
 
 To change the backend URL, modify the `target` in the proxy middleware configuration.

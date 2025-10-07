@@ -493,7 +493,7 @@ export default {
           url = `/api/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
         } else {
           // 生产环境使用CORS代理解决Mixed Content问题
-          const backendUrl = `http://13.236.162.216:8080/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
+          const backendUrl = `http://3.106.197.188:8080/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
           url = `https://api.allorigins.win/raw?url=${encodeURIComponent(backendUrl)}`;
         }
         const res = await fetch(url);

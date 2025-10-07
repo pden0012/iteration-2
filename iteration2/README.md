@@ -188,7 +188,7 @@ npm run build
 3. **Environment Variables**:
    - Go to your service's "Environment" tab in Render dashboard
    - Add: `VITE_GOOGLE_MAPS_API_KEY` with your Google Maps API key
-   - Add: `VITE_API_BASE_URL` (optional, defaults to `http://13.236.162.216:8080`)
+   - Add: `VITE_API_BASE_URL` (optional, defaults to `http://3.106.197.188:8080`)
 
 4. **Deploy**: Click "Manual Deploy" or push to your connected branch
 
@@ -219,7 +219,7 @@ npm run build
 Create a `.env` file in the project root:
 ```env
 VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
-VITE_API_BASE_URL=http://13.236.162.216:8080
+VITE_API_BASE_URL=http://3.106.197.188:8080
 VITE_APP_PASSWORD=123456
 ```
 
