@@ -36,6 +36,15 @@
         <span class="spinner"></span>
         {{ loadingMessage }}
       </div>
+      
+      <!-- retry button for failed requests -->
+      <button 
+        v-if="emptyMessage && !isLoading && retryCount >= maxRetries" 
+        @click="retryLoad" 
+        class="retry-button"
+      >
+        🔄 Retry Loading
+      </button>
     </div>
 
     <!-- map container -->
@@ -62,7 +71,8 @@ export default {
       isLoading: false, 
       loadingMessage: 'Loading tree data...',
       retryCount: 0, 
-      maxRetries: 2 
+      maxRetries: 3,
+      retryDelay: 1000 // initial delay in milliseconds 
     };
   },
   methods: {
@@ -241,12 +251,21 @@ export default {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
-          signal: AbortSignal.timeout(30000) // 30 second timeout for large tree datasets
+          signal: AbortSignal.timeout(45000) // 45 second timeout for large tree datasets
         });
         
         // check if request was successful
         if (!res.ok) {
-          throw new Error(`HTTP ${res.status}: ${res.statusText}. Please check API server status.`);
+          // handle different HTTP error codes with specific messages
+          if (res.status === 500) {
+            throw new Error(`Server Error (500): The backend API server is experiencing issues. Please try again later or contact support.`);
+          } else if (res.status === 503) {
+            throw new Error(`Service Unavailable (503): The backend API server is temporarily unavailable. Please try again in a few minutes.`);
+          } else if (res.status === 404) {
+            throw new Error(`Not Found (404): The requested tree data endpoint was not found. Please check the API configuration.`);
+          } else {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}. Please check API server status.`);
+          }
         }
         
         // parse response data
@@ -272,18 +291,25 @@ export default {
       } catch (e) {
         console.error('Failed to load map data', e);
         
-        // handle timeout errors with retry logic
-        if (this.retryCount < this.maxRetries && (e.name === 'AbortError' || e.name === 'TimeoutError')) {
+        // handle retryable errors with exponential backoff
+        const isRetryableError = e.name === 'AbortError' || e.name === 'TimeoutError' || 
+                                e.message.includes('NetworkError') || e.message.includes('Failed to fetch') ||
+                                e.message.includes('Server Error (500)') || e.message.includes('Service Unavailable (503)');
+        
+        if (this.retryCount < this.maxRetries && isRetryableError) {
           this.retryCount++;
-          console.log(`Timeout detected, retrying data load (attempt ${this.retryCount}/${this.maxRetries})...`);
+          console.log(`Retryable error detected, retrying data load (attempt ${this.retryCount}/${this.maxRetries})...`);
           
-          // show retry message to user
-          this.emptyMessage = `Loading tree data... (Retry ${this.retryCount}/${this.maxRetries})`;
+          // calculate exponential backoff delay
+          const delay = this.retryDelay * Math.pow(2, this.retryCount - 1);
           
-          // retry after 2 second delay
+          // show retry message to user with countdown
+          this.emptyMessage = `Connection issue detected, retrying... (Attempt ${this.retryCount}/${this.maxRetries})`;
+          
+          // retry after calculated delay
           setTimeout(() => {
             this.refreshMarkers();
-          }, 2000);
+          }, delay);
           return; 
         }
         
@@ -292,13 +318,17 @@ export default {
         
         // show appropriate error message based on error type
         if (e.name === 'TimeoutError' || e.name === 'AbortError') {
-          this.emptyMessage = 'Data loading timeout. The tree database is large and may take time to load. Please try again or zoom in to a smaller area.';
+          this.emptyMessage = '⏱️ Data loading timeout. The tree database is large and may take time to load. Please try again or zoom in to a smaller area for faster loading.';
         } else if (e.message.includes('NetworkError') || e.message.includes('Failed to fetch')) {
-          this.emptyMessage = 'Network connection error. Please check your internet connection and try again.';
-        } else if (e.message.includes('HTTP 500')) {
-          this.emptyMessage = 'Server error occurred while loading tree data. Please try again later.';
+          this.emptyMessage = '🌐 Network connection error. Please check your internet connection and try again.';
+        } else if (e.message.includes('Server Error (500)')) {
+          this.emptyMessage = '🔧 Server error: The backend API server is experiencing issues. Please try again later or contact support.';
+        } else if (e.message.includes('Service Unavailable (503)')) {
+          this.emptyMessage = '⚠️ Service temporarily unavailable. The backend server is being maintained. Please try again in a few minutes.';
+        } else if (e.message.includes('Not Found (404)')) {
+          this.emptyMessage = '🔍 API endpoint not found. Please check the configuration or contact support.';
         } else {
-          this.emptyMessage = `Error loading tree data: ${e.message}`;
+          this.emptyMessage = `❌ Error loading tree data: ${e.message}`;
         }
       } finally {
         // always hide loading indicator
@@ -426,6 +456,16 @@ export default {
       
       // refresh markers with new filter
       this.refreshMarkers();
+    },
+
+    // this method handles manual retry button clicks
+    // it resets retry count and attempts to load data again
+    // returns: nothing, but resets retry state and loads data
+    retryLoad() {
+      console.log('Manual retry requested by user');
+      this.retryCount = 0; // reset retry count
+      this.emptyMessage = ''; // clear error message
+      this.refreshMarkers(); // attempt to load data again
     },
 
     // this method creates a debounced version of a function to prevent too many calls
@@ -806,5 +846,26 @@ export default {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.retry-button {
+  background: #239BA7;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 12px;
+  transition: background-color 0.3s ease;
+}
+
+.retry-button:hover {
+  background: #1e8a94;
+}
+
+.retry-button:active {
+  background: #1a7a84;
 }
 </style>

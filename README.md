@@ -178,11 +178,13 @@ npm run build
 #### Issue 5: Map Data Loading Timeout Errors
 **Problem**: "Failed to load map data TimeoutError: signal timed out" when loading tree data
 **Solution**: 
-- Extended timeout from 15 seconds to 30 seconds for large tree datasets
-- Improved retry mechanism with user-friendly progress messages
-- Added intelligent error messages based on error type (timeout, network, server errors)
-- Added performance hints for users when loading large datasets (>1000 trees)
+- Extended timeout from 15 seconds to 45 seconds for large tree datasets
+- Improved retry mechanism with exponential backoff (1s, 2s, 4s delays)
+- Enhanced error classification for different HTTP status codes (500, 503, 404)
+- Added intelligent error messages with emojis for better user experience
+- Added manual retry button for users to retry failed requests
 - Enhanced loading indicators with retry attempt information
+- Better handling of server errors and network connectivity issues
 
 ### Render.com Deployment Notes
 
@@ -241,13 +243,22 @@ VITE_APP_PASSWORD=123456
 ## Map Performance Optimization
 
 ### Tree Data Loading
-The map component loads tree data from the backend API server. Due to the large dataset size, several optimizations have been implemented:
+The map component loads tree data from the backend API server. Due to the large dataset size and current server instability, several optimizations have been implemented:
 
-1. **Extended Timeout**: Increased from 15 to 30 seconds to accommodate large datasets
-2. **Smart Retry Logic**: Automatically retries failed requests up to 2 times with user feedback
+1. **Extended Timeout**: Increased from 15 to 45 seconds to accommodate large datasets
+2. **Smart Retry Logic**: Automatically retries failed requests up to 3 times with exponential backoff
 3. **Progressive Loading**: Shows loading progress and retry attempts to users
 4. **Performance Hints**: Suggests zooming in for faster loading when >1000 trees are loaded
-5. **Error Classification**: Provides specific error messages for different failure types
+5. **Error Classification**: Provides specific error messages for different failure types (500, 503, 404, timeout, network)
+6. **Manual Retry**: Users can manually retry failed requests with a dedicated button
+7. **Server Status Awareness**: Better handling of backend server issues and maintenance periods
+
+### Current Server Status
+**Backend API Server**: `http://3.106.197.188:8080`
+- **Status**: Experiencing intermittent connectivity issues
+- **Common Issues**: HTTP 500 errors, network timeouts, service unavailability
+- **User Experience**: Application provides clear error messages and retry options
+- **Recommendation**: Consider implementing a backup data source or caching mechanism
 
 ### User Experience Improvements
 - **Loading Indicators**: Clear visual feedback during data loading
