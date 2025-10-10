@@ -168,6 +168,30 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Backend connectivity test endpoint
+app.get('/api/test-backend', async (req, res) => {
+  try {
+    const response = await fetch('http://3.106.197.188:8080/dashboard?suburb=Melbourne&format=json', {
+      timeout: 5000
+    });
+    
+    res.json({
+      status: 'Backend reachable',
+      backendUrl: 'http://3.106.197.188:8080',
+      responseStatus: response.status,
+      responseOk: response.ok,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'Backend unreachable',
+      backendUrl: 'http://3.106.197.188:8080',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Render-specific diagnostic endpoint
 app.get('/api/diagnose', async (req, res) => {
   const diagnosis = {
