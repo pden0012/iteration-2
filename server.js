@@ -6,6 +6,12 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Log environment information for debugging
+console.log('🚀 Starting server with configuration:');
+console.log(`📡 PORT: ${PORT}`);
+console.log(`🌍 NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`🔗 Backend URL: http://3.106.197.188:8080`);
+
 // Enable CORS for all routes
 app.use(cors({
   origin: [
@@ -110,7 +116,21 @@ app.get('/test', (req, res) => {
   res.json({
     message: 'Proxy server is running!',
     timestamp: new Date().toISOString(),
-    backend: 'http://3.106.197.188:8080'
+    backend: 'http://3.106.197.188:8080',
+    port: PORT,
+    nodeEnv: process.env.NODE_ENV
+  });
+});
+
+// API health check endpoint (before proxy middleware)
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    proxy: 'Active',
+    backend: 'http://3.106.197.188:8080',
+    port: PORT,
+    nodeEnv: process.env.NODE_ENV
   });
 });
 

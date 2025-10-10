@@ -45,6 +45,11 @@
       >
         🔄 Retry Loading
       </button>
+      
+      <!-- server status indicator -->
+      <div v-if="serverStatus" class="server-status" :class="serverStatus.type">
+        {{ serverStatus.message }}
+      </div>
     </div>
 
     <!-- map container -->
