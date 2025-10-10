@@ -87,10 +87,10 @@ export default {
         },
         {
           id: 'trends',
-          title: 'Explore Latest Trends',
-          description: 'Track allergen patterns over time or outlook of pollen and allergen conditions.',
-          buttonText: 'Explore More',
-          iconText: '/images/prototype images/image copy 9.png'
+          title: 'Allergy-Free Garden Challenge',
+          description: 'Learn, play and grow your understanding of pollen-causing plants through fun feedback and discovery.',
+          buttonText: 'Play Now',
+          iconText: '/images/prototype images/image copy 14.png'
         },
         {
           id: 'education',

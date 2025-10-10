@@ -345,19 +345,14 @@ export default {
 </script>
 
 <style scoped>
-/* English: page background is light; cards use plain white. */
+/* English: page background is white; main content container has rounded light blue background */
 .image-page {
-  /* background image height control, covers completely to below third card */
   width: 100%;
   margin: 0;
   padding: 24px 0 40px 0;
-  background-color: #f3faf5;
-  background-image: url('/images/Image Detection Background.png');
-  background-repeat: no-repeat;
-  background-position: center top;
-  background-size: 100% 700px; 
-  
+  background-color: #ffffff; /* White page background */
 }
+
 
 
 .page-header {
@@ -383,7 +378,11 @@ export default {
   gap: 32px; /* increase spacing */
   max-width: 1280px; /* expand overall width */
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 32px 20px; /* updated padding to match container */
+  background-color: #e8f4fd;
+  border-radius: 20px;
+  border: 2px solid #d1e7f0; /* Light blue border */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
 

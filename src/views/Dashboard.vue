@@ -95,79 +95,65 @@
         </div>
       </section>
 
-      <!-- climate & dispersion section below the main dashboard -->
-      <section class="climate-section">
-        <!-- scatter plot: rainfall vs wind with medians -->
-        <div class="viz-card">
-          <h4 class="viz-title">Melbourne — Pollen-friendly vs Pollen-suppressing months</h4>
-          <svg
-            v-if="scatterViz"
-            class="chart-svg"
-            :width="scatterViz.width"
-            :height="scatterViz.height"
-            role="img"
-            aria-label="Monthly average rainfall versus wind speed scatter plot"
-          >
-            <!-- Axes -->
-            <line :x1="scatterViz.padLeft" :y1="scatterViz.padTop + scatterViz.plotH" :x2="scatterViz.padLeft + scatterViz.plotW" :y2="scatterViz.padTop + scatterViz.plotH" class="axis" />
-            <line :x1="scatterViz.padLeft" :y1="scatterViz.padTop" :x2="scatterViz.padLeft" :y2="scatterViz.padTop + scatterViz.plotH" class="axis" />
+      <!-- seasons story section 放在原图表的位置 | show seasonal pollen story here -->
+      <section class="season-story">
+        <div class="season-container">
+          <!-- 标题区：主标题 + 副标题 | header: big title + subtitle -->
+          <header class="season-header">
+            <h2 class="season-title">Melbourne’s Seasonal Pollen Story</h2>
+            <p class="season-subtitle">Our city's changing seasons shape how pollen spreads. Understanding these shifts helps residents plan better and breathe easier.</p>
+          </header>
 
-            <!-- Median dashed lines -->
-            <line :x1="scatterViz.medianX" :y1="scatterViz.padTop" :x2="scatterViz.medianX" :y2="scatterViz.padTop + scatterViz.plotH" class="median-line" />
-            <line :x1="scatterViz.padLeft" :y1="scatterViz.medianY" :x2="scatterViz.padLeft + scatterViz.plotW" :y2="scatterViz.medianY" class="median-line" />
+          <!-- 四季卡片 | four equal seasonal cards -->
+          <div class="season-grid">
+            <!-- 春季 | Spring -->
+            <article class="season-card">
+              <div class="season-index">1</div>
+              <h3 class="season-name">Spring</h3>
+              <p class="season-range">Sept - Nov</p>
+              <div class="season-icon" aria-hidden="true">
+                <img class="season-img" src="/images/prototype images/image copy 8.png" alt="Spring wind icon" />
+              </div>
+              <p class="season-note"><strong>Highest</strong> pollen spread, about 60% more than other seasons</p>
+            </article>
 
-            <!-- Points -->
-            <g v-for="pt in scatterViz.points" :key="pt.month">
-              <circle :cx="pt.x" :cy="pt.y" r="5" class="dot" />
-              <text :x="pt.x + 6" :y="pt.y - 6" class="dot-label">{{ pt.month_abbr }}</text>
-            </g>
+            <!-- 夏季 | Summer -->
+            <article class="season-card">
+              <div class="season-index">2</div>
+              <h3 class="season-name">Summer</h3>
+              <p class="season-range">Dec - Feb</p>
+              <div class="season-icon" aria-hidden="true">
+                <img class="season-img" src="/images/prototype images/image copy 11.png" alt="Summer sun icon" />
+              </div>
+              <p class="season-note"><strong>Moderate</strong> pollen levels, around 40% dispersion</p>
+            </article>
 
-            <!-- Axis labels -->
-            <text :x="scatterViz.padLeft + scatterViz.plotW/2" :y="scatterViz.padTop + scatterViz.plotH + 32" class="axis-label" text-anchor="middle">Monthly average rainfall (mm)</text>
-            <text :x="scatterViz.padLeft - 34" :y="scatterViz.padTop + scatterViz.plotH/2" class="axis-label" transform="rotate(-90, {{scatterViz.padLeft - 34}}, {{scatterViz.padTop + scatterViz.plotH/2}})" text-anchor="middle">Monthly average wind (km/h)</text>
-          </svg>
+            <!-- 秋季 | Fall -->
+            <article class="season-card">
+              <div class="season-index">3</div>
+              <h3 class="season-name">Fall</h3>
+              <p class="season-range">Mar - May</p>
+              <div class="season-icon" aria-hidden="true">
+                <img class="season-img" src="/images/prototype images/image copy 12.png" alt="Fall rain icon" />
+              </div>
+              <p class="season-note"><strong>Lowest</strong> pollen spread, about 35%, offering natural relief</p>
+            </article>
+
+            <!-- 冬季 | Winter -->
+            <article class="season-card">
+              <div class="season-index">4</div>
+              <h3 class="season-name">Winter</h3>
+              <p class="season-range">Jun - Aug</p>
+              <div class="season-icon" aria-hidden="true">
+                <img class="season-img" src="/images/prototype images/image copy 13.png" alt="Winter wind icon" />
+              </div>
+              <p class="season-note"><strong>Moderate</strong> spread, winds rise but damp air holds pollen down</p>
+            </article>
+          </div>
         </div>
-
-        <!-- stacked bar: seasonal contributions -->
-        <div class="viz-card">
-          <h4 class="viz-title">Melbourne — What’s driving dispersion by season?</h4>
-          <svg
-            v-if="stackedViz"
-            class="chart-svg"
-            :width="stackedViz.width"
-            :height="stackedViz.height"
-            role="img"
-            aria-label="Seasonal stacked contributions chart"
-          >
-            <!-- Axes -->
-            <line :x1="stackedViz.padLeft" :y1="stackedViz.padTop + stackedViz.plotH" :x2="stackedViz.padLeft + stackedViz.plotW" :y2="stackedViz.padTop + stackedViz.plotH" class="axis" />
-            <line :x1="stackedViz.padLeft" :y1="stackedViz.padTop" :x2="stackedViz.padLeft" :y2="stackedViz.padTop + stackedViz.plotH" class="axis" />
-
-            <!-- Bars -->
-            <g v-for="bar in stackedViz.bars" :key="bar.season">
-              <g v-for="seg in bar.segments" :key="seg.key">
-                <rect :x="bar.x" :y="seg.y" :width="bar.width" :height="seg.h" :fill="seg.color" />
-              </g>
-              <text :x="bar.x + bar.width/2" :y="stackedViz.padTop + stackedViz.plotH + 16" class="tick" text-anchor="middle">{{ bar.shortLabel }}</text>
-            </g>
-
-            <!-- Legend -->
-            <g class="legend" :transform="`translate(${stackedViz.padLeft}, ${stackedViz.padTop - 10})`">
-              <g v-for="(lg, i) in stackedViz.legend" :key="lg.key" :transform="`translate(${i*140}, 0)`">
-                <rect width="12" height="12" :fill="lg.color" rx="2" ry="2" />
-                <text x="18" y="11" class="legend-label">{{ lg.label }}</text>
-              </g>
-            </g>
-          </svg>
-        </div>
-
-        <!-- Short centered explanation below charts -->
-        <!-- short explanation below charts: English content, keep concise and centered -->
-        <p class="viz-note">
-          Wind, fewer rainy days and drier afternoon air make pollen spread farther. 
-          Use this view to spot months and seasons when dispersion is likely higher in Melbourne.
-        </p>
       </section>
+
+      
 
     </div>
 
@@ -790,8 +776,8 @@ export default {
     this.chartRingColor = this.colorForOverall(this.pollenData.level);
     this.chartTextColor = this.textColorForOverall(this.pollenData.level);
       
-      // initialize local climate visualization
-      this.initClimateViz();
+      // charts removed per request; keep init disabled
+      // this.initClimateViz();
   }
 }
 </script>
@@ -1213,6 +1199,85 @@ export default {
   font-size: 14px;
   line-height: 1.5;
   color: #555;
+}
+
+
+/* Seasons Story styles - blue banner with four season columns */
+.season-story {
+  width: 100%;
+  background: #3E79A6; /* blue background similar to screenshot */
+  color: #FFFFFF;
+  border-radius: 0px;
+  margin: 20px 0 0;
+}
+
+.season-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 24px 36px;
+}
+
+.season-header { text-align: center; margin: 0 0 24px; }
+.season-title {
+  font-family: var(--font-heading);
+  font-size: clamp(28px, 3.2vw, 44px);
+  font-weight: 400;
+  margin: 0 0 8px;
+}
+.season-subtitle {
+  font-family: var(--font-content);
+  font-size: clamp(14px, 1.2vw, 18px);
+  margin: 0;
+}
+
+.season-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.season-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 10px 6px;
+  border-left: 1px solid rgba(255,255,255,0.3);
+}
+.season-card:first-child { border-left: 0; }
+
+.season-index {
+  font-family: var(--font-heading);
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.season-name {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  margin: 0;
+}
+.season-range {
+  font-family: var(--font-body);
+  font-size: 14px;
+  margin: 2px 0 12px;
+}
+
+.season-icon { width: 74px; height: 74px; margin: 8px 0 12px; display: flex; align-items: center; justify-content: center; }
+.season-img { width: 74px; height: 74px; object-fit: contain; display: block; }
+
+.season-note {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.3;
+  margin: 6px 0 0;
+}
+
+@media (max-width: 1023px) {
+  .season-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 599px) {
+  .season-grid { grid-template-columns: 1fr; }
 }
 
 

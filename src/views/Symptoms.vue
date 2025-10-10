@@ -2,11 +2,12 @@
   <div class="symptoms-page">
     <!-- back button -->
     <div class="back-button-container">
-      <div class="page-container">
+      <div class="back-button-column">
         <button class="back-button" @click="goBackToResources">
           ← Back to Resources
         </button>
       </div>
+      <div class="back-button-spacer"></div>
     </div>
 
     <!-- page title -->
@@ -165,11 +166,27 @@ export default {
   padding: 64px 0 var(--spacing-xl);
 }
 
-/* back button container */
+/* back button container - align with checklist left edge */
 .back-button-container {
   background: #FFFFFF;
   padding: 20px 0 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-left: 32px;
+  padding-right: 32px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr; /* match checklist layout */
+  gap: 24px;
+}
+
+/* back button column */
+.back-button-column {
+  width: 100%;
+}
+
+/* back button spacer */
+.back-button-spacer {
+  width: 100%;
 }
 
 /* back button - navigation return to resources page */
@@ -184,6 +201,8 @@ export default {
   padding: 8px 0;
   transition: color 0.3s ease;
   margin-bottom: 16px;
+  /* align left with checklist inner padding (16px) */
+  margin-left: 16px;
 }
 
 .back-button:hover {
@@ -206,7 +225,7 @@ export default {
   line-height: 1.1;
   color: var(--color-text-primary);
   margin: 0;
-  text-align: left;
+  text-align: center;
 }
 
 
@@ -367,6 +386,9 @@ export default {
   
   .back-button-container {
     padding: 16px 0 0;
+    padding-left: 16px;
+    padding-right: 16px;
+    display: block; /* single column on mobile */
   }
   
   .back-button {
@@ -408,6 +430,12 @@ export default {
     padding: 0 20px;
   }
   
+  .back-button-container {
+    padding-left: 20px;
+    padding-right: 20px;
+    display: block; /* single column on small mobile */
+  }
+  
   .page-title {
     font-size: clamp(28px, 5vw, 30px);
   }
@@ -426,6 +454,13 @@ export default {
   }
   .page-container {
     padding: 0 32px;
+  }
+  
+  .back-button-container {
+    max-width: 600px;
+    padding-left: 32px;
+    padding-right: 32px;
+    display: block; /* single column on tablets */
   }
   
   .symptoms-page {
@@ -458,6 +493,12 @@ export default {
     padding: 0 40px;
   }
   
+  .back-button-container {
+    max-width: 700px;
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  
   .symptoms-page {
     padding: 56px 0;
   }
@@ -485,6 +526,12 @@ export default {
   .page-container {
     padding: 0 48px;
   }
+  
+  .back-button-container {
+    max-width: 800px;
+    padding-left: 48px;
+    padding-right: 48px;
+  }
   /* symptoms page */ 
   .symptoms-page {
     padding: 64px 0;
@@ -510,6 +557,11 @@ export default {
 @media (max-width: 319px) {
   .page-container {
     padding: 0 12px;
+  }
+  
+  .back-button-container {
+    padding-left: 12px;
+    padding-right: 12px;
   }
   
   .symptoms-page {
@@ -572,11 +624,8 @@ export default {
   white-space: pre-line;
 }
 
-/* extra visual polish for the page header
-   - add subtle divider and spacing to separate title from list
-   - this is small UI sugar, to make the section look clearer */
+/* title section styling */
 .title-section {
-  border-bottom: 1px solid rgba(0,0,0,0.06);
   padding-bottom: 8px;
 }
 
