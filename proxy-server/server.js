@@ -18,10 +18,11 @@ app.use(cors({
     'http://localhost:3001', 
     'http://www.hayfree.space',
     'https://iteration-2-underdeployment.onrender.com',
-    'https://iteration-2.onrender.com',
+    'https://iteration2.onrender.com',
     'https://www.hayfree.space',
     'https://hayfree.space',
-    'https://*.onrender.com' // allow all render domains
+    'https://*.onrender.com', // allow all render domains
+    'https://iteration-web.onrender.com'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

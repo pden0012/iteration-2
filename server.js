@@ -20,6 +20,7 @@ app.use(cors({
     'http://localhost:3001', 
     'https://iteration-2-underdeployment.onrender.com',
     'https://iteration-2.onrender.com',
+    'https://iteration-web.onrender.com',
     'https://www.hayfree.space',
     'https://hayfree.space',
     'https://*.onrender.com' // 允许所有Render域名
