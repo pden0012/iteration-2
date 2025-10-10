@@ -201,10 +201,8 @@ export default {
       const bbox = `${s},${w},${n},${e}`; // bounding box string
       
       // determine API base URL based on environment
-      // in dev mode, use localhost:3001 proxy server
-      // in production, use relative path (served by same server)
-      const isDev = import.meta.env.DEV;
-      const proxyBase = isDev ? 'http://localhost:3001/api' : '/api';
+      // use relative path for both dev and prod (works with Vite proxy in dev, Express in prod)
+      const proxyBase = '/api';
       
       // build the target URL based on filter selection
       let targetUrl;
