@@ -11,7 +11,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "serve": "vite preview",
-    "start": "node server.js"
+    "start": "node server.js",
+    "build-and-deploy": "node build-and-deploy.js",
+    "postbuild": "echo 'Build completed successfully'"
   },
   "dependencies": {
     "cors": "^2.8.5",

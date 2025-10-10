@@ -93,6 +93,17 @@ npm run dev
 npm run build
 ```
 
+### Build and Deploy Verification
+```bash
+npm run build-and-deploy
+```
+This script will:
+- Install dependencies
+- Build the project
+- Verify build output
+- Check environment variables
+- Provide deployment readiness status
+
 ### Preview Production Version
 ```bash
 npm run preview
@@ -220,6 +231,28 @@ npm run build
   - Improved retry logic to include 504 timeout errors
   - Better error messages for each status code with user-friendly guidance
 - **Result**: Vue application now correctly displays on Render with improved error resilience
+
+#### Issue 9: Enhanced 502 Bad Gateway Error Handling and Server Status Monitoring
+**Problem**: Persistent 502 Bad Gateway errors with insufficient error information and no server status visibility.
+**Solution**: 
+- **Enhanced Proxy Server Error Handling**:
+  - Extended proxy timeout from 60s to 90s to match client timeout
+  - Added comprehensive error classification for ECONNREFUSED, ETIMEDOUT, ENOTFOUND, ECONNRESET, EPIPE
+  - Improved error response format with detailed error information and retryable flags
+  - Added connection keep-alive headers and retry options
+  - Enhanced logging with emoji indicators for better debugging
+- **Client-Side Improvements**:
+  - Extended client timeout from 45s to 90s to match proxy server
+  - Added server status checking functionality with real-time status display
+  - Enhanced error message parsing to show detailed backend error information
+  - Added automatic server status checking when errors occur
+  - Improved retry mechanism with better user feedback
+- **New Features**:
+  - Real-time server status indicator (✅ reachable, ❌ unreachable, ⚠️ unknown)
+  - Enhanced diagnostic endpoints (/api/diagnose, /api/test-backend)
+  - Build and deployment verification script (build-and-deploy.js)
+  - Better error messages with emoji indicators for improved UX
+- **Result**: Significantly improved error handling, better user feedback, and enhanced debugging capabilities
 
 ### Render.com Deployment Notes
 

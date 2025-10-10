@@ -77,7 +77,8 @@ export default {
       loadingMessage: 'Loading tree data...',
       retryCount: 0, 
       maxRetries: 3,
-      retryDelay: 1000 // initial delay in milliseconds 
+      retryDelay: 1000, // initial delay in milliseconds
+      serverStatus: null // server status indicator
     };
   },
   methods: {
@@ -201,9 +202,8 @@ export default {
       const bbox = `${s},${w},${n},${e}`; // bounding box string
       
       // determine API base URL based on environment
-      // use CORS proxy for production to bypass Render network issues
-      const isDev = import.meta.env.DEV;
-      const proxyBase = isDev ? '/api' : 'https://api.allorigins.win/raw?url=' + encodeURIComponent('http://3.106.197.188:8080');
+      // use relative path for both dev and prod (works with Vite proxy in dev, Express in prod)
+      const proxyBase = '/api';
       
       // build the target URL based on filter selection
       let targetUrl;
@@ -255,9 +255,10 @@ export default {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache' // prevent caching issues
           },
-          signal: AbortSignal.timeout(45000) // 45 second timeout for large tree datasets
+          signal: AbortSignal.timeout(90000) // 90 second timeout to match proxy server timeout
         });
         
         // check if request was successful
@@ -268,7 +269,17 @@ export default {
           } else if (res.status === 500) {
             throw new Error(`Server Error (500): The backend API server is experiencing issues. Please try again later or contact support.`);
           } else if (res.status === 502) {
-            throw new Error(`Bad Gateway (502): The proxy server cannot connect to the backend API server. The backend server may be down or unreachable.`);
+            // Try to get detailed error information from the response
+            let errorDetails = 'The proxy server cannot connect to the backend API server. The backend server may be down or unreachable.';
+            try {
+              const errorData = await res.json();
+              if (errorData.details) {
+                errorDetails = errorData.details;
+              }
+            } catch (e) {
+              // If we can't parse the error response, use the default message
+            }
+            throw new Error(`Bad Gateway (502): ${errorDetails}`);
           } else if (res.status === 503) {
             throw new Error(`Service Unavailable (503): The backend API server is temporarily unavailable. Please try again in a few minutes.`);
           } else if (res.status === 504) {
@@ -328,6 +339,9 @@ export default {
         
         // reset retry count for other errors
         this.retryCount = 0; 
+        
+        // check server status when we encounter errors
+        await this.checkServerStatus();
         
         // show appropriate error message based on error type
         if (e.name === 'TimeoutError' || e.name === 'AbortError') {
@@ -484,7 +498,51 @@ export default {
       console.log('Manual retry requested by user');
       this.retryCount = 0; // reset retry count
       this.emptyMessage = ''; // clear error message
+      this.serverStatus = null; // clear server status
       this.refreshMarkers(); // attempt to load data again
+    },
+
+    // this method checks the backend server status
+    // returns: nothing, but updates serverStatus with server health info
+    async checkServerStatus() {
+      try {
+        console.log('Checking backend server status...');
+        const response = await fetch('/api/diagnose', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json'
+          },
+          signal: AbortSignal.timeout(10000) // 10 second timeout for status check
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Server status check result:', data);
+          
+          if (data.backend && data.backend.reachable) {
+            this.serverStatus = {
+              type: 'success',
+              message: '✅ Backend server is reachable'
+            };
+          } else {
+            this.serverStatus = {
+              type: 'error',
+              message: '❌ Backend server is unreachable'
+            };
+          }
+        } else {
+          this.serverStatus = {
+            type: 'warning',
+            message: '⚠️ Unable to check server status'
+          };
+        }
+      } catch (error) {
+        console.error('Server status check failed:', error);
+        this.serverStatus = {
+          type: 'error',
+          message: '❌ Server status check failed'
+        };
+      }
     },
 
     // this method creates a debounced version of a function to prevent too many calls
@@ -886,5 +944,32 @@ export default {
 
 .retry-button:active {
   background: #1a7a84;
+}
+
+.server-status {
+  margin-left: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.server-status.success {
+  background: rgba(46, 175, 98, 0.1);
+  color: #2EAF62;
+  border: 1px solid rgba(46, 175, 98, 0.3);
+}
+
+.server-status.error {
+  background: rgba(230, 74, 59, 0.1);
+  color: #E64A3B;
+  border: 1px solid rgba(230, 74, 59, 0.3);
+}
+
+.server-status.warning {
+  background: rgba(255, 193, 7, 0.1);
+  color: #FFC107;
+  border: 1px solid rgba(255, 193, 7, 0.3);
 }
 </style>

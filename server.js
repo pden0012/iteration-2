@@ -53,14 +53,20 @@ if (fs.existsSync(staticPath)) {
 app.use('/api', createProxyMiddleware({
   target: 'http://3.106.197.188:8080',
   changeOrigin: true,
-  timeout: 60000, // 60 second timeout for large datasets
-  proxyTimeout: 60000, // proxy timeout
+  timeout: 90000, // 90 second timeout for large datasets (increased from 60s)
+  proxyTimeout: 90000, // proxy timeout (increased from 60s)
   followRedirects: true,
   ws: false, // disable websocket proxy
   secure: false, // allow insecure connections to backend
   logLevel: 'debug', // enable detailed logging
   pathRewrite: {
     '^/api': '', // remove /api prefix
+  },
+  // Add connection retry options
+  xfwd: true, // add x-forwarded headers
+  headers: {
+    'Connection': 'keep-alive',
+    'Keep-Alive': 'timeout=90, max=1000'
   },
   onError: (err, req, res) => {
     console.error('🚨 Proxy error:', err.message);
@@ -81,32 +87,64 @@ app.use('/api', createProxyMiddleware({
     
     // Handle different types of proxy errors with specific status codes
     if (err.code === 'ECONNREFUSED') {
+      console.error('🔌 Backend server connection refused - server may be down');
       res.status(502).json({ 
-        error: 'Bad Gateway',
+        error: 'Bad Gateway (502)',
         message: 'Cannot connect to backend API server. The server may be down or unreachable.',
         code: 'ECONNREFUSED',
-        timestamp: new Date().toISOString()
+        details: 'The proxy server cannot establish a connection to the backend API server at http://3.106.197.188:8080',
+        timestamp: new Date().toISOString(),
+        retryable: true
       });
     } else if (err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT') {
+      console.error('⏱️ Backend server response timeout');
       res.status(504).json({ 
-        error: 'Gateway Timeout',
+        error: 'Gateway Timeout (504)',
         message: 'Backend API server response timeout.',
         code: 'ETIMEDOUT',
-        timestamp: new Date().toISOString()
+        details: 'The request took too long to process. This may be due to large datasets or server load.',
+        timestamp: new Date().toISOString(),
+        retryable: true
       });
     } else if (err.code === 'ENOTFOUND') {
+      console.error('🔍 Backend server hostname cannot be resolved');
       res.status(502).json({ 
-        error: 'Bad Gateway',
+        error: 'Bad Gateway (502)',
         message: 'Cannot resolve backend API server hostname.',
         code: 'ENOTFOUND',
-        timestamp: new Date().toISOString()
+        details: 'DNS resolution failed for the backend server hostname',
+        timestamp: new Date().toISOString(),
+        retryable: true
+      });
+    } else if (err.code === 'ECONNRESET') {
+      console.error('🔄 Backend connection was reset');
+      res.status(502).json({ 
+        error: 'Bad Gateway (502)',
+        message: 'Backend connection was reset.',
+        code: 'ECONNRESET',
+        details: 'The connection to the backend server was unexpectedly closed',
+        timestamp: new Date().toISOString(),
+        retryable: true
+      });
+    } else if (err.code === 'EPIPE') {
+      console.error('📡 Backend connection pipe error');
+      res.status(502).json({ 
+        error: 'Bad Gateway (502)',
+        message: 'Backend connection pipe error.',
+        code: 'EPIPE',
+        details: 'The connection to the backend server was broken',
+        timestamp: new Date().toISOString(),
+        retryable: true
       });
     } else {
+      console.error('❓ Unknown proxy error:', err.code);
       res.status(502).json({ 
-        error: 'Bad Gateway',
+        error: 'Bad Gateway (502)',
         message: err.message,
         code: err.code,
-        timestamp: new Date().toISOString()
+        details: 'An unexpected error occurred while connecting to the backend server',
+        timestamp: new Date().toISOString(),
+        retryable: true
       });
     }
   },

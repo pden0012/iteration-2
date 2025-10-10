@@ -200,15 +200,8 @@ export default {
     // params: path - api path suffix like '/ai/image'
     // returns: string complete url
     getApiUrl(path) {
-      // check if we're in development mode
-      const isDev = import.meta.env.DEV;
-      if (isDev) {
-        // use local development server (port 3000 with vite proxy)
-        return `/api${path}`;
-      } else {
-        // use CORS proxy for production to bypass Render network issues
-        return `https://api.allorigins.win/raw?url=${encodeURIComponent('http://3.106.197.188:8080' + path)}`;
-      }
+      // use relative path for both dev and prod (works with Vite proxy in dev, Express in prod)
+      return `/api${path}`;
     },
     
     // this method sends the uploaded image to AI service for plant identification

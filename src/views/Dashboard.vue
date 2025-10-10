@@ -554,15 +554,8 @@ export default {
     async loadDataForLocation(location) {
       try {
         
-        const isDev = import.meta.env.DEV;
-        let url;
-        if (isDev) {
-          url = `/api/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
-        } else {
-          // use CORS proxy for production to bypass Render network issues
-          const backendUrl = `http://3.106.197.188:8080/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
-          url = `https://api.allorigins.win/raw?url=${encodeURIComponent(backendUrl)}`;
-        }
+        // use relative path for both dev and prod (works with Vite proxy in dev, Express in prod)
+        const url = `/api/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
         const res = await fetch(url);
         const json = await res.json();
         const item = Array.isArray(json?.data) ? (json.data[0] || {}) : (json?.data || {});
