@@ -206,8 +206,8 @@ export default {
         // use local development server (port 3000 with vite proxy)
         return `/api${path}`;
       } else {
-        // use direct backend connection in production
-        return `http://3.106.197.188:8080${path}`;
+        // use production proxy server (relative path)
+        return `/api${path}`;
       }
     },
     
