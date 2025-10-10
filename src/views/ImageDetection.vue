@@ -206,8 +206,8 @@ export default {
         // use local development server (port 3000 with vite proxy)
         return `/api${path}`;
       } else {
-        // use production proxy server (relative path)
-        return `/api${path}`;
+        // use CORS proxy for production to bypass Render network issues
+        return `https://api.allorigins.win/raw?url=${encodeURIComponent('http://3.106.197.188:8080' + path)}`;
       }
     },
     

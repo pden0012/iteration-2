@@ -559,7 +559,7 @@ export default {
         if (isDev) {
           url = `/api/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
         } else {
-          
+          // use CORS proxy for production to bypass Render network issues
           const backendUrl = `http://3.106.197.188:8080/dashboard?suburb=${encodeURIComponent(location)}&format=json`;
           url = `https://api.allorigins.win/raw?url=${encodeURIComponent(backendUrl)}`;
         }

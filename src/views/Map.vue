@@ -201,8 +201,9 @@ export default {
       const bbox = `${s},${w},${n},${e}`; // bounding box string
       
       // determine API base URL based on environment
-      // use relative path for both dev and prod (works with Vite proxy in dev, Express in prod)
-      const proxyBase = '/api';
+      // use CORS proxy for production to bypass Render network issues
+      const isDev = import.meta.env.DEV;
+      const proxyBase = isDev ? '/api' : 'https://api.allorigins.win/raw?url=' + encodeURIComponent('http://3.106.197.188:8080');
       
       // build the target URL based on filter selection
       let targetUrl;
