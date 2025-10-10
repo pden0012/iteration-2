@@ -83,8 +83,13 @@ app.use('/api', createProxyMiddleware({
   },
   onProxyReq: (proxyReq, req, res) => {
     console.log(`🔄 Proxying ${req.method} ${req.url} to backend`);
+    console.log(`📡 Request headers:`, req.headers);
+    console.log(`🌍 Client IP: ${req.ip}`);
+    console.log(`🔗 User-Agent: ${req.get('User-Agent')}`);
     // Add custom headers if needed
     proxyReq.setHeader('X-Forwarded-For', req.ip);
+    proxyReq.setHeader('X-Forwarded-Proto', req.protocol);
+    proxyReq.setHeader('X-Forwarded-Host', req.get('Host'));
   },
   onProxyRes: (proxyRes, req, res) => {
     console.log(`✅ Backend responded with ${proxyRes.statusCode} for ${req.url}`);
@@ -130,8 +135,76 @@ app.get('/api/health', (req, res) => {
     proxy: 'Active',
     backend: 'http://3.106.197.188:8080',
     port: PORT,
-    nodeEnv: process.env.NODE_ENV
+    nodeEnv: process.env.NODE_ENV,
+    renderService: process.env.RENDER_SERVICE_ID ? 'Yes' : 'No',
+    renderRegion: process.env.RENDER_REGION || 'Unknown'
   });
+});
+
+// Render-specific diagnostic endpoint
+app.get('/api/diagnose', async (req, res) => {
+  const diagnosis = {
+    timestamp: new Date().toISOString(),
+    environment: {
+      NODE_ENV: process.env.NODE_ENV,
+      PORT: process.env.PORT,
+      RENDER_SERVICE_ID: process.env.RENDER_SERVICE_ID,
+      RENDER_REGION: process.env.RENDER_REGION,
+      RENDER_EXTERNAL_URL: process.env.RENDER_EXTERNAL_URL
+    },
+    backend: {
+      target: 'http://3.106.197.188:8080',
+      status: 'Testing...'
+    }
+  };
+  
+  // Test backend connectivity
+  try {
+    const http = require('http');
+    const backendTest = await new Promise((resolve, reject) => {
+      const options = {
+        hostname: '3.106.197.188',
+        port: 8080,
+        path: '/map/tree',
+        method: 'GET',
+        timeout: 10000
+      };
+      
+      const request = http.request(options, (response) => {
+        resolve({
+          status: response.statusCode,
+          headers: response.headers,
+          reachable: true
+        });
+      });
+      
+      request.on('error', (error) => {
+        resolve({
+          error: error.message,
+          code: error.code,
+          reachable: false
+        });
+      });
+      
+      request.setTimeout(10000, () => {
+        resolve({
+          error: 'Timeout',
+          reachable: false
+        });
+      });
+      
+      request.end();
+    });
+    
+    diagnosis.backend = backendTest;
+  } catch (error) {
+    diagnosis.backend = {
+      error: error.message,
+      reachable: false
+    };
+  }
+  
+  res.json(diagnosis);
 });
 
 // Catch all handler - serve index.html for Vue Router
