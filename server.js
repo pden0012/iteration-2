@@ -53,10 +53,12 @@ if (fs.existsSync(staticPath)) {
 app.use('/api', createProxyMiddleware({
   target: 'http://3.106.197.188:8080',
   changeOrigin: true,
-  timeout: 90000, // 90 second timeout for large datasets
-  proxyTimeout: 90000, // proxy timeout
+  timeout: 60000, // 60 second timeout for large datasets
+  proxyTimeout: 60000, // proxy timeout
   followRedirects: true,
   ws: false, // disable websocket proxy
+  secure: false, // allow insecure connections to backend
+  logLevel: 'debug', // enable detailed logging
   pathRewrite: {
     '^/api': '', // remove /api prefix
   },

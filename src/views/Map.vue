@@ -201,8 +201,8 @@ export default {
       const bbox = `${s},${w},${n},${e}`; // bounding box string
       
       // determine API base URL based on environment
-      // temporarily use direct backend connection due to Render proxy issues
-      const proxyBase = 'http://3.106.197.188:8080';
+      // use relative path for both dev and prod (works with Vite proxy in dev, Express in prod)
+      const proxyBase = '/api';
       
       // build the target URL based on filter selection
       let targetUrl;
