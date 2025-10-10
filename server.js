@@ -36,7 +36,18 @@ app.use((req, res, next) => {
 });
 
 // Serve static files from dist directory (frontend build)
-app.use(express.static(path.join(__dirname, 'dist')));
+const staticPath = path.join(__dirname, 'dist');
+console.log(`📁 Static files path: ${staticPath}`);
+
+// Check if dist directory exists
+const fs = require('fs');
+if (fs.existsSync(staticPath)) {
+  console.log(`✅ Dist directory exists, serving static files`);
+  app.use(express.static(staticPath));
+} else {
+  console.error(`❌ Dist directory not found at: ${staticPath}`);
+  console.log(`📋 Available directories:`, fs.readdirSync(__dirname));
+}
 
 // Proxy API requests to backend
 app.use('/api', createProxyMiddleware({
@@ -209,7 +220,19 @@ app.get('/api/diagnose', async (req, res) => {
 
 // Catch all handler - serve index.html for Vue Router
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  const indexPath = path.join(__dirname, 'dist', 'index.html');
+  console.log(`🎯 SPA route requested: ${req.url}, serving: ${indexPath}`);
+  
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    console.error(`❌ Index.html not found at: ${indexPath}`);
+    res.status(500).json({
+      error: 'Frontend not built',
+      message: 'The Vue application has not been built. Please run npm run build first.',
+      availableFiles: fs.existsSync(staticPath) ? fs.readdirSync(staticPath) : 'dist directory not found'
+    });
+  }
 });
 
 app.listen(PORT, () => {
