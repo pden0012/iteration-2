@@ -54,7 +54,44 @@
 
     <!-- map container -->
     <div id="googleMap" class="map-container" ref="mapEl"></div>
-  <div v-if="emptyMessage" class="empty-hint">{{ emptyMessage }}</div>
+    <div v-if="emptyMessage" class="empty-hint">{{ emptyMessage }}</div>
+    
+    <!-- Tree Families Chart Section -->
+    <div class="chart-section">
+      <div class="chart-container">
+        <h2 class="chart-title">Top 5 Tree Families Causing Hay Fever in Melbourne</h2>
+        <p class="chart-description">
+          This chart shows the top five tree families that release the most pollen in Melbourne, 
+          often triggering hay fever symptoms. It helps users understand which trees are the 
+          main allergy sources in their surroundings.
+        </p>
+        
+        <!-- Chart Image -->
+        <div class="chart-image-container">
+          <img 
+            src="/images/6801760092938_.pic_hd.jpg" 
+            alt="Top 5 Tree Families Causing Hay Fever in Melbourne" 
+            class="chart-image"
+          />
+        </div>
+        
+        <!-- Additional Information -->
+        <div class="chart-info">
+          <h3>Understanding Tree Pollen Impact</h3>
+          <p>
+            The chart above displays the relative pollen production of different tree families 
+            in Melbourne. Trees with higher values release more pollen and are more likely 
+            to trigger hay fever symptoms. This information helps you:
+          </p>
+          <ul class="chart-benefits">
+            <li>Identify high-risk areas on the map above</li>
+            <li>Plan outdoor activities during pollen seasons</li>
+            <li>Choose safer routes for walking or cycling</li>
+            <li>Understand local allergy patterns</li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
   
 </template>
@@ -971,5 +1008,128 @@ export default {
   background: rgba(255, 193, 7, 0.1);
   color: #FFC107;
   border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+/* Chart Section Styles */
+.chart-section {
+  margin-top: 40px;
+  padding: 40px 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.chart-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.chart-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.chart-description {
+  font-size: 16px;
+  color: #5a6c7d;
+  line-height: 1.6;
+  margin-bottom: 32px;
+  text-align: center;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.chart-image-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.chart-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.chart-image:hover {
+  transform: scale(1.02);
+}
+
+.chart-info {
+  background: white;
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chart-info h3 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 16px;
+}
+
+.chart-info p {
+  font-size: 16px;
+  color: #5a6c7d;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.chart-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.chart-benefits li {
+  position: relative;
+  padding-left: 24px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  color: #5a6c7d;
+  line-height: 1.5;
+}
+
+.chart-benefits li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #27ae60;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .chart-section {
+    margin-top: 20px;
+    padding: 20px 16px;
+  }
+  
+  .chart-title {
+    font-size: 24px;
+  }
+  
+  .chart-description {
+    font-size: 14px;
+  }
+  
+  .chart-info {
+    padding: 20px;
+  }
+  
+  .chart-info h3 {
+    font-size: 20px;
+  }
+  
+  .chart-benefits li {
+    font-size: 14px;
+  }
 }
 </style>

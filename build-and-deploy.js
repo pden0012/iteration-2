@@ -122,3 +122,4 @@ console.log('- /health - Health check');
 console.log('- /test - Test proxy server');
 console.log('- /api/diagnose - Backend connectivity test');
 console.log('- /api/health - API health check');
+
