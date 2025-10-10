@@ -332,3 +332,4 @@ The map component loads tree data from the backend API server. Due to the large 
 - **No External Dependencies**: No dependency on external image resources
 - **Responsive Design**: Adapts to various screen sizes
 - **Modern Development**: Uses Vue 3 and Vite
+# Force redeploy
