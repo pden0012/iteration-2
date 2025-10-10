@@ -204,6 +204,23 @@ npm run build
 - Improved timeout configuration for Render's infrastructure
 - Better error classification for deployment-specific issues
 
+#### Issue 8: Render Static File Serving and Connection Stability
+**Problem**: Vue application not displaying on Render deployment, only showing proxy server JSON response. Multiple connection errors including 400, 502, 504 status codes.
+**Solution**: 
+- **Static File Serving Fix**:
+  - Updated render.yaml to ensure `npm install` runs before build
+  - Added dist directory existence checking in server.js
+  - Improved static file error handling with detailed logging
+  - Created build verification script (check-build.js)
+- **Connection Stability Improvements**:
+  - Extended proxy timeout from 60s to 90s for large datasets
+  - Added proxyTimeout configuration
+  - Enhanced error handling for already-sent responses (prevents duplicate response errors)
+  - Added support for 400 (Bad Request), 504 (Gateway Timeout), and ENOTFOUND errors
+  - Improved retry logic to include 504 timeout errors
+  - Better error messages for each status code with user-friendly guidance
+- **Result**: Vue application now correctly displays on Render with improved error resilience
+
 ### Render.com Deployment Notes
 
 #### Step-by-step Render Deployment:

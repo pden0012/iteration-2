@@ -262,12 +262,16 @@ export default {
         // check if request was successful
         if (!res.ok) {
           // handle different HTTP error codes with specific messages
-          if (res.status === 500) {
+          if (res.status === 400) {
+            throw new Error(`Bad Request (400): Invalid request parameters. Please try adjusting your view or filter.`);
+          } else if (res.status === 500) {
             throw new Error(`Server Error (500): The backend API server is experiencing issues. Please try again later or contact support.`);
           } else if (res.status === 502) {
             throw new Error(`Bad Gateway (502): The proxy server cannot connect to the backend API server. The backend server may be down or unreachable.`);
           } else if (res.status === 503) {
             throw new Error(`Service Unavailable (503): The backend API server is temporarily unavailable. Please try again in a few minutes.`);
+          } else if (res.status === 504) {
+            throw new Error(`Gateway Timeout (504): The request took too long to process. Try zooming in to a smaller area.`);
           } else if (res.status === 404) {
             throw new Error(`Not Found (404): The requested tree data endpoint was not found. Please check the API configuration.`);
           } else {
@@ -302,7 +306,7 @@ export default {
         const isRetryableError = e.name === 'AbortError' || e.name === 'TimeoutError' || 
                                 e.message.includes('NetworkError') || e.message.includes('Failed to fetch') ||
                                 e.message.includes('Server Error (500)') || e.message.includes('Bad Gateway (502)') ||
-                                e.message.includes('Service Unavailable (503)');
+                                e.message.includes('Service Unavailable (503)') || e.message.includes('Gateway Timeout (504)');
         
         if (this.retryCount < this.maxRetries && isRetryableError) {
           this.retryCount++;
@@ -329,12 +333,16 @@ export default {
           this.emptyMessage = '⏱️ Data loading timeout. The tree database is large and may take time to load. Please try again or zoom in to a smaller area for faster loading.';
         } else if (e.message.includes('NetworkError') || e.message.includes('Failed to fetch')) {
           this.emptyMessage = '🌐 Network connection error. Please check your internet connection and try again.';
+        } else if (e.message.includes('Bad Request (400)')) {
+          this.emptyMessage = '⚠️ Invalid request. Please try adjusting your map view or filter settings.';
         } else if (e.message.includes('Server Error (500)')) {
           this.emptyMessage = '🔧 Server error: The backend API server is experiencing issues. Please try again later or contact support.';
         } else if (e.message.includes('Bad Gateway (502)')) {
           this.emptyMessage = '🚫 Gateway error: Cannot connect to the backend API server. The server may be down or unreachable. Please try again later.';
         } else if (e.message.includes('Service Unavailable (503)')) {
           this.emptyMessage = '⚠️ Service temporarily unavailable. The backend server is being maintained. Please try again in a few minutes.';
+        } else if (e.message.includes('Gateway Timeout (504)')) {
+          this.emptyMessage = '⏱️ Request timeout. The server took too long to respond. Try zooming in to load fewer trees.';
         } else if (e.message.includes('Not Found (404)')) {
           this.emptyMessage = '🔍 API endpoint not found. Please check the configuration or contact support.';
         } else {

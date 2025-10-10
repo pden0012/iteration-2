@@ -53,7 +53,10 @@ if (fs.existsSync(staticPath)) {
 app.use('/api', createProxyMiddleware({
   target: 'http://3.106.197.188:8080',
   changeOrigin: true,
-  timeout: 60000, // 60 second timeout for large datasets
+  timeout: 90000, // 90 second timeout for large datasets
+  proxyTimeout: 90000, // proxy timeout
+  followRedirects: true,
+  ws: false, // disable websocket proxy
   pathRewrite: {
     '^/api': '', // remove /api prefix
   },
@@ -68,6 +71,12 @@ app.use('/api', createProxyMiddleware({
       timestamp: new Date().toISOString()
     });
     
+    // Check if response has already been sent
+    if (res.headersSent) {
+      console.log('⚠️ Response already sent, skipping error handler');
+      return;
+    }
+    
     // Handle different types of proxy errors with specific status codes
     if (err.code === 'ECONNREFUSED') {
       res.status(502).json({ 
@@ -76,11 +85,18 @@ app.use('/api', createProxyMiddleware({
         code: 'ECONNREFUSED',
         timestamp: new Date().toISOString()
       });
-    } else if (err.code === 'ETIMEDOUT') {
+    } else if (err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT') {
       res.status(504).json({ 
         error: 'Gateway Timeout',
         message: 'Backend API server response timeout.',
         code: 'ETIMEDOUT',
+        timestamp: new Date().toISOString()
+      });
+    } else if (err.code === 'ENOTFOUND') {
+      res.status(502).json({ 
+        error: 'Bad Gateway',
+        message: 'Cannot resolve backend API server hostname.',
+        code: 'ENOTFOUND',
         timestamp: new Date().toISOString()
       });
     } else {
