@@ -259,6 +259,8 @@ export default {
           // handle different HTTP error codes with specific messages
           if (res.status === 500) {
             throw new Error(`Server Error (500): The backend API server is experiencing issues. Please try again later or contact support.`);
+          } else if (res.status === 502) {
+            throw new Error(`Bad Gateway (502): The proxy server cannot connect to the backend API server. The backend server may be down or unreachable.`);
           } else if (res.status === 503) {
             throw new Error(`Service Unavailable (503): The backend API server is temporarily unavailable. Please try again in a few minutes.`);
           } else if (res.status === 404) {
@@ -294,7 +296,8 @@ export default {
         // handle retryable errors with exponential backoff
         const isRetryableError = e.name === 'AbortError' || e.name === 'TimeoutError' || 
                                 e.message.includes('NetworkError') || e.message.includes('Failed to fetch') ||
-                                e.message.includes('Server Error (500)') || e.message.includes('Service Unavailable (503)');
+                                e.message.includes('Server Error (500)') || e.message.includes('Bad Gateway (502)') ||
+                                e.message.includes('Service Unavailable (503)');
         
         if (this.retryCount < this.maxRetries && isRetryableError) {
           this.retryCount++;
@@ -323,6 +326,8 @@ export default {
           this.emptyMessage = '🌐 Network connection error. Please check your internet connection and try again.';
         } else if (e.message.includes('Server Error (500)')) {
           this.emptyMessage = '🔧 Server error: The backend API server is experiencing issues. Please try again later or contact support.';
+        } else if (e.message.includes('Bad Gateway (502)')) {
+          this.emptyMessage = '🚫 Gateway error: Cannot connect to the backend API server. The server may be down or unreachable. Please try again later.';
         } else if (e.message.includes('Service Unavailable (503)')) {
           this.emptyMessage = '⚠️ Service temporarily unavailable. The backend server is being maintained. Please try again in a few minutes.';
         } else if (e.message.includes('Not Found (404)')) {

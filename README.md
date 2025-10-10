@@ -180,11 +180,29 @@ npm run build
 **Solution**: 
 - Extended timeout from 15 seconds to 45 seconds for large tree datasets
 - Improved retry mechanism with exponential backoff (1s, 2s, 4s delays)
-- Enhanced error classification for different HTTP status codes (500, 503, 404)
+- Enhanced error classification for different HTTP status codes (500, 502, 503, 404)
 - Added intelligent error messages with emojis for better user experience
 - Added manual retry button for users to retry failed requests
 - Enhanced loading indicators with retry attempt information
 - Better handling of server errors and network connectivity issues
+
+#### Issue 6: HTTP 502 Bad Gateway Errors
+**Problem**: "Error loading tree data: HTTP 502: Please check API server status" when accessing map data
+**Solution**: 
+- Enhanced proxy server error handling with detailed logging
+- Added specific error classification for 502 Bad Gateway errors (ECONNREFUSED, ETIMEDOUT)
+- Improved proxy timeout handling (60 seconds for proxy, 45 seconds for client)
+- Enhanced error messages to distinguish between different gateway issues
+- Automatic retry mechanism for 502 errors with exponential backoff
+- Better handling of Render deployment environment proxy issues
+
+#### Issue 7: Render Deployment 502 Errors
+**Problem**: 502 Bad Gateway errors when deployed on Render.com
+**Solution**: 
+- Enhanced proxy middleware error handling for Render environment
+- Added detailed logging for proxy connection issues
+- Improved timeout configuration for Render's infrastructure
+- Better error classification for deployment-specific issues
 
 ### Render.com Deployment Notes
 

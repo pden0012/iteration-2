@@ -36,16 +36,44 @@ app.use(express.static(path.join(__dirname, 'dist')));
 app.use('/api', createProxyMiddleware({
   target: 'http://3.106.197.188:8080',
   changeOrigin: true,
+  timeout: 60000, // 60 second timeout for large datasets
   pathRewrite: {
     '^/api': '', // remove /api prefix
   },
   onError: (err, req, res) => {
-    console.error('Proxy error:', err);
-    res.status(500).json({ 
-      error: 'Proxy server error',
-      message: err.message,
+    console.error('🚨 Proxy error:', err.message);
+    console.error('Error details:', {
+      code: err.code,
+      syscall: err.syscall,
+      address: err.address,
+      port: err.port,
+      url: req.url,
       timestamp: new Date().toISOString()
     });
+    
+    // Handle different types of proxy errors with specific status codes
+    if (err.code === 'ECONNREFUSED') {
+      res.status(502).json({ 
+        error: 'Bad Gateway',
+        message: 'Cannot connect to backend API server. The server may be down or unreachable.',
+        code: 'ECONNREFUSED',
+        timestamp: new Date().toISOString()
+      });
+    } else if (err.code === 'ETIMEDOUT') {
+      res.status(504).json({ 
+        error: 'Gateway Timeout',
+        message: 'Backend API server response timeout.',
+        code: 'ETIMEDOUT',
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      res.status(502).json({ 
+        error: 'Bad Gateway',
+        message: err.message,
+        code: err.code,
+        timestamp: new Date().toISOString()
+      });
+    }
   },
   onProxyReq: (proxyReq, req, res) => {
     console.log(`🔄 Proxying ${req.method} ${req.url} to backend`);
@@ -53,7 +81,13 @@ app.use('/api', createProxyMiddleware({
     proxyReq.setHeader('X-Forwarded-For', req.ip);
   },
   onProxyRes: (proxyRes, req, res) => {
-    console.log(`✅ Backend responded with ${proxyRes.statusCode}`);
+    console.log(`✅ Backend responded with ${proxyRes.statusCode} for ${req.url}`);
+    
+    // Log error responses for debugging
+    if (proxyRes.statusCode >= 400) {
+      console.error(`❌ Backend error response: ${proxyRes.statusCode} ${proxyRes.statusMessage}`);
+    }
+    
     // Add CORS headers to response
     proxyRes.headers['Access-Control-Allow-Origin'] = '*';
     proxyRes.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
