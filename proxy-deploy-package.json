@@ -1,0 +1,26 @@
+{
+  "name": "hay-fever-proxy-server",
+  "version": "1.0.0",
+  "description": "CORS proxy server for hay fever management app",
+  "main": "proxy-server-main.js",
+  "scripts": {
+    "start": "node proxy-server-main.js",
+    "dev": "nodemon proxy-server-main.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "http-proxy-middleware": "^2.0.9"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "proxy",
+    "cors",
+    "hay-fever",
+    "api"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+<<<<<<< HEAD
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/logo.png" />
@@ -10,4 +11,56 @@
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
   </body>
+=======
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hay Fever Management - Your Allergy Management Partner</title>
+    <!-- import google fonts for better typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Questrial&family=Average+Sans&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- password protection overlay - shows before main app -->
+    <div id="auth-gate" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#fff;z-index:9999">
+      <form id="auth-form" style="display:flex;flex-direction:column;gap:12px;min-width:280px;padding:24px;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.08);font-family:Inter,system-ui,Arial">
+        <h2 style="margin:0 0 8px;font-weight:600;color:#111">Enter Password</h2>
+        <input id="auth-input" type="password" placeholder="Password" style="padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;outline:none" />
+        <button type="submit" style="padding:10px 12px;border:0;background:#239BA7;color:#fff;border-radius:8px;cursor:pointer">Enter</button>
+        <p id="auth-msg" style="color:#d33;margin:0;display:none">Wrong password</p>
+      </form>
+    </div>
+
+    <!-- main app container -->
+    <div id="app"></div>
+    <script>
+      // auth system - check if user already logged in
+      window.__authOk__ = false;
+      const ok = localStorage.getItem('site_auth_ok') === '1';
+      if (ok) { 
+        window.__authOk__ = true; 
+        document.getElementById('auth-gate').style.display='none'; 
+      }
+      
+      // handle password form submission
+      document.getElementById('auth-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        // get password from environment or use default
+        const PASSWORD = (window.__ENV__ && window.__ENV__.VITE_APP_PASSWORD) || '123456';
+        const val = document.getElementById('auth-input').value || '';
+        if (val === PASSWORD) {
+          // password correct - hide auth gate and mount app
+          localStorage.setItem('site_auth_ok','1');
+          window.__authOk__ = true;
+          document.getElementById('auth-gate').style.display='none';
+          window.__mountApp__ && window.__mountApp__();
+        } else {
+          // password wrong - show error message
+          document.getElementById('auth-msg').style.display='block';
+        }
+      });
+    </script>
+    <!-- load the main vue app -->
+    <script type="module" src="/src/main.js"></script>
+</body>
+>>>>>>> parent of 0242238 (Cleanup: Remove duplicate files, old iterations, and unused proxy servers)
 </html>
