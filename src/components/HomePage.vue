@@ -22,8 +22,13 @@
     <section class="info-section">
       <div class="page-container">
         <div class="info-container">
-          <h2 class="info-title">{{ infoData.title }}</h2>
-          <p class="info-description">{{ infoData.description }}</p>
+          <div class="info-content">
+            <h2 class="info-title">{{ infoData.title }}</h2>
+            <p class="info-description">{{ infoData.description }}</p>
+          </div>
+          <div class="info-image">
+            <img src="/images/10001760142778_.pic.jpg" alt="Hay fever management illustration" class="info-img" />
+          </div>
         </div>
       </div>
     </section>
@@ -78,13 +83,13 @@ export default {
           buttonText: 'Dashboard',
           iconText: '/images/prototype images/image copy 5.png'
         },
-        {
-          id: 'map',
-          title: 'Locate Hotspots on the Map',
-          description: 'Explore an interactive map of Victoria with allergen hotspots and safe zones.',
-          buttonText: 'View Map',
-          iconText: '/images/prototype images/image copy 7.png'
-        },
+               {
+                 id: 'map',
+                 title: 'Allergy Exposure Map',
+                 description: 'Explore Melbourne\'s safe and risky tree zones on an interactive allergy exposure map.',
+                 buttonText: 'View Map',
+                 iconText: '/images/prototype images/image copy 7.png'
+               },
         {
           id: 'challenge',
           title: 'Allergy-Free Garden Challenge',
@@ -528,30 +533,75 @@ export default {
 /* 信息内容容器 - 文字内容的直接容器
    - text-align: center 文字居中对齐 */
 .info-container {
-  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.info-content {
+  flex: 2; /* Make text area wider - takes 2/3 of the space */
+  text-align: left;
 }
 
 .info-title {
   font-family: 'Questrial', sans-serif;
   font-style: normal;
   font-weight: 400;
-  font-size: 64px;
+  font-size: 48px;
   line-height: 100%;
   color: #000000;
-  margin-bottom: 40px;
-  text-align: center;
+  margin-bottom: 24px;
+  text-align: left;
 }
 
 .info-description {
   font-family: 'AR One Sans', sans-serif;
   font-style: normal;
   font-weight: 400;
-  font-size: 40px;
+  font-size: 24px;
   line-height: 120%;
   color: #000000;
-  text-align: center;
-  max-width: 1134px;
-  margin: 0 auto;
+  text-align: left;
+  margin: 0;
+}
+
+.info-image {
+  flex: 1; /* Make image area smaller - takes 1/3 of the space */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.info-img {
+  max-width: 100%;
+  height: auto;
+  max-height: 300px; /* Make image smaller */
+  object-fit: contain;
+}
+
+/* Responsive Design for Info Section */
+@media (max-width: 768px) {
+  .info-container {
+    flex-direction: column;
+    gap: 30px;
+    text-align: center;
+  }
+  
+  .info-content {
+    text-align: center;
+  }
+  
+  .info-title {
+    text-align: center;
+    font-size: 36px;
+  }
+  
+  .info-description {
+    text-align: center;
+    font-size: 18px;
+  }
 }
 
 /* Responsive Design */
