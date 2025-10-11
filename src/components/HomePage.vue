@@ -75,7 +75,7 @@ export default {
           id: 'tracker',
           title: 'Pollen & Allergen Tracker',
           description: 'Instantly see live Pollen Index, Tree, Grass, Ragweed, Dust levels for your location.',
-          buttonText: 'View Dashboard',
+          buttonText: 'Dashboard',
           iconText: '/images/prototype images/image copy 5.png'
         },
         {
@@ -86,7 +86,7 @@ export default {
           iconText: '/images/prototype images/image copy 7.png'
         },
         {
-          id: 'trends',
+          id: 'challenge',
           title: 'Allergy-Free Garden Challenge',
           description: 'Learn, play and grow your understanding of pollen-causing plants through fun feedback and discovery.',
           buttonText: 'Play Now',

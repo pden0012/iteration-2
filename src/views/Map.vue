@@ -56,39 +56,26 @@
     <div id="googleMap" class="map-container" ref="mapEl"></div>
     <div v-if="emptyMessage" class="empty-hint">{{ emptyMessage }}</div>
     
-    <!-- Tree Families Chart Section -->
+    <!-- Tree Families Chart Section - Exact Layout -->
     <div class="chart-section">
       <div class="chart-container">
-        <h2 class="chart-title">Top 5 Tree Families Causing Hay Fever in Melbourne</h2>
-        <p class="chart-description">
-          This chart shows the top five tree families that release the most pollen in Melbourne, 
-          often triggering hay fever symptoms. It helps users understand which trees are the 
-          main allergy sources in their surroundings.
-        </p>
+        <!-- Left Side: Text Content -->
+        <div class="chart-text-content">
+          <h2 class="chart-title">Top 5 Tree Families Causing Hay Fever in Melbourne</h2>
+          <p class="chart-description">
+            This chart shows the top five tree families that release the most pollen in Melbourne, 
+            often triggering hay fever symptoms. It helps users understand which trees are the 
+            main allergy sources in their surroundings.
+          </p>
+        </div>
         
-        <!-- Chart Image -->
+        <!-- Right Side: Chart Image -->
         <div class="chart-image-container">
           <img 
             src="/images/6801760092938_.pic_hd.jpg" 
             alt="Top 5 Tree Families Causing Hay Fever in Melbourne" 
             class="chart-image"
           />
-        </div>
-        
-        <!-- Additional Information -->
-        <div class="chart-info">
-          <h3>Understanding Tree Pollen Impact</h3>
-          <p>
-            The chart above displays the relative pollen production of different tree families 
-            in Melbourne. Trees with higher values release more pollen and are more likely 
-            to trigger hay fever symptoms. This information helps you:
-          </p>
-          <ul class="chart-benefits">
-            <li>Identify high-risk areas on the map above</li>
-            <li>Plan outdoor activities during pollen seasons</li>
-            <li>Choose safer routes for walking or cycling</li>
-            <li>Understand local allergy patterns</li>
-          </ul>
         </div>
       </div>
     </div>
@@ -1010,106 +997,120 @@ export default {
   border: 1px solid rgba(255, 193, 7, 0.3);
 }
 
-/* Chart Section Styles */
+/* Chart Section Styles - Centered Layout with Flexbox */
 .chart-section {
   margin-top: 40px;
   padding: 40px 20px;
-  background: #f8f9fa;
-  border-radius: 12px;
+  background: #ffffff; /* Pure white background */
 }
 
 .chart-container {
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 1200px; /* Reasonable max width for centering */
+  margin: 0 auto; /* Center the container */
+  display: flex;
+  gap: 60px; /* Space between text and image */
+  align-items: center; /* Center both text and image vertically */
+  justify-content: center;
+}
+
+/* Left Side: Text Content - Vertically Centered */
+.chart-text-content {
+  flex: 1;
+  max-width: 600px; /* Limit text width for readability */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Vertically center the text content */
 }
 
 .chart-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 16px;
-  text-align: center;
+  /* Top 5 Tree Families Causing Hay Fever in Melbourne */
+  font-family: 'Questrial', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 36px; /* Reduced from 45px */
+  line-height: 100%; /* or 36px */
+  color: #000000;
+  margin: 0 0 20px 0; /* Space between title and description */
 }
 
 .chart-description {
-  font-size: 16px;
-  color: #5a6c7d;
-  line-height: 1.6;
-  margin-bottom: 32px;
-  text-align: center;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
+  /* This chart shows the top five tree families... */
+  font-family: 'Average Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px; /* Reduced from 24px */
+  line-height: 100%; /* or 18px */
+  color: #000000;
+  margin: 0;
 }
 
+/* Right Side: Chart Image - Maintain Aspect Ratio */
 .chart-image-container {
+  flex: 1;
+  max-width: 600px; /* Limit image width */
   display: flex;
   justify-content: center;
-  margin-bottom: 32px;
+  align-items: center;
 }
 
 .chart-image {
   max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  height: auto; /* Maintain aspect ratio */
+  object-fit: contain; /* Don't compress the image */
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 4px; /* Subtle rounded corners */
 }
 
-.chart-image:hover {
-  transform: scale(1.02);
+/* Responsive Design - Centered Layout with Smaller Fonts */
+@media (max-width: 1200px) {
+  .chart-container {
+    gap: 40px; /* Reduce gap on smaller screens */
+  }
+  
+  .chart-title {
+    font-size: 32px; /* Smaller for better fit */
+  }
+  
+  .chart-description {
+    font-size: 16px; /* Smaller for better fit */
+  }
 }
 
-.chart-info {
-  background: white;
-  padding: 32px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+@media (max-width: 1024px) {
+  /* Stack layout vertically on tablet and smaller screens */
+  .chart-container {
+    flex-direction: column;
+    gap: 30px;
+    align-items: center;
+  }
+  
+  .chart-text-content {
+    max-width: 100%;
+    text-align: center; /* Center text when stacked */
+    justify-content: center; /* Keep text vertically centered */
+  }
+  
+  .chart-title {
+    font-size: 28px;
+  }
+  
+  .chart-description {
+    font-size: 16px;
+  }
+  
+  .chart-image-container {
+    max-width: 100%;
+    width: 100%;
+  }
 }
 
-.chart-info h3 {
-  font-size: 22px;
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 16px;
-}
-
-.chart-info p {
-  font-size: 16px;
-  color: #5a6c7d;
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
-
-.chart-benefits {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.chart-benefits li {
-  position: relative;
-  padding-left: 24px;
-  margin-bottom: 12px;
-  font-size: 16px;
-  color: #5a6c7d;
-  line-height: 1.5;
-}
-
-.chart-benefits li:before {
-  content: "✓";
-  position: absolute;
-  left: 0;
-  color: #27ae60;
-  font-weight: bold;
-  font-size: 18px;
-}
-
-/* Responsive Design */
 @media (max-width: 768px) {
   .chart-section {
-    margin-top: 20px;
     padding: 20px 16px;
+  }
+  
+  .chart-container {
+    gap: 24px;
   }
   
   .chart-title {
@@ -1119,17 +1120,23 @@ export default {
   .chart-description {
     font-size: 14px;
   }
-  
-  .chart-info {
-    padding: 20px;
+}
+
+@media (max-width: 480px) {
+  .chart-section {
+    padding: 16px 12px;
   }
   
-  .chart-info h3 {
+  .chart-container {
+    gap: 20px;
+  }
+  
+  .chart-title {
     font-size: 20px;
   }
   
-  .chart-benefits li {
-    font-size: 14px;
+  .chart-description {
+    font-size: 12px;
   }
 }
 </style>

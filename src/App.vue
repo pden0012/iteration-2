@@ -76,7 +76,6 @@ export default {
         { id: 'dashboard', text: 'Pollen Dashboard', href: '#dashboard' },
         { id: 'map', text: 'Allergen Map', href: '#map' },
         { id: 'image', text: 'Image Detection', href: '#image' },
-        { id: 'trends', text: 'Trends', href: '#trends' },
         { id: 'resources', text: 'Resources', href: '#resources' },
         { id: 'support', text: 'Support', href: '#support' }
       ]
@@ -108,14 +107,14 @@ export default {
     },
     
     // this method handles clicks from homepage feature cards/buttons
-    // params: id - feature id from HomePage ('tracker'|'education'|'plant-identifier'|'map')
+    // params: id - feature id from HomePage ('tracker'|'education'|'plant-identifier'|'map'|'challenge')
     // returns: nothing, but navigates to the mapped view and updates hash
     onHomeFeatureButton(id) {
       if (id === 'tracker') {
         this.currentView = 'dashboard';
         this.activeItem = 'dashboard';
         window.location.hash = '#dashboard';
-      } else if (id === 'education') {
+      } else if (id === 'education' || id === 'challenge') {
         this.currentView = 'resources';
         this.activeItem = 'resources';
         window.location.hash = '#resources';
@@ -135,7 +134,7 @@ export default {
     // returns: nothing, just updates state safely with a default fallback
     handleHashChange() {
       const hash = window.location.hash.substring(1) || 'home';
-      const validViews = ['home', 'dashboard', 'map', 'image', 'trends', 'resources', 'support', 'symptoms'];
+      const validViews = ['home', 'dashboard', 'map', 'image', 'resources', 'support', 'symptoms'];
       
       if (validViews.includes(hash)) {
         this.currentView = hash;

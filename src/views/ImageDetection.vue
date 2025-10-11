@@ -72,6 +72,28 @@
         </div>
       </div>
     </div>
+    
+    <!-- Plant Gallery Section -->
+    <div class="plant-gallery-section">
+      <div class="gallery-container">
+        <h2 class="gallery-title">Plant Gallery</h2>
+        <div class="gallery-grid">
+          <div 
+            v-for="plant in plantGallery" 
+            :key="plant.id" 
+            class="plant-card"
+          >
+            <div class="plant-image">
+              <img 
+                :src="plant.imageUrl" 
+                :alt="plant.commonName" 
+                class="plant-img"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -86,7 +108,70 @@ export default {
       results: [], 
       isLoading: false,
       retryCount: 0,
-      maxRetries: 1
+      maxRetries: 1,
+      // Plant Gallery Data
+      plantGallery: [
+        {
+          id: 1,
+          commonName: 'Ragweed',
+          scientificName: 'Ragweed',
+          imageUrl: '/images/Plant Gallery Images/1.png'
+        },
+        {
+          id: 2,
+          commonName: 'Timothy Grass',
+          scientificName: 'Phleum pratense',
+          imageUrl: '/images/Plant Gallery Images/2.png'
+        },
+        {
+          id: 3,
+          commonName: 'Mugwort',
+          scientificName: 'Mugwort',
+          imageUrl: '/images/Plant Gallery Images/3.png'
+        },
+        {
+          id: 4,
+          commonName: 'Plantain',
+          scientificName: 'Plantain',
+          imageUrl: '/images/Plant Gallery Images/4.png'
+        },
+        {
+          id: 5,
+          commonName: 'Birch',
+          scientificName: 'Betula',
+          imageUrl: '/images/Plant Gallery Images/5.png'
+        },
+        {
+          id: 6,
+          commonName: 'Ryegrass',
+          scientificName: 'Lolium',
+          imageUrl: '/images/Plant Gallery Images/6.png'
+        },
+        {
+          id: 7,
+          commonName: 'Nettle',
+          scientificName: 'Urtica',
+          imageUrl: '/images/Plant Gallery Images/7.png'
+        },
+        {
+          id: 8,
+          commonName: 'Wall Pellitory',
+          scientificName: 'Parietaria judaica',
+          imageUrl: '/images/Plant Gallery Images/8.png'
+        },
+        {
+          id: 9,
+          commonName: 'Oak',
+          scientificName: 'Quercus',
+          imageUrl: '/images/Plant Gallery Images/9.png'
+        },
+        {
+          id: 10,
+          commonName: 'Cedar',
+          scientificName: 'Cedrus',
+          imageUrl: '/images/Plant Gallery Images/10.png'
+        }
+      ]
     };
   },
   computed: {
@@ -823,6 +908,136 @@ export default {
     min-height: 70px;
     padding: 10px;
     margin-bottom: 10px;
+  }
+}
+
+/* Plant Gallery Styles */
+.plant-gallery-section {
+  margin-top: 60px;
+  padding: 40px 20px;
+  background: #ffffff;
+}
+
+.gallery-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.gallery-title {
+  font-family: 'Questrial', sans-serif;
+  font-size: 36px;
+  font-weight: 400;
+  color: #000000;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 24px;
+  justify-items: center;
+}
+
+.plant-card {
+  width: 100%;
+  max-width: 280px;
+  background: #24b36b; /* Green background like in the image */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(36, 179, 107, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.plant-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(36, 179, 107, 0.3);
+}
+
+.plant-image {
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plant-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Don't compress the image */
+  transition: transform 0.3s ease;
+}
+
+.plant-card:hover .plant-img {
+  transform: scale(1.05);
+}
+
+/* Responsive Design for Plant Gallery */
+@media (max-width: 1200px) {
+  .gallery-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+  }
+  
+  .plant-card {
+    max-width: 220px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .gallery-grid {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 18px;
+  }
+  
+  .plant-card {
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .plant-gallery-section {
+    padding: 30px 16px;
+  }
+  
+  .gallery-title {
+    font-size: 28px;
+    margin-bottom: 30px;
+  }
+  
+  .gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 16px;
+  }
+  
+  .plant-card {
+    max-width: 180px;
+  }
+  
+  .plant-image {
+    min-height: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 12px;
+  }
+  
+  .plant-card {
+    max-width: 160px;
+  }
+  
+  .plant-image {
+    min-height: 140px;
   }
 }
 </style>

@@ -134,7 +134,7 @@
               <h3 class="season-name">Fall</h3>
               <p class="season-range">Mar - May</p>
               <div class="season-icon" aria-hidden="true">
-                <img class="season-img" src="/images/prototype images/image copy 12.png" alt="Fall rain icon" />
+                <img class="season-img" src="/images/prototype images/9991760142374_.pic.jpg" alt="Fall rain icon" />
               </div>
               <p class="season-note"><strong>Lowest</strong> pollen spread, about 35%, offering natural relief</p>
             </article>
@@ -759,6 +759,9 @@ export default {
   
   // ensure addresses are loaded when component mounts, and try to fetch data with current input
   mounted() {
+    // Update the timestamp to current time when page loads
+    this.updateLastUpdated();
+    
     this.loadAddresses().then(() => {
       
       if (this.locationQuery) {
@@ -1197,11 +1200,15 @@ export default {
 
 /* Seasons Story styles - blue banner with four season columns */
 .season-story {
-  width: 100%;
+  width: 100vw; /* Extend to full viewport width */
+  margin-left: calc(50% - 50vw); /* Pull element to the left edge of the viewport */
+  margin-right: calc(50% - 50vw); /* Pull element to the right edge of the viewport */
   background: #3E79A6; /* blue background similar to screenshot */
   color: #FFFFFF;
   border-radius: 0px;
-  margin: 20px 0 0;
+  margin-top: 20px; /* Keep the top margin */
+  margin-bottom: 0; /* Explicitly set bottom margin to 0 */
+  position: relative; /* Ensure proper positioning context */
 }
 
 .season-container {
@@ -1258,6 +1265,7 @@ export default {
 
 .season-icon { width: 74px; height: 74px; margin: 8px 0 12px; display: flex; align-items: center; justify-content: center; }
 .season-img { width: 74px; height: 74px; object-fit: contain; display: block; }
+
 
 .season-note {
   font-family: var(--font-body);
